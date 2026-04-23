@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from core.config import settings
 from core.database import init_db, get_db
-from routes import health_router
+from routes import health_router, user_router
 
 
 @asynccontextmanager
@@ -34,6 +34,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(health_router, tags=["health"])
+app.include_router(user_router, prefix="/api")
 
 
 if __name__ == "__main__":
