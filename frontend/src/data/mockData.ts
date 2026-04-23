@@ -2,7 +2,8 @@ export type Role = 'Writer' | 'Editor' | 'Admin' | 'Reader';
 
 export interface User {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   avatar: string;
   role: Role;
@@ -41,7 +42,8 @@ export interface Post {
 export const mockUsers: User[] = [
 {
   id: 'u1',
-  name: 'Elena Rostova',
+  firstName: 'Elena',
+  lastName: 'Rostova',
   email: 'elena@example.com',
   avatar: 'https://i.pravatar.cc/150?u=u1',
   role: 'Admin',
@@ -51,7 +53,8 @@ export const mockUsers: User[] = [
 },
 {
   id: 'u2',
-  name: 'Marcus Chen',
+  firstName: 'Marcus',
+  lastName: 'Chen',
   email: 'marcus@example.com',
   avatar: 'https://i.pravatar.cc/150?u=u2',
   role: 'Writer',
@@ -61,7 +64,8 @@ export const mockUsers: User[] = [
 },
 {
   id: 'u3',
-  name: 'Sarah Jenkins',
+  firstName: 'Sarah',
+  lastName: 'Jenkins',
   email: 'sarah@example.com',
   avatar: 'https://i.pravatar.cc/150?u=u3',
   role: 'Writer',

@@ -54,11 +54,11 @@ export function PostCard({ post, author, index = 0 }: PostCardProps) {
           <div className="flex items-center">
             <img
               src={author?.avatar}
-              alt={author?.name}
+              alt={`${author?.firstName} ${author?.lastName}`}
               className="h-8 w-8 rounded-full border border-border" />
             
             <div className="ml-3">
-              <p className="text-sm font-medium text-text">{author?.name}</p>
+              <p className="text-sm font-medium text-text">{`${author?.firstName} ${author?.lastName}`}</p>
               <div className="flex space-x-1 text-xs text-muted-text">
                 <time dateTime={post.createdAt}>
                   {new Date(post.createdAt).toLocaleDateString('en-US', {
