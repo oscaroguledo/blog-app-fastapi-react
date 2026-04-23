@@ -1,5 +1,5 @@
 from core.types.guid import GUID
-from sqlalchemy import String, Text, Integer, Index, DateTime
+from sqlalchemy import String, Text, Index, DateTime, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import uuid
 from enum import Enum
@@ -19,6 +19,7 @@ class User(Base):
         Index("ix_users_email", "email"),
         Index("created_at_idx", "created_at"),
         Index("updated_at_idx", "updated_at"),
+        Index("active_idx", "active"),
         Index("role_idx", "role"),
         {"schema": "public"}
     )
@@ -30,9 +31,7 @@ class User(Base):
     avatar: Mapped[str | None] = mapped_column(String, nullable=True)
     role: Mapped[UserRole] = mapped_column(String, nullable=False)
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
-    followers: Mapped[int] = mapped_column(Integer, default=0)
-    following: Mapped[int] = mapped_column(Integer, default=0)
-    
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
     # Relationships
     posts = relationship("Post", back_populates="author")
     comments = relationship("Comment", back_populates="author")
@@ -52,8 +51,7 @@ class User(Base):
             "avatar": self.avatar,
             "role": self.role.value,
             "bio": self.bio,
-            "followers": self.followers,
-            "following": self.following,
+            "active": self.active,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
         }

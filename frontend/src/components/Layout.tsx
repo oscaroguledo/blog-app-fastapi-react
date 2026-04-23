@@ -49,7 +49,7 @@ export function Layout({ children, showFooter = true }: {children: React.ReactNo
             >
               <img
                 src={user?.avatar}
-                alt={user?.name}
+                alt={user?.firstName}
                 className="h-5 w-5 rounded-full border border-border"
               />
               <span className="text-xs mt-1">Profile</span>
