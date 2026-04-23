@@ -3,6 +3,8 @@ from sqlalchemy import select
 from models.user import User, UserRole
 from typing import Optional, List
 import uuid
+from core.utils.encryption.password import password_handler
+from core.utils.encryption.jwt import jwt_handler
 
 
 class UserService:
@@ -14,15 +16,18 @@ class UserService:
         firstName: str,
         lastName: str,
         email: str,
+        password: str,
         role: UserRole = UserRole.READER,
         avatar: Optional[str] = None,
         bio: Optional[str] = None
     ) -> User:
         """Create a new user."""
+        hashed_password = password_handler.hash_password(password)
         user = User(
             firstName=firstName,
             lastName=lastName,
             email=email,
+            password=hashed_password,
             role=role,
             avatar=avatar,
             bio=bio
@@ -31,6 +36,36 @@ class UserService:
         await self.db.commit()
         await self.db.refresh(user)
         return user
+
+    async def create_access_token(self, user: User) -> str:
+        """Create a JWT access token for a user."""
+        token_data = {
+            "sub": str(user.id),
+            "email": user.email,
+            "role": user.role.value
+        }
+        return jwt_handler.create_access_token(token_data)
+
+    async def login(self, email: str, password: str) -> Optional[tuple[User, str]]:
+        """Authenticate a user and return the user with access token."""
+        result = await self.db.execute(select(User).where(User.email == email))
+        user = result.scalar_one_or_none()
+        
+        if not user:
+            return None, None
+        
+        if not password_handler.verify_password(password, user.password):
+            return None, None
+        
+        if not user.active:
+            return None, None
+        
+        token = await self.create_access_token(user)
+        return user, token
+
+    async def verify_token(self, token: str) -> Optional[str]:
+        """Verify a JWT token and return the user ID if valid."""
+        return jwt_handler.verify_token(token)
 
     async def get(self, user_id: uuid.UUID, email:str = None) -> Optional[User]:
         """Get a user by ID."""

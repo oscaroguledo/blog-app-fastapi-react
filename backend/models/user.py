@@ -27,6 +27,7 @@ class User(Base):
     id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, index=True, unique=True)
     firstName: Mapped[str] = mapped_column(String, nullable=False)
     lastName: Mapped[str] = mapped_column(String, nullable=False)
+    password: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
     avatar: Mapped[str | None] = mapped_column(String, nullable=True)
     role: Mapped[UserRole] = mapped_column(String, nullable=False)
