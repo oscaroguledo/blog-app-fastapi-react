@@ -4,6 +4,7 @@ import { Home, Tag, Search, LogIn, Facebook, Linkedin, Instagram } from 'lucide-
 import { useAuth } from '../contexts/AuthContext';
 import { Header } from './Header';
 import { Input } from './ui/Input';
+import { Button } from './ui/Button';
 
 export function Layout({ children, showFooter = true }: {children: React.ReactNode; showFooter?: boolean;}) {
   const { user, isAuthenticated } = useAuth();
@@ -126,12 +127,14 @@ export function Layout({ children, showFooter = true }: {children: React.ReactNo
                     placeholder="Enter your email"
                     className="text-xs"
                   />
-                  <button
+                  <Button
                     type="submit"
-                    className="w-full px-3 py-2.5 text-xs font-medium text-white bg-accent hover:bg-accent-hover rounded-md transition-all hover:shadow-sm"
+                    variant="primary"
+                    size="sm"
+                    className="w-full"
                   >
                     Subscribe
-                  </button>
+                  </Button>
                 </form>
               </div>
             </div>

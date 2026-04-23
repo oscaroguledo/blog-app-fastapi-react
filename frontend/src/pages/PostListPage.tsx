@@ -3,13 +3,15 @@ import { useSearchParams } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { Dropdown } from '../components/ui/Dropdown';
 import { PostCard } from '../components/PostCard';
+import { Pagination } from '../components/ui/Pagination';
 import { useBlog } from '../contexts/BlogContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SearchIcon, X, SlidersHorizontal, ChevronDown } from 'lucide-react';
-export function SearchPage() {
+import { SearchIcon, X, SlidersHorizontal } from 'lucide-react';
+export function PostListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { posts, categories, tags, users, getAuthor } = useBlog();
+  const { posts, categories, tags, users, getAuthor, getPaginatedPosts } = useBlog();
   const initialQuery = searchParams.get('q') || '';
   const initialCategory = searchParams.get('category') || '';
   const initialTag = searchParams.get('tag') || '';
@@ -17,12 +19,10 @@ export function SearchPage() {
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedTag, setSelectedTag] = useState(initialTag);
   const [selectedAuthor, setSelectedAuthor] = useState('');
-  const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'oldest'>(
-    'recent'
-  );
-  const [showFilters, setShowFilters] = useState(
-    !!(initialCategory || initialTag)
-  );
+  const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'oldest'>('recent');
+  const [showFilters, setShowFilters] = useState(!!(initialCategory || initialTag));
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 9;
   const publishedPosts = posts.filter((p) => p.isPublished);
   const filteredPosts = useMemo(() => {
     let results = [...publishedPosts];
@@ -77,6 +77,7 @@ export function SearchPage() {
   );
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setCurrentPage(1);
     const params: Record<string, string> = {};
     if (query) params.q = query;
     if (selectedCategory) params.category = selectedCategory;
@@ -102,6 +103,11 @@ export function SearchPage() {
   selectedTag,
   selectedAuthor].
   filter(Boolean).length;
+
+  const startIndex = (currentPage - 1) * postsPerPage;
+  const endIndex = startIndex + postsPerPage;
+  const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -131,36 +137,42 @@ export function SearchPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search articles, topics, authors..."
-              className="pl-12 pr-24 py-3.5 bg-surface text-base"
+              className="pl-12 pr-24 bg-surface text-base"
             />
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <SearchIcon className="h-5 w-5 text-muted-text" />
             </div>
             {query &&
-            <button
+            <Button
               type="button"
               onClick={() => setQuery('')}
-              className="absolute inset-y-0 right-14 flex items-center px-2 text-muted-text hover:text-text">
-              
-                <X size={18} />
-              </button>
+              variant="ghost"
+              size="sm"
+              className="absolute inset-y-0 right-14 px-2"
+            >
+              <X size={18} />
+            </Button>
             }
-            <button
+            <Button
               type="submit"
-              className="absolute inset-y-0 right-0 flex items-center px-4 text-accent hover:text-accent-hover font-medium text-sm">
-              
+              // variant="ghost"
+              size="sm"
+              className="absolute inset-y-0 right-0 px-4 font-medium"
+            >
               Search
-            </button>
+            </Button>
           </div>
         </form>
 
         {/* Filter Toggle & Sort */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
-            <button
+            <Button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-custom border text-sm font-medium transition-colors ${showFilters || activeFilterCount > 0 ? 'border-accent bg-accent/10 text-accent' : 'border-border text-muted-text hover:border-accent hover:text-accent'}`}>
-              
+              variant={showFilters || activeFilterCount > 0 ? 'outline' : 'outline'}
+              size="sm"
+              className={`flex items-center gap-2 ${showFilters || activeFilterCount > 0 ? 'border-accent bg-accent/10 text-accent' : 'border-border text-muted-text hover:border-accent hover:text-accent'}`}
+            >
               <SlidersHorizontal size={16} />
               Filters
               {activeFilterCount > 0 &&
@@ -168,37 +180,32 @@ export function SearchPage() {
                   {activeFilterCount}
                 </span>
               }
-            </button>
+            </Button>
 
             {hasActiveFilters &&
-            <button
+            <Button
               onClick={clearAllFilters}
-              className="text-sm text-muted-text hover:text-accent transition-colors">
-              
-                Clear all
-              </button>
+              variant="ghost"
+              size="sm"
+              className="text-muted-text hover:text-accent"
+            >
+              Clear all
+            </Button>
             }
           </div>
 
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-text">Sort by:</span>
-            <div className="relative">
-              <select
-                value={sortBy}
-                onChange={(e) =>
-                setSortBy(e.target.value as 'recent' | 'popular' | 'oldest')
-                }
-                className="appearance-none bg-surface border border-border rounded-custom pl-3 pr-8 py-1.5 text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent cursor-pointer">
-                
-                <option value="recent">Most Recent</option>
-                <option value="popular">Most Popular</option>
-                <option value="oldest">Oldest First</option>
-              </select>
-              <ChevronDown
-                size={14}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-text pointer-events-none" />
-              
-            </div>
+            <Dropdown
+              value={sortBy}
+              onChange={(value) => setSortBy(value as 'recent' | 'popular' | 'oldest')}
+              options={[
+                { value: 'recent', label: 'Most Recent' },
+                { value: 'popular', label: 'Most Popular' },
+                { value: 'oldest', label: 'Oldest First' }
+              ]}
+              className="w-40"
+            />
           </div>
         </div>
 
@@ -230,24 +237,28 @@ export function SearchPage() {
                     Category
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    <button
+                    <Button
                     onClick={() => setSelectedCategory('')}
-                    className={`px-3 py-1.5 rounded-full text-sm transition-colors ${!selectedCategory ? 'bg-accent text-white' : 'bg-muted text-muted-text hover:text-text'}`}>
-                    
+                    variant={!selectedCategory ? 'primary' : 'secondary'}
+                    size="sm"
+                    className="rounded-full"
+                    >
                       All
-                    </button>
+                    </Button>
                     {categories.map((cat) =>
-                  <button
+                  <Button
                     key={cat}
                     onClick={() =>
                     setSelectedCategory(
                       selectedCategory === cat ? '' : cat
                     )
                     }
-                    className={`px-3 py-1.5 rounded-full text-sm transition-colors ${selectedCategory === cat ? 'bg-accent text-white' : 'bg-muted text-muted-text hover:text-text'}`}>
-                    
+                    variant={selectedCategory === cat ? 'primary' : 'secondary'}
+                    size="sm"
+                    className="rounded-full"
+                    >
                         {cat}
-                      </button>
+                      </Button>
                   )}
                   </div>
                 </div>
@@ -258,22 +269,26 @@ export function SearchPage() {
                     Tag
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    <button
+                    <Button
                     onClick={() => setSelectedTag('')}
-                    className={`px-3 py-1.5 rounded-full text-sm transition-colors ${!selectedTag ? 'bg-accent text-white' : 'bg-muted text-muted-text hover:text-text'}`}>
-                    
+                    variant={!selectedTag ? 'primary' : 'secondary'}
+                    size="sm"
+                    className="rounded-full"
+                    >
                       All
-                    </button>
+                    </Button>
                     {tags.map((tag) =>
-                  <button
+                  <Button
                     key={tag}
                     onClick={() =>
                     setSelectedTag(selectedTag === tag ? '' : tag)
                     }
-                    className={`px-3 py-1.5 rounded-full text-sm transition-colors ${selectedTag === tag ? 'bg-accent text-white' : 'bg-muted text-muted-text hover:text-text'}`}>
-                    
+                    variant={selectedTag === tag ? 'primary' : 'secondary'}
+                    size="sm"
+                    className="rounded-full"
+                    >
                         #{tag}
-                      </button>
+                      </Button>
                   )}
                   </div>
                 </div>
@@ -284,29 +299,32 @@ export function SearchPage() {
                     Author
                   </label>
                   <div className="space-y-2">
-                    <button
+                    <Button
                     onClick={() => setSelectedAuthor('')}
-                    className={`flex items-center w-full px-3 py-2 rounded-custom text-sm transition-colors ${!selectedAuthor ? 'bg-accent/10 text-accent border border-accent/30' : 'bg-muted/50 text-muted-text hover:bg-muted'}`}>
-                    
+                    variant={!selectedAuthor ? 'outline' : 'ghost'}
+                    size="sm"
+                    className={`w-full justify-start ${!selectedAuthor ? 'bg-accent/10 text-accent border border-accent/30' : 'bg-muted/50 text-muted-text hover:bg-muted'}`}
+                    >
                       All Authors
-                    </button>
+                    </Button>
                     {users.map((author) =>
-                  <button
+                  <Button
                     key={author.id}
                     onClick={() =>
                     setSelectedAuthor(
                       selectedAuthor === author.id ? '' : author.id
                     )
                     }
-                    className={`flex items-center w-full px-3 py-2 rounded-custom text-sm transition-colors ${selectedAuthor === author.id ? 'bg-accent/10 text-accent border border-accent/30' : 'bg-muted/50 text-muted-text hover:bg-muted'}`}>
-                    
+                    variant={selectedAuthor === author.id ? 'outline' : 'ghost'}
+                    size="sm"
+                    className={`w-full justify-start ${selectedAuthor === author.id ? 'bg-accent/10 text-accent border border-accent/30' : 'bg-muted/50 text-muted-text hover:bg-muted'}`}
+                    >
                         <img
                       src={author.avatar}
                       alt={author.name}
                       className="w-6 h-6 rounded-full mr-2" />
-                    
                         {author.name}
-                      </button>
+                      </Button>
                   )}
                   </div>
                 </div>
@@ -322,33 +340,33 @@ export function SearchPage() {
             {query &&
           <span className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
                 "{query}"
-                <button onClick={() => setQuery('')}>
+                <Button onClick={() => setQuery('')} variant="ghost" size="sm" className="p-0 h-auto">
                   <X size={14} />
-                </button>
+                </Button>
               </span>
           }
             {selectedCategory &&
           <span className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
                 {selectedCategory}
-                <button onClick={() => setSelectedCategory('')}>
+                <Button onClick={() => setSelectedCategory('')} variant="ghost" size="sm" className="p-0 h-auto">
                   <X size={14} />
-                </button>
+                </Button>
               </span>
           }
             {selectedTag &&
           <span className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
                 #{selectedTag}
-                <button onClick={() => setSelectedTag('')}>
+                <Button onClick={() => setSelectedTag('')} variant="ghost" size="sm" className="p-0 h-auto">
                   <X size={14} />
-                </button>
+                </Button>
               </span>
           }
             {selectedAuthor &&
           <span className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
                 {users.find((u) => u.id === selectedAuthor)?.name}
-                <button onClick={() => setSelectedAuthor('')}>
+                <Button onClick={() => setSelectedAuthor('')} variant="ghost" size="sm" className="p-0 h-auto">
                   <X size={14} />
-                </button>
+                </Button>
               </span>
           }
           </div>
@@ -363,29 +381,23 @@ export function SearchPage() {
         </div>
 
         {/* Results Grid */}
-        {filteredPosts.length > 0 ?
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {filteredPosts.map((post, index) =>
-          <PostCard 
-            key={post.id} 
-            post={post} 
-            author={getAuthor(post.authorId)} 
-            index={index} 
-          />
-          )}
-          </div> :
-
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 10
-          }}
-          animate={{
-            opacity: 1,
-            y: 0
-          }}
-          className="text-center py-20">
-          
+        {paginatedPosts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {paginatedPosts.map((post, index) => (
+              <PostCard 
+                key={post.id} 
+                post={post} 
+                author={getAuthor(post.authorId)!} 
+                index={index} 
+              />
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-20 text-center"
+          >
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-6">
               <SearchIcon size={28} className="text-muted-text" />
             </div>
@@ -396,15 +408,24 @@ export function SearchPage() {
               Try adjusting your search terms or filters to find what you're
               looking for.
             </p>
-            <button
-            onClick={clearAllFilters}
-            className="bg-accent hover:bg-accent-hover text-white px-6 py-2.5 rounded-full text-sm font-medium transition-colors">
-            
+            <Button
+              onClick={clearAllFilters}
+              variant="primary"
+              size="sm"
+              className="rounded-full"
+            >
               Clear all filters
-            </button>
+            </Button>
           </motion.div>
-        }
+        )}
+
+        <div className="mt-12 flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
       </div>
     </Layout>);
-
 }

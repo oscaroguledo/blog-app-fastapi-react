@@ -3,7 +3,7 @@ import { User, mockUsers } from '../data/mockData';
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string) => Promise<void>;
+  login: (email: string, redirectPath?: string) => Promise<void>;
   logout: () => void;
   signup: (name: string, email: string) => Promise<void>;
 }
@@ -18,7 +18,7 @@ export function AuthProvider({ children }: {children: React.ReactNode;}) {
       setUser(mockUsers[0]);
     }
   }, []);
-  const login = async (email: string) => {
+  const login = async (email: string, redirectPath?: string) => {
     // Simulate API call
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
@@ -26,11 +26,17 @@ export function AuthProvider({ children }: {children: React.ReactNode;}) {
         if (foundUser) {
           setUser(foundUser);
           localStorage.setItem('mock_jwt_token', 'mock.jwt.token.123');
+          if (redirectPath) {
+            window.location.href = redirectPath;
+          }
           resolve();
         } else {
           // Default to first user if not found just for demo purposes
           setUser(mockUsers[0]);
           localStorage.setItem('mock_jwt_token', 'mock.jwt.token.123');
+          if (redirectPath) {
+            window.location.href = redirectPath;
+          }
           resolve();
         }
       }, 800);

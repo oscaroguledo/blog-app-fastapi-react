@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
+import { Button } from '../components/ui/Button';
+import { Breadcrumb } from '../components/ui/Breadcrumb';
 import { useBlog } from '../contexts/BlogContext';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -9,8 +11,7 @@ import {
   Share2,
   MessageCircle,
   Bookmark,
-  MoreHorizontal,
-  Send } from
+  MoreHorizontal } from
 'lucide-react';
 import { motion } from 'framer-motion';
 export function PostDetailPage() {
@@ -44,48 +45,62 @@ export function PostDetailPage() {
   };
   return (
     <Layout>
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <article className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
+        {/* Breadcrumb */}
+        <Breadcrumb
+          items={[
+            { label: 'Home', href: '/' },
+            { label: post.categories[0] || 'Articles', href: `/search?category=${post.categories[0] || ''}` },
+            { label: post.title }
+          ]}
+        />
+
         {/* Header */}
-        <header className="mb-10 text-center max-w-3xl mx-auto">
-          <div className="flex items-center justify-center space-x-2 mb-6">
-            {post.categories.map((cat) =>
-            <Link
-              key={cat}
-              to={`/search?category=${cat}`}
-              className="text-accent font-medium text-sm hover:underline">
-              
+        <header className="mb-12 max-w-4xl mx-auto">
+          {/* Categories */}
+          <div className="flex items-center gap-2 mb-6">
+            {post.categories.map((cat) => (
+              <Link
+                key={cat}
+                to={`/search?category=${cat}`}
+                className="px-3 py-1 bg-accent/10 text-accent text-xs font-semibold uppercase tracking-wider rounded-custom hover:bg-accent hover:text-white transition-colors"
+              >
                 {cat}
               </Link>
-            )}
+            ))}
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-text leading-tight mb-6">
+          {/* Title */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-text leading-tight mb-6 tracking-tight">
             {post.title}
           </h1>
 
-          <p className="text-xl text-muted-text mb-8">{post.excerpt}</p>
+          {/* Excerpt */}
+          <p className="text-xl md:text-2xl text-muted-text mb-8 leading-relaxed font-light">
+            {post.excerpt}
+          </p>
 
-          <div className="flex items-center justify-center space-x-4">
+          {/* Author Meta */}
+          <div className="flex items-center gap-4 py-4 border-y border-border">
             <img
               src={author.avatar}
               alt={author.name}
-              className="w-12 h-12 rounded-custom" />
-            
-            <div className="text-left">
-              <p className="font-medium text-text">{author.name}</p>
-              <div className="flex items-center text-sm text-muted-text space-x-2">
-                <time dateTime={post.createdAt}>
-                  {new Date(post.createdAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                  })}
-                </time>
-                <span>&middot;</span>
-                <span className="flex items-center">
-                  <Clock size={14} className="mr-1" /> {post.readingTime} min
-                  read
-                </span>
+              className="w-12 h-12 rounded-custom object-cover"
+            />
+            <div className="flex-grow">
+              <p className="font-semibold text-text">{author.name}</p>
+              <p className="text-sm text-muted-text">{author.bio}</p>
+            </div>
+            <div className="text-right text-sm text-muted-text">
+              <time dateTime={post.createdAt}>
+                {new Date(post.createdAt).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric'
+                })}
+              </time>
+              <div className="flex items-center justify-end mt-1">
+                <Clock size={14} className="mr-1" /> {post.readingTime} min read
               </div>
             </div>
           </div>
@@ -93,153 +108,130 @@ export function PostDetailPage() {
 
         {/* Cover Image */}
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 20
-          }}
-          animate={{
-            opacity: 1,
-            y: 0
-          }}
-          className="rounded-custom overflow-hidden mb-12">
-          
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-12 rounded-custom overflow-hidden"
+        >
           <img
             src={post.coverImage}
             alt={post.title}
-            className="w-full h-auto object-cover max-h-[600px]" />
-          
+            className="w-full h-auto object-cover max-h-[400px]"
+          />
         </motion.div>
 
         {/* Content & Sidebar */}
         <div className="flex flex-col lg:flex-row gap-12">
-          {/* Action Bar (Sticky on Desktop) */}
-          <div className="lg:w-16 flex-shrink-0 order-2 lg:order-1">
-            <div className="sticky top-24 flex lg:flex-col items-center justify-center gap-6 py-4 border-y lg:border-y-0 lg:border-r border-border">
-              <button
-                onClick={() => toggleLike(post.id)}
-                className="flex flex-col items-center text-muted-text hover:text-accent transition-colors group">
-                
-                <div className="p-2 rounded-custom group-hover:bg-accent/10">
-                  <Heart size={24} />
-                </div>
-                <span className="text-xs font-medium mt-1">{post.likes}</span>
-              </button>
-
-              <a
-                href="#comments"
-                className="flex flex-col items-center text-muted-text hover:text-accent transition-colors group">
-                
-                <div className="p-2 rounded-custom group-hover:bg-accent/10">
-                  <MessageCircle size={24} />
-                </div>
-                <span className="text-xs font-medium mt-1">
-                  {postComments.length}
-                </span>
-              </a>
-
-              <button className="flex flex-col items-center text-muted-text hover:text-accent transition-colors group">
-                <div className="p-2 rounded-custom group-hover:bg-accent/10">
-                  <Bookmark size={24} />
-                </div>
-              </button>
-
-              <button className="flex flex-col items-center text-muted-text hover:text-accent transition-colors group">
-                <div className="p-2 rounded-custom group-hover:bg-accent/10">
-                  <Share2 size={24} />
-                </div>
-              </button>
-            </div>
-          </div>
-
           {/* Main Content */}
-          <div className="flex-grow order-1 lg:order-2 max-w-2xl">
-            <div
-              className="prose prose-lg dark:prose-invert max-w-none"
-              // In a real app, use a markdown parser like react-markdown.
-              // Here we just dangerously set HTML or render text for mock purposes.
+          <div className="flex-grow max-w-3xl">
+            {/* Article Content */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="prose prose-lg dark:prose-invert max-w-none mb-12"
               dangerouslySetInnerHTML={{
                 __html: post.content.replace(/\n/g, '<br/>')
-              }} />
-            
+              }}
+            />
 
             {/* Tags */}
-            <div className="mt-12 pt-8 border-t border-border flex flex-wrap gap-2">
-              {post.tags.map((tag) =>
-              <Link
-                key={tag}
-                to={`/search?tag=${tag}`}
-                className="bg-muted text-text px-3 py-1 rounded-custom text-sm hover:bg-accent hover:text-white transition-colors">
-                
+            <div className="flex flex-wrap gap-2 mb-12">
+              {post.tags.map((tag) => (
+                <Link
+                  key={tag}
+                  to={`/search?tag=${tag}`}
+                  className="px-4 py-2 bg-muted text-text text-sm font-medium rounded-custom hover:bg-accent hover:text-white transition-all"
+                >
                   #{tag}
                 </Link>
-              )}
+              ))}
             </div>
 
             {/* Author Bio Box */}
-            <div className="mt-12 bg-surface border border-border rounded-custom p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <img
-                src={author.avatar}
-                alt={author.name}
-                className="w-20 h-20 rounded-custom" />
-              
-              <div>
-                <h3 className="text-xl font-serif font-bold text-text mb-2">
-                  Written by {author.name}
-                </h3>
-                <p className="text-muted-text mb-4">{author.bio}</p>
-                <button className="bg-accent text-white px-4 py-2 rounded-custom text-sm font-medium hover:bg-accent-hover transition-colors">
-                  Follow
-                </button>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-surface border border-border rounded-custom p-8 mb-12"
+            >
+              <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+                <img
+                  src={author.avatar}
+                  alt={author.name}
+                  className="w-20 h-20 rounded-custom object-cover"
+                />
+                <div className="flex-grow">
+                  <h3 className="text-xl font-serif font-bold text-text mb-2">
+                    {author.name}
+                  </h3>
+                  <p className="text-muted-text mb-4 leading-relaxed">{author.bio}</p>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="rounded-custom"
+                  >
+                    Follow
+                  </Button>
+                </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Comments Section */}
-            <div id="comments" className="mt-16 pt-8 border-t border-border">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              id="comments"
+              className="border-t border-border pt-12"
+            >
               <h3 className="text-2xl font-serif font-bold text-text mb-8">
                 Responses ({postComments.length})
               </h3>
 
-              {isAuthenticated ?
-              <form
-                onSubmit={handleCommentSubmit}
-                className="mb-10 flex gap-4">
-                
-                  <img
-                  src={user?.avatar}
-                  alt={user?.name}
-                  className="w-10 h-10 rounded-custom flex-shrink-0" />
-                
-                  <div className="flex-grow relative">
-                    <textarea
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="What are your thoughts?"
-                    className="w-full bg-background border border-border rounded-custom p-4 pr-12 focus:outline-none focus:ring-2 focus:ring-accent resize-none min-h-[100px] text-text" />
-                  
-                    <button
-                    type="submit"
-                    disabled={!commentText.trim()}
-                    className="absolute bottom-4 right-4 text-accent hover:text-accent-hover disabled:opacity-50 disabled:cursor-not-allowed">
-                    
-                      <Send size={20} />
-                    </button>
+              {isAuthenticated ? (
+                <form onSubmit={handleCommentSubmit} className="mb-12">
+                  <div className="flex gap-4">
+                    <img
+                      src={user?.avatar}
+                      alt={user?.name}
+                      className="w-10 h-10 rounded-custom flex-shrink-0 object-cover"
+                    />
+                    <div className="flex-grow">
+                      <textarea
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        placeholder="What are your thoughts?"
+                        className="w-full bg-background border border-border rounded-custom p-4 pr-12 focus:outline-none focus:ring-2 focus:ring-accent resize-none min-h-[120px] text-text"
+                      />
+                      <div className="flex justify-end mt-4">
+                        <Button
+                          type="submit"
+                          disabled={!commentText.trim()}
+                          variant="primary"
+                          size="md"
+                        >
+                          Post Response
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                </form> :
-
-              <div className="mb-10 bg-muted p-6 rounded-custom text-center">
-                  <p className="text-text mb-4">
-                    Sign in to join the conversation.
+                </form>
+              ) : (
+                <div className="bg-muted p-8 rounded-custom text-center mb-12">
+                  <p className="text-text mb-4 text-lg">
+                    Sign in to join the conversation
                   </p>
-                  <Link
-                  to="/login"
-                  className="bg-accent text-white px-6 py-2 rounded-custom font-medium hover:bg-accent-hover transition-colors inline-block">
-                  
-                    Log In
+                  <Link to="/login">
+                    <Button variant="primary" size="md">
+                      Log In
+                    </Button>
                   </Link>
                 </div>
-              }
+              )}
 
-              <div className="space-y-8">
+              {/* Comments List */}
+              <div className="space-y-6">
                 {postComments.map((comment) => {
                   const commentAuthor = getAuthor(comment.authorId);
                   return (
@@ -247,44 +239,97 @@ export function PostDetailPage() {
                       <img
                         src={commentAuthor?.avatar}
                         alt={commentAuthor?.name}
-                        className="w-10 h-10 rounded-custom flex-shrink-0" />
-                      
+                        className="w-10 h-10 rounded-custom flex-shrink-0 object-cover"
+                      />
                       <div className="flex-grow">
-                        <div className="bg-surface border border-border rounded-custom p-4">
-                          <div className="flex justify-between items-start mb-2">
+                        <div className="bg-surface border border-border rounded-custom p-5">
+                          <div className="flex justify-between items-start mb-3">
                             <div>
-                              <span className="font-medium text-text">
+                              <span className="font-semibold text-text">
                                 {commentAuthor?.name}
                               </span>
                               <span className="text-xs text-muted-text ml-2">
-                                {new Date(
-                                  comment.createdAt
-                                ).toLocaleDateString()}
+                                {new Date(comment.createdAt).toLocaleDateString('en-US', {
+                                  month: 'long',
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                })}
                               </span>
                             </div>
-                            <button className="text-muted-text hover:text-text">
+                            <Button variant="ghost" size="sm" className="text-muted-text hover:text-text p-1">
                               <MoreHorizontal size={16} />
-                            </button>
+                            </Button>
                           </div>
-                          <p className="text-text">{comment.content}</p>
-                        </div>
-                        <div className="flex gap-4 mt-2 ml-2">
-                          <button className="flex items-center text-xs text-muted-text hover:text-accent">
-                            <Heart size={14} className="mr-1" /> {comment.likes}
-                          </button>
-                          <button className="text-xs text-muted-text hover:text-accent">
-                            Reply
-                          </button>
+                          <p className="text-text leading-relaxed">{comment.content}</p>
                         </div>
                       </div>
-                    </div>);
-
+                    </div>
+                  );
                 })}
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Sidebar - Sticky Actions */}
+          <div className="lg:w-64 flex-shrink-0">
+            <div className="sticky top-24 space-y-6">
+              {/* Action Buttons */}
+              <div className="bg-surface border border-border rounded-custom p-4">
+                <div className="flex flex-col gap-3">
+                  <Button
+                    onClick={() => toggleLike(post.id)}
+                    variant="outline"
+                    size="md"
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <Heart size={18} />
+                    <span>{post.likes} Likes</span>
+                  </Button>
+                  <a
+                    href="#comments"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 border border-border rounded-custom text-text hover:bg-muted transition-colors"
+                  >
+                    <MessageCircle size={18} />
+                    <span>{postComments.length} Comments</span>
+                  </a>
+                  <Button
+                    variant="outline"
+                    size="md"
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <Bookmark size={18} />
+                    <span>Save</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="md"
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <Share2 size={18} />
+                    <span>Share</span>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Reading Progress */}
+              <div className="bg-surface border border-border rounded-custom p-4">
+                <h4 className="text-sm font-semibold text-text mb-3">Table of Contents</h4>
+                <div className="space-y-2">
+                  <a href="#" className="block text-sm text-muted-text hover:text-accent transition-colors">
+                    Introduction
+                  </a>
+                  <a href="#" className="block text-sm text-muted-text hover:text-accent transition-colors">
+                    Main Content
+                  </a>
+                  <a href="#comments" className="block text-sm text-muted-text hover:text-accent transition-colors">
+                    Comments
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </article>
-    </Layout>);
-
+    </Layout>
+  );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -13,13 +13,18 @@ export function LoginPage() {
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get('redirect');
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
     try {
-      await login(email);
-      navigate('/');
+      await login(email, redirect || undefined);
+      if (!redirect) {
+        navigate('/');
+      }
     } catch (err) {
       setError('Invalid email or password');
     } finally {

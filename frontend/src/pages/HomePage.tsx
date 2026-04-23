@@ -6,14 +6,12 @@ import { CategorySidebar } from '../components/CategorySidebar';
 import { useBlog } from '../contexts/BlogContext';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight } from 'lucide-react';
+
 export function HomePage() {
   const { posts, categories, tags, users, getAuthor } = useBlog();
   const publishedPosts = posts.filter((p) => p.isPublished);
-  const featuredPost =
-  publishedPosts.find((p) => p.featured) || publishedPosts[0];
-  const recentPosts = publishedPosts.
-  filter((p) => p.id !== featuredPost?.id).
-  slice(0, 6);
+  const featuredPost = publishedPosts.find((p) => p.featured) || publishedPosts[0];
+  const recentPosts = publishedPosts.filter((p) => p.id !== featuredPost?.id).slice(0, 6);
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -106,12 +104,12 @@ export function HomePage() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
               {recentPosts.map((post, index) => (
                 <PostCard 
                   key={post.id} 
                   post={post} 
-                  author={getAuthor(post.authorId)} 
+                  author={getAuthor(post.authorId)!} 
                   index={index} 
                 />
               ))}

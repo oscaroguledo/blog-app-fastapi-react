@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Layout } from '../components/Layout';
+import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { useBlog } from '../contexts/BlogContext';
 import { useNavigate } from 'react-router-dom';
@@ -94,13 +95,15 @@ export function AdminDashboardPage() {
         {/* Tabs */}
         <div className="flex space-x-1 border-b border-border mb-8 overflow-x-auto">
           {['overview', 'posts', 'users'].map((tab) =>
-          <button
+          <Button
             key={tab}
             onClick={() => setActiveTab(tab as any)}
-            className={`px-4 py-2 text-sm font-medium capitalize whitespace-nowrap ${activeTab === tab ? 'border-b-2 border-accent text-accent' : 'text-muted-text hover:text-text hover:bg-muted/50'}`}>
-            
-              {tab}
-            </button>
+            variant={activeTab === tab ? 'secondary' : 'ghost'}
+            size="sm"
+            className="capitalize"
+          >
+            {tab}
+          </Button>
           )}
         </div>
 
@@ -293,15 +296,17 @@ export function AdminDashboardPage() {
                           {new Date(post.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button className="text-accent hover:text-accent-hover mr-3">
+                          <Button variant="ghost" size="sm" className="text-accent hover:text-accent-hover p-1">
                             <Edit size={16} />
-                          </button>
-                          <button
-                          onClick={() => deletePost(post.id)}
-                          className="text-red-500 hover:text-red-700">
-                          
+                          </Button>
+                          <Button
+                            onClick={() => deletePost(post.id)}
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-500 hover:text-red-600 p-1"
+                          >
                             <Trash2 size={16} />
-                          </button>
+                          </Button>
                         </td>
                       </tr>);
 
@@ -366,9 +371,9 @@ export function AdminDashboardPage() {
                         {u.followers.toLocaleString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button className="text-accent hover:text-accent-hover mr-3">
+                        <Button variant="ghost" size="sm" className="text-accent hover:text-accent-hover mr-3 p-1">
                           Edit
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                 )}

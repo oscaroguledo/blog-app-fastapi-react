@@ -8,12 +8,14 @@ import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { VerifyEmailPage } from './pages/VerifyEmailPage';
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 import { PostDetailPage } from './pages/PostDetailPage';
 import { WritePage } from './pages/WritePage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
-import { SearchPage } from './pages/SearchPage';
+import { PostListPage } from './pages/PostListPage';
+import { ProtectedRoute } from './components/ProtectedRoute';
 // Placeholder for unbuilt pages to ensure routing works
 const PlaceholderPage = ({ title }: {title: string;}) =>
 <div className="min-h-screen flex items-center justify-center bg-background text-text">
@@ -37,16 +39,29 @@ export function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/verify-email" element={<VerifyEmailPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
               
               <Route path="/post/:id" element={<PostDetailPage />} />
-              <Route path="/write" element={<WritePage />} />
-              <Route path="/admin" element={<AdminDashboardPage />} />
-              <Route path="/search" element={<SearchPage />} />
-              <Route
-                path="/profile"
-                element={<PlaceholderPage title="Profile" />} />
+              <Route 
+                path="/write" 
+                element={
+                  <ProtectedRoute>
+                    <WritePage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboardPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route path="/search" element={<PostListPage />} />
+              
               
               <Route
                 path="*"

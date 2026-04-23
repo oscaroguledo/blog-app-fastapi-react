@@ -9,12 +9,21 @@ import {
   User,
   mockUsers } from
 '../data/mockData';
+
+interface PaginationParams {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 interface BlogContextType {
   posts: Post[];
   comments: Comment[];
   categories: string[];
   tags: string[];
   users: User[];
+  getPaginatedPosts: (page: number, limit: number) => { posts: Post[]; pagination: PaginationParams };
   addPost: (post: Omit<Post, 'id' | 'createdAt' | 'likes' | 'views'>) => void;
   updatePost: (id: string, post: Partial<Post>) => void;
   deletePost: (id: string) => void;
@@ -32,6 +41,24 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
   const [categories] = useState<string[]>(mockCategories);
   const [tags] = useState<string[]>(mockTags);
   const [users] = useState<User[]>(mockUsers);
+
+  const getPaginatedPosts = (page: number, limit: number) => {
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedPosts = posts.slice(startIndex, endIndex);
+    const total = posts.length;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      posts: paginatedPosts,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages
+      }
+    };
+  };
   const addPost = (
   postData: Omit<Post, 'id' | 'createdAt' | 'likes' | 'views'>) =>
   {
@@ -98,6 +125,7 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
         categories,
         tags,
         users,
+        getPaginatedPosts,
         addPost,
         updatePost,
         deletePost,

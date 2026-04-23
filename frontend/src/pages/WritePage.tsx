@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Layout } from '../components/Layout';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { Dropdown } from '../components/ui/Dropdown';
 import { useAuth } from '../contexts/AuthContext';
 import { useBlog } from '../contexts/BlogContext';
 import { useNavigate } from 'react-router-dom';
@@ -142,17 +143,11 @@ export function WritePage() {
               <label className="block text-sm font-medium text-text mb-2">
                 Category
               </label>
-              <select
+              <Dropdown
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full bg-background border border-border rounded-custom px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent text-text">
-                
-                {categories.map((cat) =>
-                <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                )}
-              </select>
+                onChange={setSelectedCategory}
+                options={categories.map((cat) => ({ value: cat, label: cat }))}
+              />
             </div>
 
             <div>

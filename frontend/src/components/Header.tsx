@@ -67,6 +67,15 @@ export function Header() {
                 <Edit3 size={16} />
                 <span>Write</span>
               </Link>
+              {user?.role === 'Admin' && (
+                <Link
+                  to="/admin"
+                  className="flex items-center space-x-1 bg-surface border border-border hover:border-accent text-text px-4 py-2 rounded-custom text-sm font-medium transition-colors"
+                >
+                  <Settings size={16} />
+                  <span>Admin</span>
+                </Link>
+              )}
               <div className="relative group">
                 <button className="flex items-center focus:outline-none">
                   <img
