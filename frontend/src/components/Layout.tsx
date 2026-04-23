@@ -1,425 +1,198 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import {
-  Search,
-  Menu,
-  X,
-  Edit3,
-  User as UserIcon,
-  LogOut,
-  Settings } from
-'lucide-react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Home, Tag, Search, LogIn, Facebook, Linkedin, Instagram } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { motion, AnimatePresence } from 'framer-motion';
-export function Layout({ children }: {children: React.ReactNode;}) {
-  const { user, isAuthenticated, logout } = useAuth();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const location = useLocation();
-  const navLinks = [
-  {
-    name: 'Home',
-    path: '/'
-  },
-  {
-    name: 'Technology',
-    path: '/search?category=Technology'
-  },
-  {
-    name: 'Design',
-    path: '/search?category=Design'
-  }];
+import { Header } from './Header';
+import { Input } from './ui/Input';
+
+export function Layout({ children, showFooter = true }: {children: React.ReactNode; showFooter?: boolean;}) {
+  const { user, isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-text transition-colors duration-300">
-      {/* Mobile Sidebar Overlay */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Mobile Sidebar */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.aside
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-80 bg-gradient-to-b from-surface to-surface/95 z-50 md:hidden overflow-y-auto shadow-2xl"
-          >
-            <div className="p-6">
-              {/* Sidebar Header */}
-              <div className="flex items-center justify-between mb-8 pb-4 border-b border-border">
-                <div>
-                  <span className="font-serif text-2xl font-bold text-accent">Chronicle.</span>
-                </div>
-                <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 rounded-lg text-muted-text hover:bg-muted hover:text-text transition-colors"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-              <nav className="space-y-1">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    to={link.path}
-                    className={`flex items-center px-4 py-3.5 rounded-xl text-base font-medium transition-all ${
-                      location.pathname === link.path
-                        ? 'bg-accent/10 text-accent'
-                        : 'text-text hover:bg-muted hover:text-accent'
-                    }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-                <Link
-                  to="/search"
-                  className="flex items-center px-4 py-3.5 rounded-xl text-base font-medium text-text hover:bg-muted hover:text-accent transition-all"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Search
-                </Link>
-
-                {isAuthenticated ? (
-                  <>
-                    <div className="border-t border-border pt-6 mt-6">
-                      <div className="bg-gradient-to-r from-accent/10 to-accent/5 rounded-2xl p-4 mb-6">
-                        <div className="flex items-center">
-                          <img
-                            className="h-14 w-14 rounded-full border-2 border-accent/20"
-                            src={user?.avatar}
-                            alt=""
-                          />
-                          <div className="ml-4">
-                            <div className="text-base font-semibold text-text">
-                              {user?.name}
-                            </div>
-                            <div className="text-sm text-muted-text">
-                              {user?.email}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <Link
-                          to="/write"
-                          className="flex items-center px-4 py-3.5 rounded-xl text-base font-medium text-text hover:bg-muted hover:text-accent transition-all"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          <Edit3 size={18} className="mr-3" />
-                          Write a Story
-                        </Link>
-                        <Link
-                          to="/profile"
-                          className="flex items-center px-4 py-3.5 rounded-xl text-base font-medium text-text hover:bg-muted hover:text-accent transition-all"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          <UserIcon size={18} className="mr-3" />
-                          Your Profile
-                        </Link>
-                        {user?.role === 'Admin' && (
-                          <Link
-                            to="/admin"
-                            className="flex items-center px-4 py-3.5 rounded-xl text-base font-medium text-text hover:bg-muted hover:text-accent transition-all"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            <Settings size={18} className="mr-3" />
-                            Admin Dashboard
-                          </Link>
-                        )}
-                        <button
-                          onClick={() => {
-                            logout();
-                            setIsMobileMenuOpen(false);
-                          }}
-                          className="flex items-center w-full px-4 py-3.5 rounded-xl text-base font-medium text-red-500 hover:bg-red-500/10 transition-all"
-                        >
-                          <LogOut size={18} className="mr-3" />
-                          Sign out
-                        </button>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="border-t border-border pt-6 mt-6 space-y-3">
-                    <Link
-                      to="/login"
-                      className="block w-full text-center px-4 py-3.5 border border-border rounded-xl text-base font-medium text-text hover:bg-muted hover:border-accent/50 transition-all"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Log in
-                    </Link>
-                    <Link
-                      to="/signup"
-                      className="block w-full text-center px-4 py-3.5 border border-transparent rounded-xl text-base font-medium text-white bg-accent hover:bg-accent-hover shadow-lg shadow-accent/25 transition-all"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Sign up
-                    </Link>
-                  </div>
-                )}
-              </nav>
-            </div>
-          </motion.aside>
-        )}
-      </AnimatePresence>
-
-      {/* Header */}
-      <header className="bg-surface/80 backdrop-blur-md border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex-shrink-0 flex items-center">
-              <Link
-                to="/"
-                className="font-serif text-2xl font-bold tracking-tight text-accent">
-                
-                Chronicle.
-              </Link>
-            </div>
-
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex space-x-8">
-              {navLinks.map((link) =>
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`text-sm font-medium transition-colors hover:text-accent ${location.pathname === link.path ? 'text-accent' : 'text-muted-text'}`}>
-                
-                  {link.name}
-                </Link>
-              )}
-            </nav>
-
-            {/* Actions */}
-            <div className="hidden md:flex items-center space-x-4">
-              <Link
-                to="/search"
-                className="p-2 text-muted-text hover:text-accent transition-colors">
-                
-                <Search size={20} />
-              </Link>
-
-              {isAuthenticated ?
-              <div className="flex items-center space-x-4">
-                  <Link
-                  to="/write"
-                  className="flex items-center space-x-1 bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
-                  
-                    <Edit3 size={16} />
-                    <span>Write</span>
-                  </Link>
-
-                  <div className="relative">
-                    <button
-                    onClick={() =>
-                    setIsProfileDropdownOpen(!isProfileDropdownOpen)
-                    }
-                    className="flex items-center focus:outline-none">
-                    
-                      <img
-                      src={user?.avatar}
-                      alt={user?.name}
-                      className="h-8 w-8 rounded-full border-2 border-transparent hover:border-accent transition-colors" />
-                    
-                    </button>
-
-                    <AnimatePresence>
-                      {isProfileDropdownOpen &&
-                    <motion.div
-                      initial={{
-                        opacity: 0,
-                        y: 10
-                      }}
-                      animate={{
-                        opacity: 1,
-                        y: 0
-                      }}
-                      exit={{
-                        opacity: 0,
-                        y: 10
-                      }}
-                      className="absolute right-0 mt-2 w-48 bg-surface rounded-md shadow-lg py-1 border border-border ring-1 ring-black ring-opacity-5">
-                      
-                          <div className="px-4 py-2 border-b border-border">
-                            <p className="text-sm font-medium text-text truncate">
-                              {user?.name}
-                            </p>
-                            <p className="text-xs text-muted-text truncate">
-                              {user?.email}
-                            </p>
-                          </div>
-                          <Link
-                        to="/profile"
-                        className="flex items-center px-4 py-2 text-sm text-text hover:bg-muted transition-colors"
-                        onClick={() => setIsProfileDropdownOpen(false)}>
-                        
-                            <UserIcon size={16} className="mr-2" /> Profile
-                          </Link>
-                          {user?.role === 'Admin' &&
-                      <Link
-                        to="/admin"
-                        className="flex items-center px-4 py-2 text-sm text-text hover:bg-muted transition-colors"
-                        onClick={() => setIsProfileDropdownOpen(false)}>
-                        
-                              <Settings size={16} className="mr-2" /> Dashboard
-                            </Link>
-                      }
-                          <button
-                        onClick={() => {
-                          logout();
-                          setIsProfileDropdownOpen(false);
-                        }}
-                        className="flex w-full items-center px-4 py-2 text-sm text-red-500 hover:bg-muted transition-colors">
-                        
-                            <LogOut size={16} className="mr-2" /> Sign out
-                          </button>
-                        </motion.div>
-                    }
-                    </AnimatePresence>
-                  </div>
-                </div> :
-
-              <div className="flex items-center space-x-4">
-                  <Link
-                  to="/login"
-                  className="text-sm font-medium text-text hover:text-accent transition-colors">
-                  
-                    Log in
-                  </Link>
-                  <Link
-                  to="/signup"
-                  className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
-                  
-                    Sign up
-                  </Link>
-                </div>
-              }
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="flex md:hidden items-center">
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-muted-text">
-                
-                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
-      <main className="flex-grow">{children}</main>
+      <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">
+        {children}
+      </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-border z-50 shadow-xl">
+        <div className="flex justify-around items-center h-16 px-2">
+          <Link
+            to="/"
+            className="flex flex-col items-center justify-center w-full py-2 rounded-lg transition-all text-accent"
+          >
+            <Home size={20} />
+            <span className="text-xs mt-1">Home</span>
+          </Link>
+          <Link
+            to="/search?category=News"
+            className="flex flex-col items-center justify-center w-full py-2 rounded-lg transition-all text-muted-text hover:text-text"
+          >
+            <Tag size={20} />
+            <span className="text-xs mt-1">News</span>
+          </Link>
+          <Link
+            to="/search"
+            className="flex flex-col items-center justify-center w-full py-2 rounded-lg text-muted-text hover:text-text transition-all"
+          >
+            <Search size={20} />
+            <span className="text-xs mt-1">Search</span>
+          </Link>
+          {isAuthenticated ? (
+            <Link
+              to="/profile"
+              className="flex flex-col items-center justify-center w-full py-2 rounded-lg transition-all text-muted-text hover:text-text"
+            >
+              <img
+                src={user?.avatar}
+                alt={user?.name}
+                className="h-5 w-5 rounded-full border border-border"
+              />
+              <span className="text-xs mt-1">Profile</span>
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="flex flex-col items-center justify-center w-full py-2 rounded-lg transition-all text-muted-text hover:text-text"
+            >
+              <LogIn size={20} />
+              <span className="text-xs mt-1">Login</span>
+            </Link>
+          )}
+        </div>
+      </nav>
 
       {/* Footer */}
+      {showFooter && (
       <footer className="bg-surface border-t border-border mt-auto">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="col-span-1 md:col-span-2">
-              <span className="font-serif text-2xl font-bold tracking-tight text-accent">
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="col-span-2 md:col-span-1">
+              <Link to="/" className="font-serif text-lg font-semibold text-accent">
                 Chronicle.
-              </span>
-              <p className="mt-4 text-sm text-muted-text max-w-md">
+              </Link>
+              <p className="mt-3 text-sm text-muted-text leading-relaxed">
                 A modern platform for sharing ideas, stories, and knowledge.
-                Built with React, Tailwind CSS, and Framer Motion.
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-text tracking-wider uppercase">
+              <h4 className="text-xs font-semibold text-text uppercase tracking-wider mb-4">
                 Explore
-              </h3>
-              <ul className="mt-4 space-y-2">
+              </h4>
+              <ul className="space-y-3">
                 <li>
-                  <Link
-                    to="/search?category=Technology"
-                    className="text-sm text-muted-text hover:text-accent">
-                    
-                    Technology
+                  <Link to="/search?category=News" className="text-sm text-muted-text hover:text-accent transition-colors">
+                    News
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to="/search?category=Design"
-                    className="text-sm text-muted-text hover:text-accent">
-                    
-                    Design
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/search?category=Business"
-                    className="text-sm text-muted-text hover:text-accent">
-                    
+                  <Link to="/search?category=Business" className="text-sm text-muted-text hover:text-accent transition-colors">
                     Business
                   </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-text tracking-wider uppercase">
-                Platform
-              </h3>
-              <ul className="mt-4 space-y-2">
+              <h4 className="text-xs font-semibold text-text uppercase tracking-wider mb-4">
+                Company
+              </h4>
+              <ul className="space-y-3">
                 <li>
-                  <Link
-                    to="/about"
-                    className="text-sm text-muted-text hover:text-accent">
-                    
-                    About Us
+                  <Link to="/about" className="text-sm text-muted-text hover:text-accent transition-colors">
+                    About
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to="/write"
-                    className="text-sm text-muted-text hover:text-accent">
-                    
-                    Write
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/login"
-                    className="text-sm text-muted-text hover:text-accent">
-                    
-                    Sign In
+                  <Link to="/contact" className="text-sm text-muted-text hover:text-accent transition-colors">
+                    Contact
                   </Link>
                 </li>
               </ul>
             </div>
+            <div>
+              <h4 className="text-xs font-semibold text-text uppercase tracking-wider mb-4">
+                Subscribe
+              </h4>
+              <div className="space-y-3">
+                <p className="text-xs text-muted-text leading-relaxed">
+                  Weekly digest of the best stories, no spam.
+                </p>
+                <form className="space-y-2">
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="text-xs"
+                  />
+                  <button
+                    type="submit"
+                    className="w-full px-3 py-2.5 text-xs font-medium text-white bg-accent hover:bg-accent-hover rounded-md transition-all hover:shadow-sm"
+                  >
+                    Subscribe
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
-          <div className="mt-8 border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-muted-text">
-              &copy; {new Date().getFullYear()} Chronicle Blog. All rights
-              reserved.
-            </p>
-            <div className="mt-4 md:mt-0 flex space-x-6">
-              <a href="#" className="text-muted-text hover:text-accent">
-                Twitter
-              </a>
-              <a href="#" className="text-muted-text hover:text-accent">
-                GitHub
-              </a>
-              <a href="#" className="text-muted-text hover:text-accent">
-                LinkedIn
-              </a>
+
+          <div className="mt-12 pt-8 border-t border-border/50">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-xs text-muted-text">
+                &copy; {new Date().getFullYear()} Chronicle. All rights reserved.
+              </p>
+              <div className="flex items-center gap-4">
+                <a
+                  href="https://twitter.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-text hover:text-accent transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </a>
+                <a
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-text hover:text-accent transition-colors"
+                >
+                  <Facebook size={16} />
+                </a>
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-text hover:text-accent transition-colors"
+                >
+                  <Instagram size={16} />
+                </a>
+                <a
+                  href="https://linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-text hover:text-accent transition-colors"
+                >
+                  <Linkedin size={16} />
+                </a>
+                <a
+                  href="https://wa.me/1234567890"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-text hover:text-accent transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </footer>
-    </div>);
-
+      )}
+    </div>
+  );
 }

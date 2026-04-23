@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Layout } from '../components/Layout';
+import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { useBlog } from '../contexts/BlogContext';
 import { useNavigate } from 'react-router-dom';
@@ -63,19 +65,15 @@ export function WritePage() {
             <button className="text-muted-text hover:text-text">
               <Settings size={20} />
             </button>
-            <button
+            <Button
               onClick={handlePublish}
               disabled={isPublishing || !title || !content}
-              className="bg-accent hover:bg-accent-hover text-white px-5 py-2 rounded-full text-sm font-medium transition-colors disabled:opacity-50 flex items-center">
-              
-              {isPublishing ?
-              'Publishing...' :
-
-              <>
-                  <Check size={16} className="mr-2" /> Publish
-                </>
-              }
-            </button>
+              variant="primary"
+              size="md"
+              className="flex items-center"
+            >
+              {isPublishing ? 'Publishing...' : <><Check size={16} className="mr-2" /> Publish</>}
+            </Button>
           </div>
         </div>
 
@@ -85,13 +83,13 @@ export function WritePage() {
           <div className="flex-grow flex flex-col overflow-y-auto pr-2 custom-scrollbar">
             {!isPreview ?
             <>
-                <input
+                <Input
                 type="text"
                 placeholder="Title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="text-4xl md:text-5xl font-serif font-bold bg-transparent border-none focus:outline-none focus:ring-0 text-text placeholder-muted-text mb-6" />
-              
+                className="text-4xl md:text-5xl font-serif font-bold bg-transparent border-none focus:outline-none focus:ring-0 placeholder-muted-text mb-6"
+                />
 
                 <textarea
                 placeholder="Tell your story..."
@@ -120,15 +118,13 @@ export function WritePage() {
               <label className="block text-sm font-medium text-text mb-2">
                 Cover Image URL
               </label>
-              <div className="flex items-center">
-                <input
-                  type="text"
-                  value={coverImage}
-                  onChange={(e) => setCoverImage(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent text-text" />
-                
-              </div>
+              <Input
+                type="text"
+                value={coverImage}
+                onChange={(e) => setCoverImage(e.target.value)}
+                placeholder="https://..."
+                className="text-sm"
+              />
               {coverImage &&
               <img
                 src={coverImage}

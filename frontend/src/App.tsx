@@ -6,6 +6,10 @@ import { BlogProvider } from './contexts/BlogContext';
 // Pages
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
+import { SignupPage } from './pages/SignupPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { AboutPage } from './pages/AboutPage';
+import { ContactPage } from './pages/ContactPage';
 import { PostDetailPage } from './pages/PostDetailPage';
 import { WritePage } from './pages/WritePage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
@@ -31,9 +35,10 @@ export function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
-              <Route
-                path="/signup"
-                element={<PlaceholderPage title="Sign Up" />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
               
               <Route path="/post/:id" element={<PostDetailPage />} />
               <Route path="/write" element={<WritePage />} />

@@ -88,12 +88,12 @@ export function CategorySidebar({ categories, tags, posts, users }: CategorySide
                 <p className="text-xs text-muted-text">{author.role}</p>
               </div>
               <button className="text-xs font-medium text-accent hover:text-accent-hover border border-accent hover:bg-accent hover:text-white px-3 py-1 rounded-full transition-colors">
-                Follow
+                View All
               </button>
             </li>
           )}
         </ul>
       </div>
-    </aside>);
-
+    </aside>
+  );
 }

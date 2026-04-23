@@ -3,104 +3,89 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-export function LoginPage() {
+
+export function SignupPage() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
   const navigate = useNavigate();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
     try {
-      await login(email);
+      // Simulate signup - in real app this would call an API
+      await new Promise(resolve => setTimeout(resolve, 1000));
       navigate('/');
     } catch (err) {
-      setError('Invalid email or password');
+      setError('Failed to create account');
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <Layout showFooter={false}>
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 20
-          }}
-          animate={{
-            opacity: 1,
-            y: 0
-          }}
-          className="max-w-md w-full space-y-8 bg-surface p-8 rounded-2xl border border-border shadow-sm">
-          
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md w-full space-y-8 bg-surface p-8 rounded-2xl border border-border shadow-sm"
+        >
           <div>
             <h2 className="mt-2 text-center text-3xl font-serif font-bold text-text">
-              Welcome back
+              Create an account
             </h2>
             <p className="mt-2 text-center text-sm text-muted-text">
-              Don't have an account?{' '}
+              Already have an account?{' '}
               <Link
-                to="/signup"
-                className="font-medium text-accent hover:text-accent-hover">
-                
-                Sign up for free
+                to="/login"
+                className="font-medium text-accent hover:text-accent-hover"
+              >
+                Sign in
               </Link>
             </p>
           </div>
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            {error &&
-            <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm text-center">
+            {error && (
+              <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm text-center">
                 {error}
               </div>
-            }
+            )}
 
             <div className="space-y-4">
               <Input
+                label="Full name"
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="John Doe"
+              />
+
+              <Input
                 label="Email address"
                 type="email"
-                id="email-address"
-                name="email"
-                autoComplete="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
               />
 
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-text">
-                    
-                    Password
-                  </label>
-                  <Link
-                    to="/reset-password"
-                    className="text-xs font-medium text-accent hover:text-accent-hover">
-                    
-                    Forgot password?
-                  </Link>
-                </div>
-                <Input
-                  type="password"
-                  id="password"
-                  name="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                />
-              </div>
+              <Input
+                label="Password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+              />
             </div>
 
             <Button
@@ -110,7 +95,7 @@ export function LoginPage() {
               size="md"
               className="w-full"
             >
-              {isLoading ? 'Signing in...' : <><span>Sign in</span><ArrowRight className="ml-2 h-5 w-5" /></>}
+              {isLoading ? 'Creating account...' : <><span>Create account</span><ArrowRight className="ml-2 h-5 w-5" /></>}
             </Button>
           </form>
 
@@ -140,12 +125,12 @@ export function LoginPage() {
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                 </svg>
-                <span className="sr-only">Sign in with X</span>
+                <span className="sr-only">Sign up with X</span>
               </button>
             </div>
           </div>
         </motion.div>
       </div>
-    </Layout>);
-
+    </Layout>
+  );
 }

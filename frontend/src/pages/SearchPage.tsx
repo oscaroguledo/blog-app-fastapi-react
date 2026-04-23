@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Layout } from '../components/Layout';
+import { Input } from '../components/ui/Input';
 import { PostCard } from '../components/PostCard';
 import { useBlog } from '../contexts/BlogContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -124,16 +125,16 @@ export function SearchPage() {
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="mb-6">
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <SearchIcon className="h-5 w-5 text-muted-text" />
-            </div>
-            <input
+            <Input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search articles, topics, authors..."
-              className="w-full pl-12 pr-12 py-3.5 bg-surface border border-border rounded-xl text-text placeholder-muted-text focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent text-base transition-colors" />
-            
+              className="pl-12 pr-24 py-3.5 bg-surface text-base"
+            />
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <SearchIcon className="h-5 w-5 text-muted-text" />
+            </div>
             {query &&
             <button
               type="button"
