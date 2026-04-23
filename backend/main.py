@@ -9,7 +9,8 @@ from routes import health_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    init_db()
+    await init_db()
+    
     yield
     # Shutdown
     pass

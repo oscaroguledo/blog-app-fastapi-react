@@ -12,17 +12,15 @@ import { motion } from 'framer-motion';
 import { SearchIcon, X, Filter } from 'lucide-react';
 export function PostListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { posts, categories, tags, users, getAuthor } = useBlog();
+  const { posts, categories, users, getAuthor } = useBlog();
   const initialQuery = searchParams.get('q') || '';
   const initialCategory = searchParams.get('category') || '';
-  const initialTag = searchParams.get('tag') || '';
   const [query, setQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState<string[]>(initialCategory ? [initialCategory] : []);
-  const [selectedTag, setSelectedTag] = useState<string[]>(initialTag ? [initialTag] : []);
   const [selectedAuthor, setSelectedAuthor] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'oldest'>('recent');
   const [offset, setOffset] = useState(0);
-  const [openModal, setOpenModal] = useState<'category' | 'tag' | 'author' | null>(null);
+  const [openModal, setOpenModal] = useState<'category' | 'author' | null>(null);
   const limit = 9;
   const publishedPosts = posts.filter((p) => p.isPublished);
   const filteredPosts = useMemo(() => {
@@ -43,12 +41,6 @@ export function PostListPage() {
     if (selectedCategory.length > 0) {
       results = results.filter((post) =>
         selectedCategory.some(cat => post.categories.includes(cat))
-      );
-    }
-    // Tag filter
-    if (selectedTag.length > 0) {
-      results = results.filter((post) =>
-        selectedTag.some(tag => post.tags.includes(tag))
       );
     }
     // Author filter
@@ -76,7 +68,6 @@ export function PostListPage() {
     publishedPosts,
     query,
     selectedCategory,
-    selectedTag,
     selectedAuthor,
     sortBy,
     users,
@@ -87,18 +78,15 @@ export function PostListPage() {
     const params: Record<string, string> = {};
     if (query) params.q = query;
     if (selectedCategory.length > 0) params.category = selectedCategory.join(',');
-    if (selectedTag.length > 0) params.tag = selectedTag.join(',');
     setSearchParams(params);
   };
   const hasActiveFilters = !!(
   query ||
   selectedCategory.length > 0 ||
-  selectedTag.length > 0 ||
   selectedAuthor.length > 0);
   const clearAllFilters = () => {
     setQuery('');
     setSelectedCategory([]);
-    setSelectedTag([]);
     setSelectedAuthor([]);
     setSortBy('recent');
     setSearchParams({});
@@ -113,15 +101,11 @@ export function PostListPage() {
           <h1 className="text-3xl md:text-4xl font-serif font-bold text-text mb-2">
             {initialCategory ?
             initialCategory :
-            initialTag ?
-            `#${initialTag}` :
             'Search'}
           </h1>
           <p className="text-muted-text">
             {initialCategory ?
             `Explore articles in ${initialCategory}` :
-            initialTag ?
-            `Articles tagged with ${initialTag}` :
             'Find articles, topics, and authors'}
           </p>
         </div>
@@ -174,16 +158,6 @@ export function PostListPage() {
             {selectedCategory.length > 0 && <span className="bg-white/20 text-xs px-2 py-0.5 rounded-full">{selectedCategory.length}</span>}
           </Button>
           <Button
-            onClick={() => setOpenModal('tag')}
-            variant={selectedTag.length > 0 ? 'primary' : 'outline'}
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <Filter size={16} />
-            Tag
-            {selectedTag.length > 0 && <span className="bg-white/20 text-xs px-2 py-0.5 rounded-full">{selectedTag.length}</span>}
-          </Button>
-          <Button
             onClick={() => setOpenModal('author')}
             variant={selectedAuthor.length > 0 ? 'primary' : 'outline'}
             size="sm"
@@ -234,14 +208,6 @@ export function PostListPage() {
           <span key={cat} className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
                 {cat}
                 <Button onClick={() => setSelectedCategory(selectedCategory.filter(c => c !== cat))} variant="ghost" size="sm" className="p-0 h-auto">
-                  <X size={14} />
-                </Button>
-              </span>
-          )}
-            {selectedTag.map((tag) =>
-          <span key={tag} className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
-                #{tag}
-                <Button onClick={() => setSelectedTag(selectedTag.filter(t => t !== tag))} variant="ghost" size="sm" className="p-0 h-auto">
                   <X size={14} />
                 </Button>
               </span>
@@ -328,23 +294,6 @@ export function PostListPage() {
             }
           }}
           onClear={() => setSelectedCategory([])}
-          multiSelect
-        />
-
-        <Modal
-          isOpen={openModal === 'tag'}
-          onClose={() => setOpenModal(null)}
-          title="Select Tags"
-          options={tags}
-          selected={selectedTag}
-          onSelect={(value) => {
-            if (selectedTag.includes(value)) {
-              setSelectedTag(selectedTag.filter(t => t !== value));
-            } else {
-              setSelectedTag([...selectedTag, value]);
-            }
-          }}
-          onClear={() => setSelectedTag([])}
           multiSelect
         />
 

@@ -1,0 +1,82 @@
+from core.types.guid import GUID
+from sqlalchemy import String, Text, Integer, Index, DateTime, Boolean, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+import uuid
+from datetime import datetime, timezone
+from core.database import Base
+
+
+# Association models for many-to-many relationships
+class PostCategory(Base):
+    __tablename__ = "post_category"
+    
+    post_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('posts.id', ondelete='CASCADE'), primary_key=True)
+    category_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('categories.id', ondelete='CASCADE'), primary_key=True)
+    
+    post = relationship("Post", back_populates="post_categories")
+    category = relationship("Category", back_populates="post_categories")
+
+
+class PostTag(Base):
+    __tablename__ = "post_tag"
+    
+    post_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('posts.id', ondelete='CASCADE'), primary_key=True)
+    tag_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('tags.id', ondelete='CASCADE'), primary_key=True)
+    
+    post = relationship("Post", back_populates="post_tags")
+    tag = relationship("Tag", back_populates="post_tags")
+
+
+class Post(Base):
+    __tablename__ = "posts"
+    
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    excerpt: Mapped[str] = mapped_column(String, nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    coverImage: Mapped[str] = mapped_column(String, nullable=False)
+    authorId: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('users.id'), nullable=False)
+    readingTime: Mapped[int] = mapped_column(Integer, nullable=False)
+    likes: Mapped[int] = mapped_column(Integer, nullable=False)
+    views: Mapped[int] = mapped_column(Integer, nullable=False)
+    isPublished: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    featured: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    # Relationships
+    author = relationship("User", back_populates="posts")
+    post_categories = relationship("PostCategory", back_populates="post", cascade="all, delete-orphan")
+    post_tags = relationship("PostTag", back_populates="post", cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="post")
+    
+    @property
+    def categories(self):
+        return [pc.category for pc in self.post_categories]
+    
+    @property
+    def tags(self):
+        return [pt.tag for pt in self.post_tags]
+
+    def __repr__(self):
+        return f"<Post {self.id} {self.title}>"
+    
+    def to_dict(self):
+        return {
+            "id": str(self.id),
+            "title": self.title,
+            "excerpt": self.excerpt,
+            "content": self.content,
+            "coverImage": self.coverImage,
+            "authorId": str(self.authorId),
+            "categories": [cat.name for cat in self.categories],
+            "tags": [tag.name for tag in self.tags],
+            "createdAt": self.created_at.isoformat(),
+            "updatedAt": self.updated_at.isoformat(),
+            "readingTime": self.readingTime,
+            "likes": self.likes,
+            "views": self.views,
+            "isPublished": self.isPublished,
+            "featured": self.featured
+        }

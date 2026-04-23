@@ -4,12 +4,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 import uuid
 from enum import Enum
 from datetime import datetime, timezone
+from core.database import Base
 
 class UserRole(Enum):
     WRITER = "Writer"
     EDITOR = "Editor"
     ADMIN = "Admin"
     READER = "Reader"
+
 
 class User(Base):
     __tablename__ = "users"
@@ -35,8 +37,8 @@ class User(Base):
     posts = relationship("Post", back_populates="author")
     comments = relationship("Comment", back_populates="author")
     
-    created_at = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
         return f"<User {self.id} {self.firstName} {self.lastName} {self.email}>"

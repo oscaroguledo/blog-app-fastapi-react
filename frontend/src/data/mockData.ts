@@ -76,22 +76,15 @@ export const mockUsers: User[] = [
 
 
 export const mockCategories = [
-'Technology',
-'Design',
-'Business',
-'Lifestyle',
-'Science',
-'AI'];
+  { label: 'Technology', value: 'Technology' },
+  { label: 'Design', value: 'Design' },
+  { label: 'Business', value: 'Business' },
+  { label: 'Lifestyle', value: 'Lifestyle' },
+  { label: 'Science', value: 'Science' },
+  { label: 'AI', value: 'AI' }
+];
 
-export const mockTags = [
-'React',
-'TypeScript',
-'UI/UX',
-'Productivity',
-'Web Dev',
-'Machine Learning',
-'Startups',
-'Career'];
+
 
 
 export const mockPosts: Post[] = [

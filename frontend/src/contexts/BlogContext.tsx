@@ -38,8 +38,8 @@ const BlogContext = createContext<BlogContextType | undefined>(undefined);
 export function BlogProvider({ children }: {children: React.ReactNode;}) {
   const [posts, setPosts] = useState<Post[]>(mockPosts);
   const [comments, setComments] = useState<Comment[]>(mockComments);
-  const [categories] = useState<string[]>(mockCategories);
-  const [tags] = useState<string[]>(mockTags);
+  const [categories] = useState<string[]>(mockCategories.map(c => c.value));
+  const [tags] = useState<string[]>(mockTags.map(t => t.value));
   const [users] = useState<User[]>(mockUsers);
 
   const getPaginatedPosts = (page: number, limit: number) => {
