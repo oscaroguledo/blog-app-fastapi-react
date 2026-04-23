@@ -3,12 +3,16 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
+  limit: number;
+  offset: number;
+  total: number;
+  onPageChange: (offset: number) => void;
 }
 
-export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+export function Pagination({ limit, offset, total, onPageChange }: PaginationProps) {
+  const currentPage = Math.floor(offset / limit) + 1;
+  const totalPages = Math.ceil(total / limit);
+
   const getPageNumbers = () => {
     const pages = [];
     const maxVisible = 5;
@@ -44,12 +48,17 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
     return pages;
   };
 
+  const handlePageChange = (page: number) => {
+    const newOffset = (page - 1) * limit;
+    onPageChange(newOffset);
+  };
+
   return (
     <div className="flex items-center justify-center gap-2">
       <Button
         variant="outline"
         size="sm"
-        onClick={() => onPageChange(currentPage - 1)}
+        onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className="flex items-center gap-1"
       >
@@ -66,7 +75,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
               <Button
                 variant={page === currentPage ? 'primary' : 'outline'}
                 size="sm"
-                onClick={() => onPageChange(page as number)}
+                onClick={() => handlePageChange(page as number)}
                 className="w-10 h-10 p-0"
               >
                 {page}
@@ -79,7 +88,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
       <Button
         variant="outline"
         size="sm"
-        onClick={() => onPageChange(currentPage + 1)}
+        onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className="flex items-center gap-1"
       >

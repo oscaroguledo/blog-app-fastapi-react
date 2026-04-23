@@ -21,9 +21,9 @@ export function PostListPage() {
   const [selectedTag, setSelectedTag] = useState<string[]>(initialTag ? [initialTag] : []);
   const [selectedAuthor, setSelectedAuthor] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'oldest'>('recent');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [offset, setOffset] = useState(0);
   const [openModal, setOpenModal] = useState<'category' | 'tag' | 'author' | null>(null);
-  const postsPerPage = 9;
+  const limit = 9;
   const publishedPosts = posts.filter((p) => p.isPublished);
   const filteredPosts = useMemo(() => {
     let results = [...publishedPosts];
@@ -83,7 +83,7 @@ export function PostListPage() {
   ]);
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setCurrentPage(1);
+    setOffset(0);
     const params: Record<string, string> = {};
     if (query) params.q = query;
     if (selectedCategory.length > 0) params.category = selectedCategory.join(',');
@@ -104,10 +104,7 @@ export function PostListPage() {
     setSearchParams({});
   };
 
-  const startIndex = (currentPage - 1) * postsPerPage;
-  const endIndex = startIndex + postsPerPage;
-  const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  const paginatedPosts = filteredPosts.slice(offset, offset + limit);
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -251,7 +248,7 @@ export function PostListPage() {
           )}
             {selectedAuthor.map((authorId) =>
           <span key={authorId} className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
-                {users.find((u) => u.id === authorId)?.name}
+                {users.find((u) => u.id === authorId)?.firstName} {users.find((u) => u.id === authorId)?.lastName}
                 <Button onClick={() => setSelectedAuthor(selectedAuthor.filter(a => a !== authorId))} variant="ghost" size="sm" className="p-0 h-auto">
                   <X size={14} />
                 </Button>
@@ -309,9 +306,10 @@ export function PostListPage() {
 
         <div className="mt-12 flex justify-center">
           <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            limit={limit}
+            offset={offset}
+            total={filteredPosts.length}
+            onPageChange={setOffset}
           />
         </div>
 
@@ -354,10 +352,10 @@ export function PostListPage() {
           isOpen={openModal === 'author'}
           onClose={() => setOpenModal(null)}
           title="Select Authors"
-          options={users.map(u => u.name)}
-          selected={selectedAuthor.map(id => users.find(u => u.id === id)?.name || '')}
+          options={users.map(u => `${u.firstName} ${u.lastName}`)}
+          selected={selectedAuthor.map(id => `${users.find(u => u.id === id)?.firstName} ${users.find(u => u.id === id)?.lastName}` || '')}
           onSelect={(value) => {
-            const author = users.find(u => u.name === value);
+            const author = users.find(u => `${u.firstName} ${u.lastName}` === value);
             if (!author) return;
             if (selectedAuthor.includes(author.id)) {
               setSelectedAuthor(selectedAuthor.filter(id => id !== author.id));
