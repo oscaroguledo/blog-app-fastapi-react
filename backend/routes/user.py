@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Optional
 import uuid
 from datetime import datetime
@@ -11,11 +11,11 @@ from models.user import UserRole
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-@router.post("/register", response_model=Response)
+@router.post("/register")
 async def register(
     firstName: str,
     lastName: str,
-    email: EmailStr,
+    email: str,
     password: str,
     role: Optional[str] = "Reader",
     avatar: Optional[str] = None,
@@ -59,9 +59,9 @@ async def register(
         )
 
 
-@router.post("/login", response_model=Response)
+@router.post("/login")
 async def login(
-    email: EmailStr,
+    email: str,
     password: str,
     db: AsyncSession = Depends(get_db)
 ):
@@ -88,7 +88,7 @@ async def login(
     )
 
 
-@router.get("/me", response_model=Response)
+@router.get("/me")
 async def get_current_user(token: str, db: AsyncSession = Depends(get_db)):
     """Get current user from JWT token."""
     user_service = UserService(db)
@@ -116,7 +116,7 @@ async def get_current_user(token: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.patch("/me", response_model=Response)
+@router.patch("/me")
 async def update_current_user(
     token: str,
     email: Optional[str] = None,
@@ -160,7 +160,7 @@ async def update_current_user(
     )
 
 
-@router.delete("/me", response_model=Response)
+@router.delete("/me")
 async def delete_current_user(token: str, db: AsyncSession = Depends(get_db)):
     """Delete current user."""
     user_service = UserService(db)
@@ -189,7 +189,7 @@ async def delete_current_user(token: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/me/activate", response_model=Response)
+@router.post("/me/activate")
 async def activate_current_user(token: str, db: AsyncSession = Depends(get_db)):
     """Activate current user account."""
     user_service = UserService(db)
@@ -218,7 +218,7 @@ async def activate_current_user(token: str, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.post("/me/deactivate", response_model=Response)
+@router.post("/me/deactivate")
 async def deactivate_current_user(token: str, db: AsyncSession = Depends(get_db)):
     """Deactivate current user account."""
     user_service = UserService(db)
@@ -247,7 +247,7 @@ async def deactivate_current_user(token: str, db: AsyncSession = Depends(get_db)
     )
 
 
-@router.get("/", response_model=Response)
+@router.get("/")
 async def list_users(
     active: Optional[bool] = None,
     role: Optional[str] = None,
@@ -285,7 +285,7 @@ async def list_users(
     )
 
 
-@router.get("/{user_id}", response_model=Response)
+@router.get("/{user_id}")
 async def get_user(user_id: str, db: AsyncSession = Depends(get_db)):
     """Get a specific user by ID."""
     user_service = UserService(db)
@@ -312,7 +312,7 @@ async def get_user(user_id: str, db: AsyncSession = Depends(get_db)):
         )
 
 
-@router.patch("/{user_id}", response_model=Response)
+@router.patch("/{user_id}")
 async def update_user(
     user_id: str,
     email: Optional[str] = None,
@@ -357,7 +357,7 @@ async def update_user(
         )
 
 
-@router.delete("/{user_id}", response_model=Response)
+@router.delete("/{user_id}")
 async def delete_user(user_id: str, db: AsyncSession = Depends(get_db)):
     """Delete a user."""
     user_service = UserService(db)
@@ -385,7 +385,7 @@ async def delete_user(user_id: str, db: AsyncSession = Depends(get_db)):
         )
 
 
-@router.post("/{user_id}/activate", response_model=Response)
+@router.post("/{user_id}/activate")
 async def activate_user(user_id: str, db: AsyncSession = Depends(get_db)):
     """Activate a user account."""
     user_service = UserService(db)
@@ -413,7 +413,7 @@ async def activate_user(user_id: str, db: AsyncSession = Depends(get_db)):
         )
 
 
-@router.post("/{user_id}/deactivate", response_model=Response)
+@router.post("/{user_id}/deactivate")
 async def deactivate_user(user_id: str, db: AsyncSession = Depends(get_db)):
     """Deactivate a user account."""
     user_service = UserService(db)

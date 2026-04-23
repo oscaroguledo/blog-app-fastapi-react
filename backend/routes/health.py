@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from core.utils.response import Response
 
 
-router = APIRouter()
+router = APIRouter(tags=["health"])
 
 
 @router.get("/")
