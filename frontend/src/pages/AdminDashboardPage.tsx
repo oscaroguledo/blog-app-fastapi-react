@@ -140,7 +140,7 @@ export function AdminDashboardPage() {
             map((stat, i) =>
             <div
               key={i}
-              className="bg-surface border border-border rounded-xl p-6 flex items-center">
+              className="bg-surface border border-border rounded-custom p-6 flex items-center">
               
                   <div
                 className={`p-3 rounded-lg ${stat.bg} ${stat.color} mr-4`}>
@@ -159,7 +159,7 @@ export function AdminDashboardPage() {
 
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-surface border border-border rounded-xl p-6">
+              <div className="bg-surface border border-border rounded-custom p-6">
                 <h3 className="text-lg font-medium text-text mb-6">
                   Traffic Overview (7 days)
                 </h3>
@@ -197,7 +197,7 @@ export function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="bg-surface border border-border rounded-xl p-6">
+              <div className="bg-surface border border-border rounded-custom p-6">
                 <h3 className="text-lg font-medium text-text mb-6">
                   Posts by Category
                 </h3>
@@ -235,7 +235,7 @@ export function AdminDashboardPage() {
         }
 
         {activeTab === 'posts' &&
-        <div className="bg-surface border border-border rounded-xl overflow-hidden">
+        <div className="bg-surface border border-border rounded-custom overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-border">
                 <thead className="bg-muted/50">
@@ -273,7 +273,7 @@ export function AdminDashboardPage() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <img
-                            className="h-6 w-6 rounded-full mr-2"
+                            className="h-6 w-6 rounded-custom mr-2"
                             src={author?.avatar}
                             alt="" />
                           
@@ -284,7 +284,7 @@ export function AdminDashboardPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${post.isPublished ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-custom ${post.isPublished ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
                           
                             {post.isPublished ? 'Published' : 'Draft'}
                           </span>
@@ -313,7 +313,7 @@ export function AdminDashboardPage() {
         }
 
         {activeTab === 'users' &&
-        <div className="bg-surface border border-border rounded-xl overflow-hidden">
+        <div className="bg-surface border border-border rounded-custom overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-border">
                 <thead className="bg-muted/50">
@@ -341,7 +341,7 @@ export function AdminDashboardPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <img
-                        className="h-8 w-8 rounded-full mr-3"
+                        className="h-8 w-8 rounded-custom mr-3"
                         src={u.avatar}
                         alt="" />
                       
@@ -357,7 +357,7 @@ export function AdminDashboardPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${u.role === 'Admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' : u.role === 'Editor' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}`}>
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-custom ${u.role === 'Admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' : u.role === 'Editor' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}`}>
                       
                           {u.role}
                         </span>

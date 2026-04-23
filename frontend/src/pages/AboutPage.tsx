@@ -46,7 +46,7 @@ export function AboutPage() {
         >
           <h2 className="text-3xl font-serif font-bold text-text mb-8 text-center">Our Values</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-surface border border-border rounded-xl p-6 text-center">
+            <div className="bg-surface border border-border rounded-custom p-6 text-center">
               <Heart className="h-10 w-10 text-accent mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-text mb-2">Passion</h3>
               <p className="text-sm text-muted-text">
@@ -54,7 +54,7 @@ export function AboutPage() {
               </p>
             </div>
 
-            <div className="bg-surface border border-border rounded-xl p-6 text-center">
+            <div className="bg-surface border border-border rounded-custom p-6 text-center">
               <Users className="h-10 w-10 text-accent mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-text mb-2">Community</h3>
               <p className="text-sm text-muted-text">
@@ -62,7 +62,7 @@ export function AboutPage() {
               </p>
             </div>
 
-            <div className="bg-surface border border-border rounded-xl p-6 text-center">
+            <div className="bg-surface border border-border rounded-custom p-6 text-center">
               <BookOpen className="h-10 w-10 text-accent mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-text mb-2">Knowledge</h3>
               <p className="text-sm text-muted-text">

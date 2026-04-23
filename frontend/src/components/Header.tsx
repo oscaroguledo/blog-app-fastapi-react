@@ -62,7 +62,7 @@ export function Header() {
             <>
               <Link
                 to="/write"
-                className="flex items-center space-x-1 bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-full text-sm font-medium transition-colors"
+                className="flex items-center space-x-1 bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-custom text-sm font-medium transition-colors"
               >
                 <Edit3 size={16} />
                 <span>Write</span>
@@ -72,7 +72,7 @@ export function Header() {
                   <img
                     src={user?.avatar}
                     alt={user?.name}
-                    className="h-8 w-8 rounded-full border-2 border-transparent hover:border-accent transition-colors"
+                    className="h-8 w-8 rounded-custom border-2 border-transparent hover:border-accent transition-colors"
                   />
                 </button>
                 <div className="absolute right-0 mt-2 w-48 bg-surface rounded-lg shadow-lg py-2 border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
@@ -104,20 +104,12 @@ export function Header() {
               </div>
             </>
           ) : (
-            <>
-              <Link
-                to="/login"
-                className="text-sm font-medium text-text hover:text-accent transition-colors"
-              >
-                Log in
-              </Link>
-              <Link
-                to="/signup"
-                className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-full text-sm font-medium transition-colors"
-              >
-                Sign up
-              </Link>
-            </>
+            <Link
+              to="/login"
+              className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-custom text-sm font-medium transition-colors"
+            >
+              Log in
+            </Link>
           )}
         </div>
       </header>

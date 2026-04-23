@@ -70,7 +70,7 @@ export function ResetPasswordPage() {
             </>
           ) : (
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-custom bg-accent/10 mb-6">
                 <CheckCircle size={32} className="text-accent" />
               </div>
               <h2 className="text-2xl font-serif font-bold text-text mb-2">

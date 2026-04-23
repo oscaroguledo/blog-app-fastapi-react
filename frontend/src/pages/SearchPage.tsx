@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
 import { PostCard } from '../components/PostCard';
 import { useBlog } from '../contexts/BlogContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -158,7 +159,7 @@ export function SearchPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${showFilters || activeFilterCount > 0 ? 'border-accent bg-accent/10 text-accent' : 'border-border text-muted-text hover:border-accent hover:text-accent'}`}>
+              className={`flex items-center gap-2 px-4 py-2 rounded-custom border text-sm font-medium transition-colors ${showFilters || activeFilterCount > 0 ? 'border-accent bg-accent/10 text-accent' : 'border-border text-muted-text hover:border-accent hover:text-accent'}`}>
               
               <SlidersHorizontal size={16} />
               Filters
@@ -187,7 +188,7 @@ export function SearchPage() {
                 onChange={(e) =>
                 setSortBy(e.target.value as 'recent' | 'popular' | 'oldest')
                 }
-                className="appearance-none bg-surface border border-border rounded-lg pl-3 pr-8 py-1.5 text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent cursor-pointer">
+                className="appearance-none bg-surface border border-border rounded-custom pl-3 pr-8 py-1.5 text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent cursor-pointer">
                 
                 <option value="recent">Most Recent</option>
                 <option value="popular">Most Popular</option>
@@ -222,7 +223,7 @@ export function SearchPage() {
             }}
             className="overflow-hidden mb-8">
             
-              <div className="bg-surface border border-border rounded-xl p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-surface border border-border rounded-custom p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Category Filter */}
                 <div>
                   <label className="block text-sm font-medium text-text mb-2">
@@ -285,7 +286,7 @@ export function SearchPage() {
                   <div className="space-y-2">
                     <button
                     onClick={() => setSelectedAuthor('')}
-                    className={`flex items-center w-full px-3 py-2 rounded-lg text-sm transition-colors ${!selectedAuthor ? 'bg-accent/10 text-accent border border-accent/30' : 'bg-muted/50 text-muted-text hover:bg-muted'}`}>
+                    className={`flex items-center w-full px-3 py-2 rounded-custom text-sm transition-colors ${!selectedAuthor ? 'bg-accent/10 text-accent border border-accent/30' : 'bg-muted/50 text-muted-text hover:bg-muted'}`}>
                     
                       All Authors
                     </button>
@@ -297,7 +298,7 @@ export function SearchPage() {
                       selectedAuthor === author.id ? '' : author.id
                     )
                     }
-                    className={`flex items-center w-full px-3 py-2 rounded-lg text-sm transition-colors ${selectedAuthor === author.id ? 'bg-accent/10 text-accent border border-accent/30' : 'bg-muted/50 text-muted-text hover:bg-muted'}`}>
+                    className={`flex items-center w-full px-3 py-2 rounded-custom text-sm transition-colors ${selectedAuthor === author.id ? 'bg-accent/10 text-accent border border-accent/30' : 'bg-muted/50 text-muted-text hover:bg-muted'}`}>
                     
                         <img
                       src={author.avatar}

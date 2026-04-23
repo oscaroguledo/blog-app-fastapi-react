@@ -69,7 +69,7 @@ export function PostDetailPage() {
             <img
               src={author.avatar}
               alt={author.name}
-              className="w-12 h-12 rounded-full" />
+              className="w-12 h-12 rounded-custom" />
             
             <div className="text-left">
               <p className="font-medium text-text">{author.name}</p>
@@ -101,7 +101,7 @@ export function PostDetailPage() {
             opacity: 1,
             y: 0
           }}
-          className="rounded-2xl overflow-hidden mb-12">
+          className="rounded-custom overflow-hidden mb-12">
           
           <img
             src={post.coverImage}
@@ -119,7 +119,7 @@ export function PostDetailPage() {
                 onClick={() => toggleLike(post.id)}
                 className="flex flex-col items-center text-muted-text hover:text-accent transition-colors group">
                 
-                <div className="p-2 rounded-full group-hover:bg-accent/10">
+                <div className="p-2 rounded-custom group-hover:bg-accent/10">
                   <Heart size={24} />
                 </div>
                 <span className="text-xs font-medium mt-1">{post.likes}</span>
@@ -129,7 +129,7 @@ export function PostDetailPage() {
                 href="#comments"
                 className="flex flex-col items-center text-muted-text hover:text-accent transition-colors group">
                 
-                <div className="p-2 rounded-full group-hover:bg-accent/10">
+                <div className="p-2 rounded-custom group-hover:bg-accent/10">
                   <MessageCircle size={24} />
                 </div>
                 <span className="text-xs font-medium mt-1">
@@ -138,13 +138,13 @@ export function PostDetailPage() {
               </a>
 
               <button className="flex flex-col items-center text-muted-text hover:text-accent transition-colors group">
-                <div className="p-2 rounded-full group-hover:bg-accent/10">
+                <div className="p-2 rounded-custom group-hover:bg-accent/10">
                   <Bookmark size={24} />
                 </div>
               </button>
 
               <button className="flex flex-col items-center text-muted-text hover:text-accent transition-colors group">
-                <div className="p-2 rounded-full group-hover:bg-accent/10">
+                <div className="p-2 rounded-custom group-hover:bg-accent/10">
                   <Share2 size={24} />
                 </div>
               </button>
@@ -168,7 +168,7 @@ export function PostDetailPage() {
               <Link
                 key={tag}
                 to={`/search?tag=${tag}`}
-                className="bg-muted text-text px-3 py-1 rounded-full text-sm hover:bg-accent hover:text-white transition-colors">
+                className="bg-muted text-text px-3 py-1 rounded-custom text-sm hover:bg-accent hover:text-white transition-colors">
                 
                   #{tag}
                 </Link>
@@ -176,18 +176,18 @@ export function PostDetailPage() {
             </div>
 
             {/* Author Bio Box */}
-            <div className="mt-12 bg-surface border border-border rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+            <div className="mt-12 bg-surface border border-border rounded-custom p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
               <img
                 src={author.avatar}
                 alt={author.name}
-                className="w-20 h-20 rounded-full" />
+                className="w-20 h-20 rounded-custom" />
               
               <div>
                 <h3 className="text-xl font-serif font-bold text-text mb-2">
                   Written by {author.name}
                 </h3>
                 <p className="text-muted-text mb-4">{author.bio}</p>
-                <button className="bg-accent text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-accent-hover transition-colors">
+                <button className="bg-accent text-white px-4 py-2 rounded-custom text-sm font-medium hover:bg-accent-hover transition-colors">
                   Follow
                 </button>
               </div>
@@ -207,14 +207,14 @@ export function PostDetailPage() {
                   <img
                   src={user?.avatar}
                   alt={user?.name}
-                  className="w-10 h-10 rounded-full flex-shrink-0" />
+                  className="w-10 h-10 rounded-custom flex-shrink-0" />
                 
                   <div className="flex-grow relative">
                     <textarea
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="What are your thoughts?"
-                    className="w-full bg-background border border-border rounded-xl p-4 pr-12 focus:outline-none focus:ring-2 focus:ring-accent resize-none min-h-[100px] text-text" />
+                    className="w-full bg-background border border-border rounded-custom p-4 pr-12 focus:outline-none focus:ring-2 focus:ring-accent resize-none min-h-[100px] text-text" />
                   
                     <button
                     type="submit"
@@ -226,13 +226,13 @@ export function PostDetailPage() {
                   </div>
                 </form> :
 
-              <div className="mb-10 bg-muted p-6 rounded-xl text-center">
+              <div className="mb-10 bg-muted p-6 rounded-custom text-center">
                   <p className="text-text mb-4">
                     Sign in to join the conversation.
                   </p>
                   <Link
                   to="/login"
-                  className="bg-accent text-white px-6 py-2 rounded-full font-medium hover:bg-accent-hover transition-colors inline-block">
+                  className="bg-accent text-white px-6 py-2 rounded-custom font-medium hover:bg-accent-hover transition-colors inline-block">
                   
                     Log In
                   </Link>
@@ -247,10 +247,10 @@ export function PostDetailPage() {
                       <img
                         src={commentAuthor?.avatar}
                         alt={commentAuthor?.name}
-                        className="w-10 h-10 rounded-full flex-shrink-0" />
+                        className="w-10 h-10 rounded-custom flex-shrink-0" />
                       
                       <div className="flex-grow">
-                        <div className="bg-surface border border-border rounded-xl p-4">
+                        <div className="bg-surface border border-border rounded-custom p-4">
                           <div className="flex justify-between items-start mb-2">
                             <div>
                               <span className="font-medium text-text">

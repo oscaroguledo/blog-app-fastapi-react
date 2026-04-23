@@ -47,24 +47,28 @@ export function WritePage() {
         {/* Toolbar */}
         <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
           <div className="flex items-center space-x-4">
-            <button
+            <Button
               onClick={() => setIsPreview(false)}
-              className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${!isPreview ? 'bg-muted text-text' : 'text-muted-text hover:bg-muted/50'}`}>
-              
+              variant={!isPreview ? 'secondary' : 'ghost'}
+              size="sm"
+              className="flex items-center"
+            >
               <Edit2 size={16} className="mr-2" /> Write
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setIsPreview(true)}
-              className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${isPreview ? 'bg-muted text-text' : 'text-muted-text hover:bg-muted/50'}`}>
-              
+              variant={isPreview ? 'secondary' : 'ghost'}
+              size="sm"
+              className="flex items-center"
+            >
               <Eye size={16} className="mr-2" /> Preview
-            </button>
+            </Button>
           </div>
 
           <div className="flex items-center space-x-4">
-            <button className="text-muted-text hover:text-text">
+            <Button variant="ghost" size="sm">
               <Settings size={20} />
-            </button>
+            </Button>
             <Button
               onClick={handlePublish}
               disabled={isPublishing || !title || !content}
@@ -129,7 +133,7 @@ export function WritePage() {
               <img
                 src={coverImage}
                 alt="Cover preview"
-                className="mt-3 w-full h-32 object-cover rounded-lg border border-border" />
+                className="mt-3 w-full h-32 object-cover rounded-custom border border-border" />
 
               }
             </div>
@@ -141,7 +145,7 @@ export function WritePage() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent text-text">
+                className="w-full bg-background border border-border rounded-custom px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent text-text">
                 
                 {categories.map((cat) =>
                 <option key={cat} value={cat}>
@@ -159,7 +163,7 @@ export function WritePage() {
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
                 placeholder="Brief summary for post cards..."
-                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent resize-none h-24 text-text" />
+                className="w-full bg-background border border-border rounded-custom px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent resize-none h-24 text-text" />
               
             </div>
           </div>

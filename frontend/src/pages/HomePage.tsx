@@ -24,7 +24,7 @@ export function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="relative rounded-2xl overflow-hidden group"
+              className="relative rounded-custom overflow-hidden group"
             >
               <div className="absolute inset-0">
                 <img
@@ -41,7 +41,7 @@ export function HomePage() {
                     {featuredPost.categories.map((cat) => (
                       <span
                         key={cat}
-                        className="bg-accent text-white text-xs font-semibold px-3 py-1 rounded-full"
+                        className="bg-accent text-white text-xs font-semibold px-3 py-1 rounded-custom"
                       >
                         {cat}
                       </span>
@@ -63,7 +63,7 @@ export function HomePage() {
                       <img
                         src={getAuthor(featuredPost.authorId)?.avatar}
                         alt={getAuthor(featuredPost.authorId)?.name}
-                        className="h-10 w-10 rounded-full border-2 border-white/20"
+                        className="h-10 w-10 rounded-custom border-2 border-white/20"
                       />
                       <div className="ml-3">
                         <p className="text-sm font-medium text-white">{getAuthor(featuredPost.authorId)?.name}</p>
@@ -120,7 +120,7 @@ export function HomePage() {
                 <div className="mt-10 text-center">
                   <Link
                     to="/search"
-                    className="inline-block bg-surface border border-border hover:border-accent text-text px-6 py-3 rounded-full font-medium transition-colors"
+                    className="inline-block bg-surface border border-border hover:border-accent text-text px-6 py-3 rounded-custom font-medium transition-colors"
                   >
                     Read More
                   </Link>

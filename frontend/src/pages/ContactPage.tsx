@@ -36,7 +36,7 @@ export function ContactPage() {
               transition={{ delay: 0.1 }}
               className="flex items-start space-x-4"
             >
-              <div className="flex-shrink-0 w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+              <div className="flex-shrink-0 w-12 h-12 bg-accent/10 rounded-custom flex items-center justify-center">
                 <Mail className="h-6 w-6 text-accent" />
               </div>
               <div>
@@ -51,7 +51,7 @@ export function ContactPage() {
               transition={{ delay: 0.2 }}
               className="flex items-start space-x-4"
             >
-              <div className="flex-shrink-0 w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+              <div className="flex-shrink-0 w-12 h-12 bg-accent/10 rounded-custom flex items-center justify-center">
                 <Phone className="h-6 w-6 text-accent" />
               </div>
               <div>
@@ -66,7 +66,7 @@ export function ContactPage() {
               transition={{ delay: 0.3 }}
               className="flex items-start space-x-4"
             >
-              <div className="flex-shrink-0 w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+              <div className="flex-shrink-0 w-12 h-12 bg-accent/10 rounded-custom flex items-center justify-center">
                 <MapPin className="h-6 w-6 text-accent" />
               </div>
               <div>
@@ -115,7 +115,7 @@ export function ContactPage() {
                     required
                     rows={6}
                     placeholder="Your message..."
-                    className="w-full px-3 py-2.5 text-sm border border-border rounded-md bg-background text-text placeholder-muted-text focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all resize-none"
+                    className="w-full px-3 py-2.5 text-sm border border-border rounded-custom bg-background text-text placeholder-muted-text focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all resize-none"
                   />
                 </div>
 

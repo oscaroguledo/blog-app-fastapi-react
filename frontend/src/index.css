@@ -17,6 +17,7 @@
   --color-muted: #e2e5ea;
   --color-muted-text: #666666;
   --color-border: #e2e5ea;
+  --border-radius: 1px;
 }
 .dark {
   --color-background: #1a1d23;
@@ -27,6 +28,7 @@
   --color-muted: #3a414e;
   --color-muted-text: #a0aabf;
   --color-border: #3a414e;
+  --border-radius: 1px;
 }
 body {
   background-color: var(--color-background);
@@ -43,7 +45,7 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-muted);
-  border-radius: 1px;
+  border-radius: var(--border-radius);
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-muted-text);
@@ -88,7 +90,7 @@ body {
 .prose code {
   background-color: var(--color-muted);
   padding: 0.2em 0.4em;
-  border-radius: 1px;
+  border-radius: var(--border-radius);
   font-size: 0.875em;
   font-family: monospace;
 }
@@ -96,7 +98,7 @@ body {
   background-color: #1a1d23;
   color: #f8f9fb;
   padding: 1rem;
-  border-radius: 1px;
+  border-radius: var(--border-radius);
   overflow-x: auto;
   margin-bottom: 1.5em;
 }
@@ -104,4 +106,8 @@ body {
   background-color: transparent;
   padding: 0;
   color: inherit;
+}
+
+.rounded-custom {
+  border-radius: var(--border-radius);
 }
