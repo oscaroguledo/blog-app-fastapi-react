@@ -1,0 +1,174 @@
+import React, { useState } from 'react';
+import { Layout } from '../components/Layout';
+import { useAuth } from '../contexts/AuthContext';
+import { useBlog } from '../contexts/BlogContext';
+import { useNavigate } from 'react-router-dom';
+import { Image as ImageIcon, Settings, Eye, Edit2, Check } from 'lucide-react';
+export function WritePage() {
+  const { isAuthenticated, user } = useAuth();
+  const { addPost, categories, tags } = useBlog();
+  const navigate = useNavigate();
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [excerpt, setExcerpt] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+  const [coverImage, setCoverImage] = useState('');
+  const [isPreview, setIsPreview] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  // Redirect if not logged in
+  if (!isAuthenticated) {
+    navigate('/login');
+    return null;
+  }
+  const handlePublish = () => {
+    if (!title || !content) return;
+    setIsPublishing(true);
+    setTimeout(() => {
+      addPost({
+        title,
+        content,
+        excerpt: excerpt || content.substring(0, 150) + '...',
+        coverImage: coverImage || 'https://picsum.photos/seed/new/1200/600',
+        authorId: user!.id,
+        categories: [selectedCategory],
+        tags: ['New'],
+        readingTime: Math.ceil(content.split(' ').length / 200),
+        isPublished: true
+      });
+      setIsPublishing(false);
+      navigate('/');
+    }, 1000);
+  };
+  return (
+    <Layout>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-4rem)] flex flex-col">
+        {/* Toolbar */}
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setIsPreview(false)}
+              className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${!isPreview ? 'bg-muted text-text' : 'text-muted-text hover:bg-muted/50'}`}>
+              
+              <Edit2 size={16} className="mr-2" /> Write
+            </button>
+            <button
+              onClick={() => setIsPreview(true)}
+              className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${isPreview ? 'bg-muted text-text' : 'text-muted-text hover:bg-muted/50'}`}>
+              
+              <Eye size={16} className="mr-2" /> Preview
+            </button>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <button className="text-muted-text hover:text-text">
+              <Settings size={20} />
+            </button>
+            <button
+              onClick={handlePublish}
+              disabled={isPublishing || !title || !content}
+              className="bg-accent hover:bg-accent-hover text-white px-5 py-2 rounded-full text-sm font-medium transition-colors disabled:opacity-50 flex items-center">
+              
+              {isPublishing ?
+              'Publishing...' :
+
+              <>
+                  <Check size={16} className="mr-2" /> Publish
+                </>
+              }
+            </button>
+          </div>
+        </div>
+
+        {/* Editor Area */}
+        <div className="flex-grow flex flex-col md:flex-row gap-8 overflow-hidden">
+          {/* Main Editor */}
+          <div className="flex-grow flex flex-col overflow-y-auto pr-2 custom-scrollbar">
+            {!isPreview ?
+            <>
+                <input
+                type="text"
+                placeholder="Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="text-4xl md:text-5xl font-serif font-bold bg-transparent border-none focus:outline-none focus:ring-0 text-text placeholder-muted-text mb-6" />
+              
+
+                <textarea
+                placeholder="Tell your story..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                className="flex-grow text-lg bg-transparent border-none focus:outline-none focus:ring-0 text-text placeholder-muted-text resize-none min-h-[400px]" />
+              
+              </> :
+
+            <div className="prose prose-lg dark:prose-invert max-w-none">
+                <h1>{title || 'Untitled'}</h1>
+                <div
+                dangerouslySetInnerHTML={{
+                  __html:
+                  content.replace(/\n/g, '<br/>') ||
+                  '<em>Nothing to preview yet.</em>'
+                }} />
+              
+              </div>
+            }
+          </div>
+
+          {/* Settings Sidebar */}
+          <div className="w-full md:w-80 flex-shrink-0 space-y-6 overflow-y-auto pr-2 custom-scrollbar border-l border-border pl-6 hidden md:block">
+            <div>
+              <label className="block text-sm font-medium text-text mb-2">
+                Cover Image URL
+              </label>
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  value={coverImage}
+                  onChange={(e) => setCoverImage(e.target.value)}
+                  placeholder="https://..."
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent text-text" />
+                
+              </div>
+              {coverImage &&
+              <img
+                src={coverImage}
+                alt="Cover preview"
+                className="mt-3 w-full h-32 object-cover rounded-lg border border-border" />
+
+              }
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text mb-2">
+                Category
+              </label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent text-text">
+                
+                {categories.map((cat) =>
+                <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                )}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text mb-2">
+                Excerpt
+              </label>
+              <textarea
+                value={excerpt}
+                onChange={(e) => setExcerpt(e.target.value)}
+                placeholder="Brief summary for post cards..."
+                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent resize-none h-24 text-text" />
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </Layout>);
+
+}

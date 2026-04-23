@@ -1,0 +1,107 @@
+/* @import url() FONT IMPORTS MUST ALWAYS BE AT THE VERY TOP OF THIS FILE, ABOVE THE TAILWIND IMPORTS — DO NOT DELETE THIS COMMENT */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
+
+/* CRITICAL: THE FOLLOWING TAILWIND IMPORTS MUST NEVER BE DELETED OR REORDERED — DO NOT DELETE THIS COMMENT */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* END TAILWIND IMPORTS — ALL OTHER CSS MUST GO BELOW THIS LINE */
+
+:root {
+  --color-background: #f8f9fb;
+  --color-surface: #ffffff;
+  --color-text: #1a1a1a;
+  --color-accent: #445E86;
+  --color-accent-hover: #374d6e;
+  --color-muted: #e2e5ea;
+  --color-muted-text: #666666;
+  --color-border: #e2e5ea;
+}
+.dark {
+  --color-background: #1a1d23;
+  --color-surface: #242830;
+  --color-text: #f8f9fb;
+  --color-accent: #6b8cbd;
+  --color-accent-hover: #8ba7d1;
+  --color-muted: #3a414e;
+  --color-muted-text: #a0aabf;
+  --color-border: #3a414e;
+}
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-muted);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-text);
+}
+/* Markdown Styles */
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  font-family: 'Playfair Display', serif;
+  color: var(--color-text);
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+  font-weight: 700;
+}
+.prose p {
+  margin-bottom: 1.25em;
+  line-height: 1.75;
+  color: var(--color-text);
+}
+.prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+.prose a:hover {
+  color: var(--color-accent-hover);
+}
+.prose blockquote {
+  border-left: 4px solid var(--color-accent);
+  padding-left: 1rem;
+  font-style: italic;
+  color: var(--color-muted-text);
+  margin: 1.5em 0;
+}
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin-bottom: 1.25em;
+}
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin-bottom: 1.25em;
+}
+.prose code {
+  background-color: var(--color-muted);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: monospace;
+}
+.prose pre {
+  background-color: #1a1d23;
+  color: #f8f9fb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 1.5em;
+}
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}

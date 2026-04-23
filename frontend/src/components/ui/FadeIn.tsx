@@ -1,0 +1,39 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+
+interface FadeInProps {
+  children: React.ReactNode;
+  delay?: number;
+  duration?: number;
+  direction?: 'up' | 'down' | 'left' | 'right';
+  className?: string;
+}
+
+export function FadeIn({ 
+  children, 
+  delay = 0, 
+  duration = 0.4,
+  direction = 'up',
+  className 
+}: FadeInProps) {
+  const getInitialPosition = () => {
+    switch (direction) {
+      case 'up': return { y: 20 };
+      case 'down': return { y: -20 };
+      case 'left': return { x: 20 };
+      case 'right': return { x: -20 };
+      default: return { y: 20 };
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, ...getInitialPosition() }}
+      animate={{ opacity: 1, x: 0, y: 0 }}
+      transition={{ duration, delay }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
