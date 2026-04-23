@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Header } from './Header';
+import { Home, Tag, Search, LogIn, Facebook, Instagram, Linkedin } from 'lucide-react';
 
 export function Layout({ children, showFooter = true }: {children: React.ReactNode; showFooter?: boolean;}) {
   const { user, isAuthenticated } = useAuth();

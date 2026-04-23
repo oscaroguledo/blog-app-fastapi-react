@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useBlog } from '@/contexts/BlogContext';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, Filter, MoreHorizontal, Edit2, Trash2, Eye, TrendingUp, Users, FileText } from 'lucide-react';
+import { Search, Filter, MoreHorizontal, Edit2, Trash2, Eye, TrendingUp, Users, FileText, MessageSquare, Edit } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -17,7 +17,6 @@ import {
   LineChart,
   Line } from
 'recharts';
-import { Users, FileText, Eye, MessageSquare, Edit, Trash2 } from 'lucide-react';
 export function AdminDashboardPage() {
   const { isAuthenticated, user } = useAuth();
   const { posts, users, comments, deletePost } = useBlog();
