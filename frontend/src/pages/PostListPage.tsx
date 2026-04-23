@@ -6,22 +6,23 @@ import { Button } from '@/components/ui/Button';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { PostCard } from '@/components/PostCard';
 import { Pagination } from '@/components/ui/Pagination';
+import { Modal } from '@/components/ui/Modal';
 import { useBlog } from '@/contexts/BlogContext';
-import { motion, AnimatePresence } from 'framer-motion';
-import { SearchIcon, X, SlidersHorizontal } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { SearchIcon, X, Filter } from 'lucide-react';
 export function PostListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { posts, categories, tags, users, getAuthor, getPaginatedPosts } = useBlog();
+  const { posts, categories, tags, users, getAuthor } = useBlog();
   const initialQuery = searchParams.get('q') || '';
   const initialCategory = searchParams.get('category') || '';
   const initialTag = searchParams.get('tag') || '';
   const [query, setQuery] = useState(initialQuery);
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [selectedTag, setSelectedTag] = useState(initialTag);
-  const [selectedAuthor, setSelectedAuthor] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string[]>(initialCategory ? [initialCategory] : []);
+  const [selectedTag, setSelectedTag] = useState<string[]>(initialTag ? [initialTag] : []);
+  const [selectedAuthor, setSelectedAuthor] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'oldest'>('recent');
-  const [showFilters, setShowFilters] = useState(!!(initialCategory || initialTag));
   const [currentPage, setCurrentPage] = useState(1);
+  const [openModal, setOpenModal] = useState<'category' | 'tag' | 'author' | null>(null);
   const postsPerPage = 9;
   const publishedPosts = posts.filter((p) => p.isPublished);
   const filteredPosts = useMemo(() => {
@@ -39,18 +40,22 @@ export function PostListPage() {
       );
     }
     // Category filter
-    if (selectedCategory) {
+    if (selectedCategory.length > 0) {
       results = results.filter((post) =>
-      post.categories.includes(selectedCategory)
+        selectedCategory.some(cat => post.categories.includes(cat))
       );
     }
     // Tag filter
-    if (selectedTag) {
-      results = results.filter((post) => post.tags.includes(selectedTag));
+    if (selectedTag.length > 0) {
+      results = results.filter((post) =>
+        selectedTag.some(tag => post.tags.includes(tag))
+      );
     }
     // Author filter
-    if (selectedAuthor) {
-      results = results.filter((post) => post.authorId === selectedAuthor);
+    if (selectedAuthor.length > 0) {
+      results = results.filter((post) =>
+        selectedAuthor.includes(post.authorId)
+      );
     }
     // Sort
     if (sortBy === 'recent') {
@@ -68,41 +73,36 @@ export function PostListPage() {
     }
     return results;
   }, [
-  publishedPosts,
-  query,
-  selectedCategory,
-  selectedTag,
-  selectedAuthor,
-  sortBy]
-  );
+    publishedPosts,
+    query,
+    selectedCategory,
+    selectedTag,
+    selectedAuthor,
+    sortBy,
+    users,
+  ]);
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
     const params: Record<string, string> = {};
     if (query) params.q = query;
-    if (selectedCategory) params.category = selectedCategory;
-    if (selectedTag) params.tag = selectedTag;
+    if (selectedCategory.length > 0) params.category = selectedCategory.join(',');
+    if (selectedTag.length > 0) params.tag = selectedTag.join(',');
     setSearchParams(params);
-  };
-  const clearAllFilters = () => {
-    setQuery('');
-    setSelectedCategory('');
-    setSelectedTag('');
-    setSelectedAuthor('');
-    setSortBy('recent');
-    setSearchParams({});
   };
   const hasActiveFilters = !!(
   query ||
-  selectedCategory ||
-  selectedTag ||
-  selectedAuthor);
-
-  const activeFilterCount = [
-  selectedCategory,
-  selectedTag,
-  selectedAuthor].
-  filter(Boolean).length;
+  selectedCategory.length > 0 ||
+  selectedTag.length > 0 ||
+  selectedAuthor.length > 0);
+  const clearAllFilters = () => {
+    setQuery('');
+    setSelectedCategory([]);
+    setSelectedTag([]);
+    setSelectedAuthor([]);
+    setSortBy('recent');
+    setSearchParams({});
+  };
 
   const startIndex = (currentPage - 1) * postsPerPage;
   const endIndex = startIndex + postsPerPage;
@@ -164,36 +164,38 @@ export function PostListPage() {
           </div>
         </form>
 
-        {/* Filter Toggle & Sort */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={() => setShowFilters(!showFilters)}
-              variant={showFilters || activeFilterCount > 0 ? 'outline' : 'outline'}
-              size="sm"
-              className={`flex items-center gap-2 ${showFilters || activeFilterCount > 0 ? 'border-accent bg-accent/10 text-accent' : 'border-border text-muted-text hover:border-accent hover:text-accent'}`}
-            >
-              <SlidersHorizontal size={16} />
-              Filters
-              {activeFilterCount > 0 &&
-              <span className="bg-accent text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                  {activeFilterCount}
-                </span>
-              }
-            </Button>
-
-            {hasActiveFilters &&
-            <Button
-              onClick={clearAllFilters}
-              variant="ghost"
-              size="sm"
-              className="text-muted-text hover:text-accent"
-            >
-              Clear all
-            </Button>
-            }
-          </div>
-
+        {/* Filter Buttons */}
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <Button
+            onClick={() => setOpenModal('category')}
+            variant={selectedCategory.length > 0 ? 'primary' : 'outline'}
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Filter size={16} />
+            Category
+            {selectedCategory.length > 0 && <span className="bg-white/20 text-xs px-2 py-0.5 rounded-full">{selectedCategory.length}</span>}
+          </Button>
+          <Button
+            onClick={() => setOpenModal('tag')}
+            variant={selectedTag.length > 0 ? 'primary' : 'outline'}
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Filter size={16} />
+            Tag
+            {selectedTag.length > 0 && <span className="bg-white/20 text-xs px-2 py-0.5 rounded-full">{selectedTag.length}</span>}
+          </Button>
+          <Button
+            onClick={() => setOpenModal('author')}
+            variant={selectedAuthor.length > 0 ? 'primary' : 'outline'}
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Filter size={16} />
+            Author
+            {selectedAuthor.length > 0 && <span className="bg-white/20 text-xs px-2 py-0.5 rounded-full">{selectedAuthor.length}</span>}
+          </Button>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-text">Sort by:</span>
             <Dropdown
@@ -207,131 +209,17 @@ export function PostListPage() {
               className="w-40"
             />
           </div>
+          {hasActiveFilters && (
+            <Button
+              onClick={clearAllFilters}
+              variant="ghost"
+              size="sm"
+              className="text-muted-text hover:text-accent"
+            >
+              Clear all
+            </Button>
+          )}
         </div>
-
-        {/* Filters Panel */}
-        <AnimatePresence>
-          {showFilters &&
-          <motion.div
-            initial={{
-              height: 0,
-              opacity: 0
-            }}
-            animate={{
-              height: 'auto',
-              opacity: 1
-            }}
-            exit={{
-              height: 0,
-              opacity: 0
-            }}
-            transition={{
-              duration: 0.25
-            }}
-            className="overflow-hidden mb-8">
-            
-              <div className="bg-surface border border-border rounded-custom p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Category Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-text mb-2">
-                    Category
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                    onClick={() => setSelectedCategory('')}
-                    variant={!selectedCategory ? 'primary' : 'secondary'}
-                    size="sm"
-                    className="rounded-full"
-                    >
-                      All
-                    </Button>
-                    {categories.map((cat) =>
-                  <Button
-                    key={cat}
-                    onClick={() =>
-                    setSelectedCategory(
-                      selectedCategory === cat ? '' : cat
-                    )
-                    }
-                    variant={selectedCategory === cat ? 'primary' : 'secondary'}
-                    size="sm"
-                    className="rounded-full"
-                    >
-                        {cat}
-                      </Button>
-                  )}
-                  </div>
-                </div>
-
-                {/* Tag Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-text mb-2">
-                    Tag
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                    onClick={() => setSelectedTag('')}
-                    variant={!selectedTag ? 'primary' : 'secondary'}
-                    size="sm"
-                    className="rounded-full"
-                    >
-                      All
-                    </Button>
-                    {tags.map((tag) =>
-                  <Button
-                    key={tag}
-                    onClick={() =>
-                    setSelectedTag(selectedTag === tag ? '' : tag)
-                    }
-                    variant={selectedTag === tag ? 'primary' : 'secondary'}
-                    size="sm"
-                    className="rounded-full"
-                    >
-                        #{tag}
-                      </Button>
-                  )}
-                  </div>
-                </div>
-
-                {/* Author Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-text mb-2">
-                    Author
-                  </label>
-                  <div className="space-y-2">
-                    <Button
-                    onClick={() => setSelectedAuthor('')}
-                    variant={!selectedAuthor ? 'outline' : 'ghost'}
-                    size="sm"
-                    className={`w-full justify-start ${!selectedAuthor ? 'bg-accent/10 text-accent border border-accent/30' : 'bg-muted/50 text-muted-text hover:bg-muted'}`}
-                    >
-                      All Authors
-                    </Button>
-                    {users.map((author) =>
-                  <Button
-                    key={author.id}
-                    onClick={() =>
-                    setSelectedAuthor(
-                      selectedAuthor === author.id ? '' : author.id
-                    )
-                    }
-                    variant={selectedAuthor === author.id ? 'outline' : 'ghost'}
-                    size="sm"
-                    className={`w-full justify-start ${selectedAuthor === author.id ? 'bg-accent/10 text-accent border border-accent/30' : 'bg-muted/50 text-muted-text hover:bg-muted'}`}
-                    >
-                        <img
-                      src={author.avatar}
-                      alt={author.name}
-                      className="w-6 h-6 rounded-full mr-2" />
-                        {author.name}
-                      </Button>
-                  )}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          }
-        </AnimatePresence>
 
         {/* Active Filter Pills */}
         {hasActiveFilters &&
@@ -345,30 +233,30 @@ export function PostListPage() {
                 </Button>
               </span>
           }
-            {selectedCategory &&
-          <span className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
-                {selectedCategory}
-                <Button onClick={() => setSelectedCategory('')} variant="ghost" size="sm" className="p-0 h-auto">
+            {selectedCategory.map((cat) =>
+          <span key={cat} className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
+                {cat}
+                <Button onClick={() => setSelectedCategory(selectedCategory.filter(c => c !== cat))} variant="ghost" size="sm" className="p-0 h-auto">
                   <X size={14} />
                 </Button>
               </span>
-          }
-            {selectedTag &&
-          <span className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
-                #{selectedTag}
-                <Button onClick={() => setSelectedTag('')} variant="ghost" size="sm" className="p-0 h-auto">
+          )}
+            {selectedTag.map((tag) =>
+          <span key={tag} className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
+                #{tag}
+                <Button onClick={() => setSelectedTag(selectedTag.filter(t => t !== tag))} variant="ghost" size="sm" className="p-0 h-auto">
                   <X size={14} />
                 </Button>
               </span>
-          }
-            {selectedAuthor &&
-          <span className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
-                {users.find((u) => u.id === selectedAuthor)?.name}
-                <Button onClick={() => setSelectedAuthor('')} variant="ghost" size="sm" className="p-0 h-auto">
+          )}
+            {selectedAuthor.map((authorId) =>
+          <span key={authorId} className="inline-flex items-center gap-1 bg-accent/10 text-accent text-sm px-3 py-1 rounded-full">
+                {users.find((u) => u.id === authorId)?.name}
+                <Button onClick={() => setSelectedAuthor(selectedAuthor.filter(a => a !== authorId))} variant="ghost" size="sm" className="p-0 h-auto">
                   <X size={14} />
                 </Button>
               </span>
-          }
+          )}
           </div>
         }
 
@@ -426,6 +314,60 @@ export function PostListPage() {
             onPageChange={setCurrentPage}
           />
         </div>
+
+        {/* Filter Modals */}
+        <Modal
+          isOpen={openModal === 'category'}
+          onClose={() => setOpenModal(null)}
+          title="Select Categories"
+          options={categories}
+          selected={selectedCategory}
+          onSelect={(value) => {
+            if (selectedCategory.includes(value)) {
+              setSelectedCategory(selectedCategory.filter(c => c !== value));
+            } else {
+              setSelectedCategory([...selectedCategory, value]);
+            }
+          }}
+          onClear={() => setSelectedCategory([])}
+          multiSelect
+        />
+
+        <Modal
+          isOpen={openModal === 'tag'}
+          onClose={() => setOpenModal(null)}
+          title="Select Tags"
+          options={tags}
+          selected={selectedTag}
+          onSelect={(value) => {
+            if (selectedTag.includes(value)) {
+              setSelectedTag(selectedTag.filter(t => t !== value));
+            } else {
+              setSelectedTag([...selectedTag, value]);
+            }
+          }}
+          onClear={() => setSelectedTag([])}
+          multiSelect
+        />
+
+        <Modal
+          isOpen={openModal === 'author'}
+          onClose={() => setOpenModal(null)}
+          title="Select Authors"
+          options={users.map(u => u.name)}
+          selected={selectedAuthor.map(id => users.find(u => u.id === id)?.name || '')}
+          onSelect={(value) => {
+            const author = users.find(u => u.name === value);
+            if (!author) return;
+            if (selectedAuthor.includes(author.id)) {
+              setSelectedAuthor(selectedAuthor.filter(id => id !== author.id));
+            } else {
+              setSelectedAuthor([...selectedAuthor, author.id]);
+            }
+          }}
+          onClear={() => setSelectedAuthor([])}
+          multiSelect
+        />
       </div>
     </Layout>);
 }
