@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Layout } from '../components/Layout';
-import { Button } from '../components/ui/Button';
-import { Breadcrumb } from '../components/ui/Breadcrumb';
-import { useBlog } from '../contexts/BlogContext';
-import { useAuth } from '../contexts/AuthContext';
+import { Layout } from '@/components/Layout';
+import { Button } from '@/components/ui/Button';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { useBlog } from '@/contexts/BlogContext';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   Clock,
   Heart,

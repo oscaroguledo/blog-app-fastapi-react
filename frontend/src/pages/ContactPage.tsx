@@ -1,7 +1,7 @@
-import React from 'react';
-import { Layout } from '../components/Layout';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
+import React, { useState } from 'react';
+import { Layout } from '@/components/Layout';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 

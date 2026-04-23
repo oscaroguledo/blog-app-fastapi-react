@@ -1,7 +1,7 @@
 import React from 'react';
-import { Layout } from '../components/Layout';
+import { Layout } from '@/components/Layout';
 import { motion } from 'framer-motion';
-import { Heart, Users, BookOpen, Target } from 'lucide-react';
+import { Award, BookOpen, Users, Heart } from 'lucide-react';
 
 export function AboutPage() {
   return (

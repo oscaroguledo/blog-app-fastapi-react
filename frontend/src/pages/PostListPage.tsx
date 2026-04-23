@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Layout } from '../components/Layout';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
-import { Dropdown } from '../components/ui/Dropdown';
-import { PostCard } from '../components/PostCard';
-import { Pagination } from '../components/ui/Pagination';
-import { useBlog } from '../contexts/BlogContext';
+import { Layout } from '@/components/Layout';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { PostCard } from '@/components/PostCard';
+import { Pagination } from '@/components/ui/Pagination';
+import { useBlog } from '@/contexts/BlogContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SearchIcon, X, SlidersHorizontal } from 'lucide-react';
 export function PostListPage() {

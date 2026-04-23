@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { Button } from './Button';
+import { Button } from '@/components/ui/Button';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;

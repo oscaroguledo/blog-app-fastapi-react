@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { User, Post } from '../data/mockData';
+import { Button } from '@/components/ui/Button';
+import { User, Post } from '@/data/mockData';
 
 interface CategoryItem {
   name: string;

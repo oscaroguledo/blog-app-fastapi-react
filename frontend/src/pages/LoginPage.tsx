@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Layout } from '../components/Layout';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
-import { useAuth } from '../contexts/AuthContext';
+import { Layout } from '@/components/Layout';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 export function LoginPage() {

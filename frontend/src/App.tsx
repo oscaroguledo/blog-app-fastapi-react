@@ -1,21 +1,21 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { AuthProvider } from './contexts/AuthContext';
-import { BlogProvider } from './contexts/BlogContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { BlogProvider } from '@/contexts/BlogContext';
 // Pages
-import { HomePage } from './pages/HomePage';
-import { LoginPage } from './pages/LoginPage';
-import { SignupPage } from './pages/SignupPage';
-import { ResetPasswordPage } from './pages/ResetPasswordPage';
-import { VerifyEmailPage } from './pages/VerifyEmailPage';
-import { AboutPage } from './pages/AboutPage';
-import { ContactPage } from './pages/ContactPage';
-import { PostDetailPage } from './pages/PostDetailPage';
-import { WritePage } from './pages/WritePage';
-import { AdminDashboardPage } from './pages/AdminDashboardPage';
-import { PostListPage } from './pages/PostListPage';
-import { ProtectedRoute } from './components/ProtectedRoute';
+import { HomePage } from '@/pages/HomePage';
+import { LoginPage } from '@/pages/LoginPage';
+import { SignupPage } from '@/pages/SignupPage';
+import { ResetPasswordPage } from '@/pages/ResetPasswordPage';
+import { VerifyEmailPage } from '@/pages/VerifyEmailPage';
+import { AboutPage } from '@/pages/AboutPage';
+import { ContactPage } from '@/pages/ContactPage';
+import { PostDetailPage } from '@/pages/PostDetailPage';
+import { WritePage } from '@/pages/WritePage';
+import { AdminDashboardPage } from '@/pages/AdminDashboardPage';
+import { PostListPage } from '@/pages/PostListPage';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 // Placeholder for unbuilt pages to ensure routing works
 const PlaceholderPage = ({ title }: {title: string;}) =>
 <div className="min-h-screen flex items-center justify-center bg-background text-text">

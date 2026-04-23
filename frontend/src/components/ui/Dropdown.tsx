@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 interface DropdownProps {
   label?: string;

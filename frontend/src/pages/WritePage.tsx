@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Layout } from '../components/Layout';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
-import { Dropdown } from '../components/ui/Dropdown';
-import { useAuth } from '../contexts/AuthContext';
-import { useBlog } from '../contexts/BlogContext';
+import { Layout } from '@/components/Layout';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { useAuth } from '@/contexts/AuthContext';
+import { useBlog } from '@/contexts/BlogContext';
 import { useNavigate } from 'react-router-dom';
 import { Image as ImageIcon, Settings, Eye, Edit2, Check } from 'lucide-react';
 export function WritePage() {

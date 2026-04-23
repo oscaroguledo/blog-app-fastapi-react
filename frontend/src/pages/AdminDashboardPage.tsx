@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Layout } from '../components/Layout';
-import { Button } from '../components/ui/Button';
-import { useAuth } from '../contexts/AuthContext';
-import { useBlog } from '../contexts/BlogContext';
+import { Layout } from '@/components/Layout';
+import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/contexts/AuthContext';
+import { useBlog } from '@/contexts/BlogContext';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Search, Filter, MoreHorizontal, Edit2, Trash2, Eye, TrendingUp, Users, FileText } from 'lucide-react';
 import {
   BarChart,
   Bar,

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Layout } from '../components/Layout';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+import { Layout } from '@/components/Layout';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { motion } from 'framer-motion';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 

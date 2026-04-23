@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Layout } from '../components/Layout';
-import { PostCard } from '../components/PostCard';
-import { CategorySidebar } from '../components/CategorySidebar';
-import { useBlog } from '../contexts/BlogContext';
+import { Layout } from '@/components/Layout';
+import { PostCard } from '@/components/PostCard';
+import { CategorySidebar } from '@/components/CategorySidebar';
+import { useBlog } from '@/contexts/BlogContext';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight } from 'lucide-react';
 

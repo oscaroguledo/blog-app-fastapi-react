@@ -1,10 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Home, Tag, Search, LogIn, Facebook, Linkedin, Instagram } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { Outlet, Link } from 'react-router-dom';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/contexts/AuthContext';
 import { Header } from './Header';
-import { Input } from './ui/Input';
-import { Button } from './ui/Button';
 
 export function Layout({ children, showFooter = true }: {children: React.ReactNode; showFooter?: boolean;}) {
   const { user, isAuthenticated } = useAuth();

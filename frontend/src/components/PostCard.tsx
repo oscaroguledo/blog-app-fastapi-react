@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, Heart } from 'lucide-react';
-import { Post, User } from '../data/mockData';
+import { Heart, MessageCircle, Clock, Eye } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { Post, User } from '@/data/mockData';
 import { motion } from 'framer-motion';
 interface PostCardProps {
   post: Post;

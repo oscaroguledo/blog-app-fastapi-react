@@ -8,7 +8,7 @@ import {
   mockTags,
   User,
   mockUsers } from
-'../data/mockData';
+'@/data/mockData';
 
 interface PaginationParams {
   page: number;

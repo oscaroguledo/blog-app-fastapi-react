@@ -1,5 +1,5 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
-import { User, mockUsers } from '../data/mockData';
+import { User, mockUsers } from '@/data/mockData';
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;

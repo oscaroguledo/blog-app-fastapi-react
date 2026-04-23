@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Layout } from '../components/Layout';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
+import { Layout } from '@/components/Layout';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 
