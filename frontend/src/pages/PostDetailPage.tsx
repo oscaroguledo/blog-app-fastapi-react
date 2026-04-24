@@ -14,7 +14,6 @@ import {
   Heart,
   Share2,
   MessageCircle,
-  Bookmark,
   MoreHorizontal } from
 'lucide-react';
 import { motion } from 'framer-motion';
@@ -23,7 +22,7 @@ export function PostDetailPage() {
   const { id } = useParams<{
     id: string;
   }>();
-  const { getAuthor, addComment, toggleLike, toggleBookmark, bookmarkedPosts } = useBlog();
+  const { getAuthor, addComment, toggleLike } = useBlog();
   const { user, isAuthenticated } = useAuth();
   const [commentText, setCommentText] = useState('');
   const [post, setPost] = useState<Post | null>(null);
@@ -314,15 +313,6 @@ export function PostDetailPage() {
                     <MessageCircle size={18} />
                     <span>{postComments.length} Comments</span>
                   </a>
-                  <Button
-                    onClick={() => toggleBookmark(post.id)}
-                    variant="outline"
-                    size="md"
-                    className="flex items-center justify-center gap-2"
-                  >
-                    <Bookmark size={18} fill={bookmarkedPosts.has(post.id) ? 'currentColor' : 'none'} />
-                    <span>{bookmarkedPosts.has(post.id) ? 'Saved' : 'Save'}</span>
-                  </Button>
                   <Button
                     variant="outline"
                     size="md"

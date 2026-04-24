@@ -37,22 +37,6 @@ class PostTag(Base):
     tag = relationship("Tag", back_populates="post_tags")
 
 
-class PostBookmark(Base):
-    __tablename__ = "post_bookmark"
-    __table_args__ = (
-        Index("ix_post_bookmark_post_id", "post_id"),
-        Index("ix_post_bookmark_user_id", "user_id"),
-        {"schema": "public"}
-    )
-
-    post_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('posts.id', ondelete='CASCADE'), primary_key=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('users.id', ondelete='CASCADE'), primary_key=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
-
-    post = relationship("Post")
-    user = relationship("User")
-
-
 class Post(Base):
     __tablename__ = "posts"
     __table_args__ = (

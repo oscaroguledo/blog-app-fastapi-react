@@ -19,7 +19,6 @@ interface BlogContextType {
   users: User[];
   pagination: PaginationState;
   likedPosts: Set<string>;
-  bookmarkedPosts: Set<string>;
   fetchPosts: (params?: { limit?: number; offset?: number; is_published?: boolean; featured?: boolean }) => Promise<void>;
   fetchPostsPaginated: (page: number, limit: number) => Promise<{ posts: Post[]; total: number }>;
   addPost: (post: Omit<Post, 'id' | 'createdAt' | 'likes' | 'views'>) => Promise<void>;
@@ -28,7 +27,6 @@ interface BlogContextType {
   addComment: (comment: Omit<Comment, 'id' | 'createdAt' | 'likes'>) => Promise<void>;
   deleteComment: (id: string) => Promise<void>;
   toggleLike: (postId: string) => Promise<void>;
-  toggleBookmark: (postId: string) => Promise<void>;
   getAuthor: (authorId: string) => User | undefined;
 }
 
@@ -40,7 +38,6 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
   const [categories, setCategories] = useState<string[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
-  const [bookmarkedPosts, setBookmarkedPosts] = useState<Set<string>>(new Set());
   const [pagination, setPagination] = useState<PaginationState>({
     limit: 10,
     offset: 0,
@@ -183,28 +180,6 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
     }
   };
 
-  const toggleBookmark = async (postId: string) => {
-    try {
-      const isBookmarked = bookmarkedPosts.has(postId);
-      const response = isBookmarked
-        ? await postApi.unbookmark(postId)
-        : await postApi.bookmark(postId);
-
-      if (response.success) {
-        setBookmarkedPosts(prev => {
-          const newSet = new Set(prev);
-          if (isBookmarked) {
-            newSet.delete(postId);
-          } else {
-            newSet.add(postId);
-          }
-          return newSet;
-        });
-      }
-    } catch (error) {
-      console.error('Failed to toggle bookmark:', error);
-    }
-  };
   const getAuthor = (authorId: string) => {
     return users.find((u) => u.id === authorId);
   };
@@ -217,7 +192,6 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
         users,
         pagination,
         likedPosts,
-        bookmarkedPosts,
         fetchPosts,
         fetchPostsPaginated,
         addPost,
@@ -226,7 +200,6 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
         addComment,
         deleteComment,
         toggleLike,
-        toggleBookmark,
         getAuthor
       }}>
       
