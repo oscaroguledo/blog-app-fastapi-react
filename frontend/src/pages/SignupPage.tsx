@@ -8,11 +8,13 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Facebook, Linkedin, Instagram } from 'lucide-react';
 
 export function SignupPage() {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { signup } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,8 +22,7 @@ export function SignupPage() {
     setIsLoading(true);
     setError('');
     try {
-      // Simulate signup - in real app this would call an API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await signup(firstName, lastName, email, password);
       navigate('/');
     } catch (err) {
       setError('Failed to create account');
@@ -62,12 +63,21 @@ export function SignupPage() {
 
             <div className="space-y-4">
               <Input
-                label="Full name"
+                label="First name"
                 type="text"
                 required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="John Doe"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="John"
+              />
+
+              <Input
+                label="Last name"
+                type="text"
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Doe"
               />
 
               <Input

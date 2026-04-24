@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
-import { User, Post } from '@/data/mockData';
+import { User, Post } from '@/api/blogApi';
 
 interface CategoryItem {
   name: string;

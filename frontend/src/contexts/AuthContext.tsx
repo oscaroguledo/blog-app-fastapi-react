@@ -1,70 +1,87 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
-import { User, mockUsers } from '@/data/mockData';
+import { usersApi, User } from '@/api/blogApi';
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, redirectPath?: string) => Promise<void>;
+  login: (email: string, password: string, redirectPath?: string) => Promise<void>;
   logout: () => void;
-  signup: (name: string, email: string) => Promise<void>;
+  signup: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
 }
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
 export function AuthProvider({ children }: {children: React.ReactNode;}) {
   const [user, setUser] = useState<User | null>(null);
-  // Simulate checking for JWT token on load
+  const [token, setToken] = useState<string | null>(null);
+
   useEffect(() => {
-    const token = localStorage.getItem('mock_jwt_token');
-    if (token) {
-      // In a real app, we'd validate the token. Here we just log in the admin user.
-      setUser(mockUsers[0]);
+    const storedToken = localStorage.getItem('auth_token');
+    if (storedToken) {
+      setToken(storedToken);
+      fetchUser(storedToken);
     }
   }, []);
-  const login = async (email: string, redirectPath?: string) => {
-    // Simulate API call
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        const foundUser = mockUsers.find((u) => u.email === email);
-        if (foundUser) {
-          setUser(foundUser);
-          localStorage.setItem('mock_jwt_token', 'mock.jwt.token.123');
-          if (redirectPath) {
-            window.location.href = redirectPath;
-          }
-          resolve();
-        } else {
-          // Default to first user if not found just for demo purposes
-          setUser(mockUsers[0]);
-          localStorage.setItem('mock_jwt_token', 'mock.jwt.token.123');
-          if (redirectPath) {
-            window.location.href = redirectPath;
-          }
-          resolve();
-        }
-      }, 800);
-    });
+
+  const fetchUser = async (authToken: string) => {
+    try {
+      const response = await usersApi.getMe(authToken);
+      if (response.success && response.data) {
+        setUser(response.data);
+      } else {
+        localStorage.removeItem('auth_token');
+        setToken(null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+      localStorage.removeItem('auth_token');
+      setToken(null);
+    }
   };
+
+  const login = async (email: string, password: string, redirectPath?: string) => {
+    try {
+      const response = await usersApi.login({ email, password });
+      if (response.success && response.data) {
+        const { user: userData, token: authToken } = response.data;
+        setUser(userData);
+        setToken(authToken);
+        localStorage.setItem('auth_token', authToken);
+        if (redirectPath) {
+          window.location.href = redirectPath;
+        }
+      } else {
+        throw new Error(response.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  };
+
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('mock_jwt_token');
+    setToken(null);
+    localStorage.removeItem('auth_token');
   };
-  const signup = async (name: string, email: string) => {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        const newUser: User = {
-          id: `u${Date.now()}`,
-          name,
-          email,
-          avatar: `https://i.pravatar.cc/150?u=${Date.now()}`,
-          role: 'Writer',
-          bio: 'New user to the platform.',
-          followers: 0,
-          following: 0
-        };
-        setUser(newUser);
-        localStorage.setItem('mock_jwt_token', 'mock.jwt.token.123');
-        resolve();
-      }, 800);
-    });
+
+  const signup = async (firstName: string, lastName: string, email: string, password: string) => {
+    try {
+      const response = await usersApi.register({ firstName, lastName, email, password });
+      if (response.success && response.data) {
+        const { user: userData, token: authToken } = response.data;
+        setUser(userData);
+        setToken(authToken);
+        localStorage.setItem('auth_token', authToken);
+      } else {
+        throw new Error(response.message || 'Signup failed');
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      throw error;
+    }
   };
+
   return (
     <AuthContext.Provider
       value={{
@@ -74,11 +91,10 @@ export function AuthProvider({ children }: {children: React.ReactNode;}) {
         logout,
         signup
       }}>
-      
       {children}
     </AuthContext.Provider>);
-
 }
+
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

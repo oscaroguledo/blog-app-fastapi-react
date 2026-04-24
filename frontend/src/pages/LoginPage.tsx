@@ -21,7 +21,7 @@ export function LoginPage() {
     setIsLoading(true);
     setError('');
     try {
-      await login(email, redirect || undefined);
+      await login(email, password, redirect || undefined);
       if (!redirect) {
         navigate('/');
       }
