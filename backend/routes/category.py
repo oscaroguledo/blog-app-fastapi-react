@@ -70,7 +70,7 @@ async def list_categories(
         return Response(
             success=True,
             message="Categories retrieved successfully",
-            data={"categories": [category.to_dict() for category in categories]},
+            data=[category.to_dict() for category in categories],
             pagination={"limit": limit, "offset": offset, "total": len(categories)}
         )
     except ValueError as e:

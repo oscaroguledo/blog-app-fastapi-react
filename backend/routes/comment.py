@@ -81,7 +81,7 @@ async def list_comments(
         return Response(
             success=True,
             message="Comments retrieved successfully",
-            data={"comments": [comment.to_dict() for comment in comments]},
+            data=[comment.to_dict() for comment in comments],
             pagination={"limit": limit, "offset": offset, "total": len(comments)}
         )
     except ValueError as e:

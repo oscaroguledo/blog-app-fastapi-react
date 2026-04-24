@@ -287,7 +287,7 @@ async def list_users(
     return Response(
         success=True,
         message="Users retrieved successfully",
-        data={"users": [user.to_dict() for user in users]},
+        data=[user.to_dict() for user in users],
         pagination={"limit": limit, "offset": offset, "total": len(users)}
     )
 

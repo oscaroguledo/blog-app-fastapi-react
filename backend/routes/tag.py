@@ -70,7 +70,7 @@ async def list_tags(
         return Response(
             success=True,
             message="Tags retrieved successfully",
-            data={"tags": [tag.to_dict() for tag in tags]},
+            data=[tag.to_dict() for tag in tags],
             pagination={"limit": limit, "offset": offset, "total": len(tags)}
         )
     except ValueError as e:

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { Input } from '@/components/ui/Input';
@@ -8,11 +8,14 @@ import { PostCard } from '@/components/PostCard';
 import { Pagination } from '@/components/ui/Pagination';
 import { Modal } from '@/components/ui/Modal';
 import { useBlog } from '@/contexts/BlogContext';
+import { postApi } from '@/api/post';
+import { Post } from '@/api/post';
 import { motion } from 'framer-motion';
 import { SearchIcon, X, Filter } from 'lucide-react';
+
 export function PostListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { posts, categories, users, getAuthor } = useBlog();
+  const { categories, users, getAuthor } = useBlog();
   const initialQuery = searchParams.get('q') || '';
   const initialCategory = searchParams.get('category') || '';
   const [query, setQuery] = useState(initialQuery);
@@ -21,56 +24,36 @@ export function PostListPage() {
   const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'oldest'>('recent');
   const [offset, setOffset] = useState(0);
   const [openModal, setOpenModal] = useState<'category' | 'author' | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
   const limit = 9;
-  const publishedPosts = posts.filter((p) => p.isPublished);
-  const filteredPosts = useMemo(() => {
-    let results = [...publishedPosts];
-    // Text search
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      results = results.filter(
-        (post) =>
-        post.title.toLowerCase().includes(q) ||
-        post.excerpt.toLowerCase().includes(q) ||
-        post.content.toLowerCase().includes(q) ||
-        post.categories.some((c) => c.toLowerCase().includes(q))
-      );
-    }
-    // Category filter
-    if (selectedCategory.length > 0) {
-      results = results.filter((post) =>
-        selectedCategory.some(cat => post.categories.includes(cat))
-      );
-    }
-    // Author filter
-    if (selectedAuthor.length > 0) {
-      results = results.filter((post) =>
-        selectedAuthor.includes(post.authorId)
-      );
-    }
-    // Sort
-    if (sortBy === 'recent') {
-      results.sort(
-        (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-    } else if (sortBy === 'popular') {
-      results.sort((a, b) => b.likes - a.likes);
-    } else if (sortBy === 'oldest') {
-      results.sort(
-        (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
-    }
-    return results;
-  }, [
-    publishedPosts,
-    query,
-    selectedCategory,
-    selectedAuthor,
-    sortBy,
-    users,
-  ]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      try {
+        const response = await postApi.getAll({
+          search_query: query || undefined,
+          category_id: selectedCategory[0] || undefined,
+          author_id: selectedAuthor[0] || undefined,
+          is_published: true,
+          limit,
+          offset
+        });
+        if (response.success && response.data) {
+          setPosts(response.data.posts);
+          setTotal(response.data.pagination.total);
+        }
+      } catch (error) {
+        console.error('Failed to fetch posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [query, selectedCategory, selectedAuthor, offset, limit]);
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setOffset(0);
