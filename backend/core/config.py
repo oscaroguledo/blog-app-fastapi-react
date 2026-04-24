@@ -20,5 +20,19 @@ class Settings(BaseSettings):
     CORS_ALLOW_METHODS: str = "*"
     CORS_ALLOW_HEADERS: str = "*"
 
+    # Email / SMTP
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_NAME: str = "Blog Platform"
+    SMTP_FROM_EMAIL: str = ""
+    SMTP_TLS: bool = True
+
+    # App
+    APP_URL: str = "http://localhost:5173"
+    EMAIL_VERIFICATION_EXPIRE_HOURS: int = 24
+    PASSWORD_RESET_EXPIRE_HOURS: int = 2
+
 
 settings = Settings()

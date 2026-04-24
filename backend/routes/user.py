@@ -50,7 +50,7 @@ async def register(
         # Generate tokens
         access_token = await user_service.create_access_token(user)
         refresh_token = await user_service.create_refresh_token(user)
-        
+
         return Response(
             success=True,
             message="User registered successfully",
@@ -87,7 +87,7 @@ async def login(
             message="Invalid email or password",
             status_code=status.HTTP_401_UNAUTHORIZED
         )
-    
+
     return Response(
         success=True,
         message="Login successful",
@@ -467,18 +467,22 @@ async def reset_password(
 ):
     """Send password reset email."""
     user_service = UserService(db)
-    
+
     user = await user_service.get(user_id=None, email=email)
-    
-    if not user:
-        # Return success even if user doesn't exist for security
-        return Response(
-            success=True,
-            message="If an account with this email exists, a password reset link has been sent."
-        )
-    
-    # TODO: Implement actual email sending with reset token
-    # For now, just return success
+
+    if user:
+        try:
+            from worker.tasks import send_password_reset_email
+            from core.config import settings
+            reset_token = user_service.generate_signed_token(
+                {"id": str(user.id), "email": user.email, "type": "password_reset"},
+                expires_hours=settings.PASSWORD_RESET_EXPIRE_HOURS,
+            )
+            send_password_reset_email.delay(user.email, user.firstName, reset_token)
+        except Exception:
+            pass
+
+    # Always return success to avoid user enumeration
     return Response(
         success=True,
         message="If an account with this email exists, a password reset link has been sent."
@@ -502,8 +506,17 @@ async def verify_email(
             status_code=status.HTTP_404_NOT_FOUND
         )
 
-    # TODO: Implement actual email sending with verification token
-    # For now, just return success
+    try:
+        from worker.tasks import send_email_verification
+        from core.config import settings
+        verification_token = user_service.generate_signed_token(
+            {"id": str(user.id), "email": user.email, "type": "email_verification"},
+            expires_hours=settings.EMAIL_VERIFICATION_EXPIRE_HOURS,
+        )
+        send_email_verification.delay(user.email, user.firstName, verification_token)
+    except Exception:
+        pass
+
     return Response(
         success=True,
         message="Verification email sent successfully"

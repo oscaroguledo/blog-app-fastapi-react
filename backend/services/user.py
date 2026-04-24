@@ -241,4 +241,9 @@ class UserService:
         await self.db.commit()
         await self.db.refresh(user)
         return user
+
+    def generate_signed_token(self, payload: dict, expires_hours: int = 24) -> str:
+        """Generate a short-lived signed JWT for email verification / password reset."""
+        from datetime import timedelta
+        return jwt_handler.create_access_token(payload, expires_delta=timedelta(hours=expires_hours))
     

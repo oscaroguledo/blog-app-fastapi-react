@@ -1,14 +1,11 @@
 from celery import Celery
+from celery.schedules import crontab
 from core.config import settings
-
-# Use Redis as both broker and result backend
-# Convert async URL to sync for Celery (celery doesn't use asyncpg)
-_broker_url = settings.REDIS_URL
 
 celery_app = Celery(
     "blog_worker",
-    broker=_broker_url,
-    backend=_broker_url,
+    broker=settings.REDIS_URL,
+    backend=settings.REDIS_URL,
     include=["worker.tasks"],
 )
 
@@ -21,4 +18,12 @@ celery_app.conf.update(
     broker_connection_retry_on_startup=True,
     task_acks_late=True,
     task_reject_on_worker_lost=True,
+
+    # ── Periodic tasks (Celery Beat) ──────────────────────────────────────
+    beat_schedule={
+        "weekly-digest-every-monday": {
+            "task": "worker.tasks.send_weekly_digest",
+            "schedule": crontab(hour=8, minute=0, day_of_week=1),  # Mon 08:00 UTC
+        },
+    },
 )
