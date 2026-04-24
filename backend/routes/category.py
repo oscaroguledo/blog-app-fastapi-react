@@ -82,16 +82,12 @@ async def list_categories(
 
 
 @router.get("/{category_id}")
-async def get_category(category_id: Optional[str] = None, slug: Optional[str] = None, name: Optional[str] = None, db: AsyncSession = Depends(get_db)):
-    """Get a specific category by ID, slug, or name."""
+async def get_category(category_id: str, db: AsyncSession = Depends(get_db)):
+    """Get a specific category by ID."""
     category_service = CategoryService(db)
     
     try:
-        category = await category_service.get(
-            uuid.UUID(category_id) if category_id else None,
-            slug=slug,
-            name=name
-        )
+        category = await category_service.get(uuid.UUID(category_id))
         if not category:
             return Response(
                 success=False,
@@ -104,10 +100,10 @@ async def get_category(category_id: Optional[str] = None, slug: Optional[str] = 
             message="Category retrieved successfully",
             data=category.to_dict()
         )
-    except ValueError as e:
+    except ValueError:
         return Response(
             success=False,
-            message=str(e),
+            message="Invalid category ID format",
             status_code=status.HTTP_400_BAD_REQUEST
         )
 

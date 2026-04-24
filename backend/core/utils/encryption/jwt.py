@@ -35,17 +35,13 @@ class JWTHandler:
         except JWTError:
             return None
 
-    def verify_token(self, token: str) -> Optional[str]:
+    def verify_token(self, token: str) -> Optional[Dict[str, Any]]:
         """Verify a JWT token and return the user ID if valid."""
         payload = self.decode_token(token)
         if payload is None:
             return None
         
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            return None
-        
-        return user_id
+        return payload
 
 
 jwt_handler = JWTHandler()

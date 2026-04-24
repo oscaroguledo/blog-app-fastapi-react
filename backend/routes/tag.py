@@ -82,12 +82,12 @@ async def list_tags(
 
 
 @router.get("/{tag_id}")
-async def get_tag(tag_id: Optional[str] = None, slug: Optional[str] = None, name: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+async def get_tag(tag_id: str, db: AsyncSession = Depends(get_db)):
     """Get a specific tag by ID."""
     tag_service = TagService(db)
     
     try:
-        tag = await tag_service.get(uuid.UUID(tag_id) if tag_id else None, slug=slug, name=name)
+        tag = await tag_service.get(uuid.UUID(tag_id))
         if not tag:
             return Response(
                 success=False,

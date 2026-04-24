@@ -6,6 +6,7 @@ from datetime import datetime
 from core.database import get_db
 from services.comment import CommentService
 from core.utils.response import Response
+from core.dependencies import get_current_user
 
 router = APIRouter(prefix="/comments", tags=["comments"])
 
@@ -13,9 +14,9 @@ router = APIRouter(prefix="/comments", tags=["comments"])
 @router.post("/")
 async def create_comment(
     post_id: str,
-    author_id: str,
     content: str,
     parent_id: Optional[str] = None,
+    current_user = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Create a new comment."""
@@ -24,7 +25,7 @@ async def create_comment(
     try:
         comment = await comment_service.create(
             post_id=uuid.UUID(post_id),
-            author_id=uuid.UUID(author_id),
+            author_id=current_user.id,
             content=content,
             parent_id=uuid.UUID(parent_id) if parent_id else None
         )
@@ -122,23 +123,33 @@ async def get_comment(comment_id: str, db: AsyncSession = Depends(get_db)):
 async def update_comment(
     comment_id: str,
     content: Optional[str] = None,
+    current_user = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Update a comment."""
     comment_service = CommentService(db)
     
     try:
-        comment = await comment_service.update(
-            uuid.UUID(comment_id),
-            content=content
-        )
-        
+        # Check if user owns the comment or is admin
+        comment = await comment_service.get(uuid.UUID(comment_id))
         if not comment:
             return Response(
                 success=False,
                 message="Comment not found",
                 status_code=status.HTTP_404_NOT_FOUND
             )
+        
+        if comment.author_id != current_user.id and current_user.role.value != "Admin":
+            return Response(
+                success=False,
+                message="You can only update your own comments",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
+        
+        comment = await comment_service.update(
+            uuid.UUID(comment_id),
+            content=content
+        )
         
         return Response(
             success=True,
@@ -154,19 +165,32 @@ async def update_comment(
 
 
 @router.delete("/{comment_id}")
-async def delete_comment(comment_id: str, db: AsyncSession = Depends(get_db)):
+async def delete_comment(
+    comment_id: str,
+    current_user = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
     """Delete a comment."""
     comment_service = CommentService(db)
     
     try:
-        success = await comment_service.delete(uuid.UUID(comment_id))
-        
-        if not success:
+        # Check if user owns the comment or is admin
+        comment = await comment_service.get(uuid.UUID(comment_id))
+        if not comment:
             return Response(
                 success=False,
                 message="Comment not found",
                 status_code=status.HTTP_404_NOT_FOUND
             )
+        
+        if comment.author_id != current_user.id and current_user.role.value != "Admin":
+            return Response(
+                success=False,
+                message="You can only delete your own comments",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
+        
+        success = await comment_service.delete(uuid.UUID(comment_id))
         
         return Response(
             success=True,

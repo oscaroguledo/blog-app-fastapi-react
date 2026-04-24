@@ -6,6 +6,7 @@ from datetime import datetime
 from core.database import get_db
 from services.post import PostService
 from core.utils.response import Response
+from core.dependencies import get_current_user
 
 router = APIRouter(prefix="/posts", tags=["posts"])
 
@@ -16,11 +17,11 @@ async def create_post(
     excerpt: str,
     content: str,
     coverImage: str,
-    authorId: str,
     category_ids: Optional[str] = None,
     tag_ids: Optional[str] = None,
     isPublished: bool = False,
     featured: bool = False,
+    current_user = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Create a new post."""
@@ -36,7 +37,7 @@ async def create_post(
             excerpt=excerpt,
             content=content,
             coverImage=coverImage,
-            authorId=uuid.UUID(authorId),
+            authorId=current_user.id,
             category_ids=cat_ids,
             tag_ids=tag_ids_list,
             isPublished=isPublished,
@@ -151,12 +152,29 @@ async def update_post(
     featured: Optional[bool] = None,
     category_ids: Optional[str] = None,
     tag_ids: Optional[str] = None,
+    current_user = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Update a post."""
     post_service = PostService(db)
     
     try:
+        # Check if user owns the post or is admin
+        post = await post_service.get(uuid.UUID(post_id))
+        if not post:
+            return Response(
+                success=False,
+                message="Post not found",
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+        
+        if post.authorId != current_user.id and current_user.role.value != "Admin":
+            return Response(
+                success=False,
+                message="You can only update your own posts",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
+        
         cat_ids = [uuid.UUID(cid.strip()) for cid in category_ids.split(",")] if category_ids else None
         tag_ids_list = [uuid.UUID(tid.strip()) for tid in tag_ids.split(",")] if tag_ids else None
         
@@ -172,13 +190,6 @@ async def update_post(
             tag_ids=tag_ids_list
         )
         
-        if not post:
-            return Response(
-                success=False,
-                message="Post not found",
-                status_code=status.HTTP_404_NOT_FOUND
-            )
-        
         return Response(
             success=True,
             message="Post updated successfully",
@@ -193,19 +204,32 @@ async def update_post(
 
 
 @router.delete("/{post_id}")
-async def delete_post(post_id: str, db: AsyncSession = Depends(get_db)):
+async def delete_post(
+    post_id: str,
+    current_user = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
     """Delete a post."""
     post_service = PostService(db)
     
     try:
-        success = await post_service.delete(uuid.UUID(post_id))
-        
-        if not success:
+        # Check if user owns the post or is admin
+        post = await post_service.get(uuid.UUID(post_id))
+        if not post:
             return Response(
                 success=False,
                 message="Post not found",
                 status_code=status.HTTP_404_NOT_FOUND
             )
+        
+        if post.authorId != current_user.id and current_user.role.value != "Admin":
+            return Response(
+                success=False,
+                message="You can only delete your own posts",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
+        
+        success = await post_service.delete(uuid.UUID(post_id))
         
         return Response(
             success=True,

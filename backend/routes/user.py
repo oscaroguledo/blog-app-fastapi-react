@@ -8,6 +8,7 @@ from core.database import get_db
 from services.user import UserService
 from core.utils.response import Response
 from models.user import UserRole
+from core.dependencies import get_current_user, get_current_admin
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -89,36 +90,18 @@ async def login(
 
 
 @router.get("/me")
-async def get_current_user(token: str, db: AsyncSession = Depends(get_db)):
+async def get_current_user(current_user = Depends(get_current_user)):
     """Get current user from JWT token."""
-    user_service = UserService(db)
-    
-    user_id = await user_service.verify_token(token)
-    if not user_id:
-        return Response(
-            success=False,
-            message="Invalid or expired token",
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
-    
-    user = await user_service.get(uuid.UUID(user_id))
-    if not user:
-        return Response(
-            success=False,
-            message="User not found",
-            status_code=status.HTTP_404_NOT_FOUND
-        )
-    
     return Response(
         success=True,
         message="User retrieved successfully",
-        data=user.to_dict()
+        data=current_user.to_dict()
     )
 
 
 @router.patch("/me")
 async def update_current_user(
-    token: str,
+    current_user = Depends(get_current_user),
     email: Optional[str] = None,
     firstName: Optional[str] = None,
     lastName: Optional[str] = None,
@@ -129,16 +112,8 @@ async def update_current_user(
     """Update current user."""
     user_service = UserService(db)
     
-    user_id = await user_service.verify_token(token)
-    if not user_id:
-        return Response(
-            success=False,
-            message="Invalid or expired token",
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
-    
     user = await user_service.update(
-        uuid.UUID(user_id),
+        current_user.id,
         email=email,
         firstName=firstName,
         lastName=lastName,
@@ -161,19 +136,14 @@ async def update_current_user(
 
 
 @router.delete("/me")
-async def delete_current_user(token: str, db: AsyncSession = Depends(get_db)):
+async def delete_current_user(
+    current_user = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
     """Delete current user."""
     user_service = UserService(db)
     
-    user_id = await user_service.verify_token(token)
-    if not user_id:
-        return Response(
-            success=False,
-            message="Invalid or expired token",
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
-    
-    success = await user_service.delete(uuid.UUID(user_id))
+    success = await user_service.delete(current_user.id)
     
     if not success:
         return Response(
@@ -190,19 +160,14 @@ async def delete_current_user(token: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/me/activate")
-async def activate_current_user(token: str, db: AsyncSession = Depends(get_db)):
+async def activate_current_user(
+    current_user = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
     """Activate current user account."""
     user_service = UserService(db)
     
-    user_id = await user_service.verify_token(token)
-    if not user_id:
-        return Response(
-            success=False,
-            message="Invalid or expired token",
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
-    
-    user = await user_service.activate(uuid.UUID(user_id))
+    user = await user_service.activate(current_user.id)
     
     if not user:
         return Response(
@@ -219,19 +184,14 @@ async def activate_current_user(token: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/me/deactivate")
-async def deactivate_current_user(token: str, db: AsyncSession = Depends(get_db)):
+async def deactivate_current_user(
+    current_user = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
     """Deactivate current user account."""
     user_service = UserService(db)
     
-    user_id = await user_service.verify_token(token)
-    if not user_id:
-        return Response(
-            success=False,
-            message="Invalid or expired token",
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
-    
-    user = await user_service.deactivate(uuid.UUID(user_id))
+    user = await user_service.deactivate(current_user.id)
     
     if not user:
         return Response(
@@ -358,8 +318,12 @@ async def update_user(
 
 
 @router.delete("/{user_id}")
-async def delete_user(user_id: str, db: AsyncSession = Depends(get_db)):
-    """Delete a user."""
+async def delete_user(
+    user_id: str,
+    current_admin = Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete a user (admin only)."""
     user_service = UserService(db)
     
     try:
@@ -386,8 +350,12 @@ async def delete_user(user_id: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/{user_id}/activate")
-async def activate_user(user_id: str, db: AsyncSession = Depends(get_db)):
-    """Activate a user account."""
+async def activate_user(
+    user_id: str,
+    current_admin = Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Activate a user account (admin only)."""
     user_service = UserService(db)
     
     try:
@@ -414,8 +382,12 @@ async def activate_user(user_id: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/{user_id}/deactivate")
-async def deactivate_user(user_id: str, db: AsyncSession = Depends(get_db)):
-    """Deactivate a user account."""
+async def deactivate_user(
+    user_id: str,
+    current_admin = Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Deactivate a user account (admin only)."""
     user_service = UserService(db)
     
     try:

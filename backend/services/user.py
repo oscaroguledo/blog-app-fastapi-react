@@ -78,22 +78,25 @@ class UserService:
         token = await self.create_access_token(user)
         return user, token
 
-    async def verify_token(self, token: str) -> Optional[str]:
+    async def verify_token(self, token: str) -> Optional[dict]:
         """Verify a JWT token and return the user ID if valid."""
         if not token:
             raise ValueError("Token is required")
         return jwt_handler.verify_token(token)
-
+    
     async def get(self, user_id: Optional[uuid.UUID] = None, email:Optional[str] = None) -> Optional[User]:
-        """Get a user by ID."""
+        """Get a user by ID or email."""
         if not user_id and not email:
             raise ValueError("User ID or email is required")
         
-        query = select(User).where(User.id == user_id)
+        query = select(User)
+        if user_id:
+            query = query.where(User.id == user_id)
         if email:
-            query = query.options(selectinload(User.email))
+            query = query.where(User.email == email)
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
+    
 
     async def list(self, 
         active: Optional[bool] = None,
