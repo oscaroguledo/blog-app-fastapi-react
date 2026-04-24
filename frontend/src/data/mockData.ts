@@ -6,8 +6,10 @@ export interface User {
   lastName: string;
   email: string;
   avatar: string;
-  role: Role;
   bio: string;
+  role: string;
+  active: boolean;
+  createdAt: string;
   followers: number;
   following: number;
 }
@@ -47,6 +49,8 @@ export const mockUsers: User[] = [
   avatar: 'https://i.pravatar.cc/150?u=u1',
   role: 'Admin',
   bio: 'Chief Editor and Tech Enthusiast. Writing about the future of web development.',
+  active: true,
+  createdAt: '2023-01-15T10:00:00Z',
   followers: 12500,
   following: 340
 },
@@ -58,6 +62,8 @@ export const mockUsers: User[] = [
   avatar: 'https://i.pravatar.cc/150?u=u2',
   role: 'Writer',
   bio: 'UX Designer turned Frontend Developer. I build things that look good and work well.',
+  active: true,
+  createdAt: '2023-02-20T14:30:00Z',
   followers: 8430,
   following: 120
 },
@@ -69,6 +75,8 @@ export const mockUsers: User[] = [
   avatar: 'https://i.pravatar.cc/150?u=u3',
   role: 'Writer',
   bio: 'Data Scientist exploring AI and Machine Learning applications in everyday life.',
+  active: true,
+  createdAt: '2023-03-10T09:15:00Z',
   followers: 5200,
   following: 450
 }];

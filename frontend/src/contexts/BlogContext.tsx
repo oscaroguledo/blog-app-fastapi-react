@@ -1,13 +1,5 @@
-import React, { useState, createContext, useContext } from 'react';
-import {
-  Post,
-  Comment,
-  mockPosts,
-  mockComments,
-  mockCategories,
-  User,
-  mockUsers } from
-'@/data/mockData';
+import React, { useState, createContext, useContext, useEffect } from 'react';
+import { postsApi, categoriesApi, commentsApi, Post, Comment, User } from '@/api/blogApi';
 
 interface PaginationParams {
   page: number;
@@ -34,10 +26,36 @@ interface BlogContextType {
 }
 const BlogContext = createContext<BlogContextType | undefined>(undefined);
 export function BlogProvider({ children }: {children: React.ReactNode;}) {
-  const [posts, setPosts] = useState<Post[]>(mockPosts);
-  const [comments, setComments] = useState<Comment[]>(mockComments);
-  const [categories] = useState<string[]>(mockCategories.map(c => c.value));
-  const [users] = useState<User[]>(mockUsers);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    // Fetch initial data
+    const fetchData = async () => {
+      try {
+        const postsRes = await postsApi.getAll();
+        if (postsRes.success && postsRes.data) {
+          setPosts(postsRes.data);
+        }
+
+        const categoriesRes = await categoriesApi.getAll();
+        if (categoriesRes.success && categoriesRes.data) {
+          setCategories(categoriesRes.data.map(c => c.name));
+        }
+
+        const commentsRes = await commentsApi.getAll();
+        if (commentsRes.success && commentsRes.data) {
+          setComments(commentsRes.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const getPaginatedPosts = (page: number, limit: number) => {
     const startIndex = (page - 1) * limit;

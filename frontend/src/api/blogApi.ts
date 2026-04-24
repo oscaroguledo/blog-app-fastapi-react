@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:8000';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -112,7 +112,7 @@ export const categoriesApi = {
 export interface Comment {
   id: string;
   postId: string;
-  author_id: string;
+  authorId: string;
   content: string;
   createdAt: string;
   likes: number;
@@ -201,6 +201,8 @@ export interface User {
   role: string;
   active: boolean;
   createdAt: string;
+  followers: number;
+  following: number;
 }
 
 export interface UserCreate {
