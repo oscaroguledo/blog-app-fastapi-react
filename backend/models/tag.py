@@ -8,6 +8,13 @@ from core.database import Base
 
 class Tag(Base):
     __tablename__ = "tags"
+    __table_args__ = (
+        Index("ix_tags_name", "name"),
+        Index("ix_tags_slug", "slug"),
+        Index("ix_tags_created_at", "created_at"),
+        Index("ix_tags_updated_at", "updated_at"),
+        {"schema": "public"}
+    )
     
     id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String, unique=True, nullable=False)

@@ -8,6 +8,13 @@ from core.database import Base
 
 class Category(Base):
     __tablename__ = "categories"
+    __table_args__ = (
+        Index("ix_categories_name", "name"),
+        Index("ix_categories_slug", "slug"),
+        Index("ix_categories_created_at", "created_at"),
+        Index("ix_categories_updated_at", "updated_at"),
+        {"schema": "public"}
+    )
     
     id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String, unique=True, nullable=False)

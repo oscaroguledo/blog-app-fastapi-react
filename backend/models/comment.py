@@ -8,6 +8,14 @@ from core.database import Base
 
 class Comment(Base):
     __tablename__ = "comments"
+    __table_args__ = (
+        Index("ix_comments_post_id", "post_id"),
+        Index("ix_comments_author_id", "author_id"),
+        Index("ix_comments_parent_id", "parent_id"),
+        Index("ix_comments_created_at", "created_at"),
+        Index("ix_comments_likes", "likes"),
+        {"schema": "public"}
+    )
     
     id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
     post_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('posts.id', ondelete='CASCADE'), nullable=False)

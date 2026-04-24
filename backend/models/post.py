@@ -9,6 +9,11 @@ from core.database import Base
 # Association models for many-to-many relationships
 class PostCategory(Base):
     __tablename__ = "post_category"
+    __table_args__ = (
+        Index("ix_post_category_post_id", "post_id"),
+        Index("ix_post_category_category_id", "category_id"),
+        {"schema": "public"}
+    )
     
     post_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('posts.id', ondelete='CASCADE'), primary_key=True)
     category_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('categories.id', ondelete='CASCADE'), primary_key=True)
@@ -19,6 +24,11 @@ class PostCategory(Base):
 
 class PostTag(Base):
     __tablename__ = "post_tag"
+    __table_args__ = (
+        Index("ix_post_tag_post_id", "post_id"),
+        Index("ix_post_tag_tag_id", "tag_id"),
+        {"schema": "public"}
+    )
     
     post_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('posts.id', ondelete='CASCADE'), primary_key=True)
     tag_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('tags.id', ondelete='CASCADE'), primary_key=True)
@@ -29,6 +39,17 @@ class PostTag(Base):
 
 class Post(Base):
     __tablename__ = "posts"
+    __table_args__ = (
+        Index("ix_posts_authorId", "authorId"),
+        Index("ix_posts_created_at", "created_at"),
+        Index("ix_posts_updated_at", "updated_at"),
+        Index("ix_posts_isPublished", "isPublished"),
+        Index("ix_posts_featured", "featured"),
+        Index("ix_posts_likes", "likes"),
+        Index("ix_posts_views", "views"),
+        Index("ix_posts_readingTime", "readingTime"),
+        {"schema": "public"}
+    )
     
     id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
     title: Mapped[str] = mapped_column(String, nullable=False)
