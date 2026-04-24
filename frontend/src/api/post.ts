@@ -1,3 +1,5 @@
+import { apiFetch, parseApiResponse } from '@/utils/apiClient';
+
 const API_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:8000';
 
 interface ApiResponse<T> {
@@ -42,46 +44,41 @@ export const postApi = {
     if (params?.category) queryParams.append('category', params.category);
     if (params?.author) queryParams.append('author', params.author);
     
-    const response = await fetch(`${API_URL}/posts/?${queryParams}`);
-    return response.json();
+    const response = await apiFetch(`${API_URL}/posts/?${queryParams}`);
+    return parseApiResponse<Post[]>(response);
   },
 
   getById: async (id: string): Promise<ApiResponse<Post>> => {
-    const response = await fetch(`${API_URL}/posts/${id}`);
-    return response.json();
+    const response = await apiFetch(`${API_URL}/posts/${id}`);
+    return parseApiResponse<Post>(response);
   },
 
-  create: async (data: PostCreate, token: string): Promise<ApiResponse<Post>> => {
-    const response = await fetch(`${API_URL}/posts/`, {
+  create: async (data: PostCreate): Promise<ApiResponse<Post>> => {
+    const response = await apiFetch(`${API_URL}/posts/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
-    return response.json();
+    return parseApiResponse<Post>(response);
   },
 
-  update: async (id: string, data: Partial<PostCreate>, token: string): Promise<ApiResponse<Post>> => {
-    const response = await fetch(`${API_URL}/posts/${id}`, {
+  update: async (id: string, data: Partial<PostCreate>): Promise<ApiResponse<Post>> => {
+    const response = await apiFetch(`${API_URL}/posts/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
-    return response.json();
+    return parseApiResponse<Post>(response);
   },
 
-  delete: async (id: string, token: string): Promise<ApiResponse<void>> => {
-    const response = await fetch(`${API_URL}/posts/${id}`, {
+  delete: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await apiFetch(`${API_URL}/posts/${id}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
     });
-    return response.json();
+    return parseApiResponse<void>(response);
   },
 };

@@ -1,3 +1,5 @@
+import { apiFetch, parseApiResponse } from '@/utils/apiClient';
+
 const API_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:8000';
 
 interface ApiResponse<T> {
@@ -35,7 +37,7 @@ export interface UserLogin {
 }
 
 export const userApi = {
-  register: async (data: UserCreate): Promise<ApiResponse<{ user: User; token: string }>> => {
+  register: async (data: UserCreate): Promise<ApiResponse<{ user: User; token: string; refresh_token?: string }>> => {
     const response = await fetch(`${API_URL}/users/register`, {
       method: 'POST',
       headers: {
@@ -46,7 +48,7 @@ export const userApi = {
     return response.json();
   },
 
-  login: async (data: UserLogin): Promise<ApiResponse<{ user: User; token: string }>> => {
+  login: async (data: UserLogin): Promise<ApiResponse<{ user: User; token: string; refresh_token?: string }>> => {
     const response = await fetch(`${API_URL}/users/login`, {
       method: 'POST',
       headers: {
@@ -57,33 +59,24 @@ export const userApi = {
     return response.json();
   },
 
-  getMe: async (token: string): Promise<ApiResponse<User>> => {
-    const response = await fetch(`${API_URL}/users/me`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    return response.json();
+  getMe: async (): Promise<ApiResponse<User>> => {
+    const response = await apiFetch(`${API_URL}/users/me`);
+    return parseApiResponse<User>(response);
   },
 
-  updateMe: async (data: Partial<User>, token: string): Promise<ApiResponse<User>> => {
-    const response = await fetch(`${API_URL}/users/me`, {
+  updateMe: async (data: Partial<User>): Promise<ApiResponse<User>> => {
+    const response = await apiFetch(`${API_URL}/users/me`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
-    return response.json();
+    return parseApiResponse<User>(response);
   },
 
-  getAll: async (token: string): Promise<ApiResponse<User[]>> => {
-    const response = await fetch(`${API_URL}/users/`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    return response.json();
+  getAll: async (): Promise<ApiResponse<User[]>> => {
+    const response = await apiFetch(`${API_URL}/users/`);
+    return parseApiResponse<User[]>(response);
   },
 };

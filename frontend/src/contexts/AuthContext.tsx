@@ -1,5 +1,6 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
 import { userApi, User } from '@/api/user';
+import { tokenManager } from '@/utils/tokenManager';
 
 interface AuthContextType {
   user: User | null;
@@ -13,29 +14,33 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: {children: React.ReactNode;}) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('auth_token');
-    if (storedToken) {
-      setToken(storedToken);
-      fetchUser(storedToken);
+    const token = tokenManager.getAccessToken();
+    if (token && !tokenManager.isTokenExpired(token)) {
+      fetchUser();
+    } else if (token && tokenManager.isTokenExpired(token)) {
+      // Token is expired, clear it
+      tokenManager.clearTokens();
     }
   }, []);
 
-  const fetchUser = async (authToken: string) => {
+  const fetchUser = async () => {
     try {
-      const response = await userApi.getMe(authToken);
+      const token = tokenManager.getAccessToken();
+      if (!token) return;
+      
+      const response = await userApi.getMe();
       if (response.success && response.data) {
         setUser(response.data);
       } else {
-        localStorage.removeItem('auth_token');
-        setToken(null);
+        tokenManager.clearTokens();
+        setUser(null);
       }
     } catch (error) {
       console.error('Failed to fetch user:', error);
-      localStorage.removeItem('auth_token');
-      setToken(null);
+      tokenManager.clearTokens();
+      setUser(null);
     }
   };
 
@@ -45,8 +50,10 @@ export function AuthProvider({ children }: {children: React.ReactNode;}) {
       if (response.success && response.data) {
         const { user: userData, token: authToken } = response.data;
         setUser(userData);
-        setToken(authToken);
-        localStorage.setItem('auth_token', authToken);
+        tokenManager.setTokens({
+          access_token: authToken,
+          refresh_token: response.data.refresh_token,
+        });
         if (redirectPath) {
           window.location.href = redirectPath;
         }
@@ -61,8 +68,7 @@ export function AuthProvider({ children }: {children: React.ReactNode;}) {
 
   const logout = () => {
     setUser(null);
-    setToken(null);
-    localStorage.removeItem('auth_token');
+    tokenManager.clearTokens();
   };
 
   const signup = async (firstName: string, lastName: string, email: string, password: string) => {
@@ -71,8 +77,10 @@ export function AuthProvider({ children }: {children: React.ReactNode;}) {
       if (response.success && response.data) {
         const { user: userData, token: authToken } = response.data;
         setUser(userData);
-        setToken(authToken);
-        localStorage.setItem('auth_token', authToken);
+        tokenManager.setTokens({
+          access_token: authToken,
+          refresh_token: response.data.refresh_token,
+        });
       } else {
         throw new Error(response.message || 'Signup failed');
       }

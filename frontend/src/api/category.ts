@@ -1,3 +1,5 @@
+import { apiFetch, parseApiResponse } from '@/utils/apiClient';
+
 const API_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:8000';
 
 interface ApiResponse<T> {
@@ -17,12 +19,12 @@ export interface Category {
 
 export const categoryApi = {
   getAll: async (): Promise<ApiResponse<Category[]>> => {
-    const response = await fetch(`${API_URL}/categories/`);
-    return response.json();
+    const response = await apiFetch(`${API_URL}/categories/`);
+    return parseApiResponse<Category[]>(response);
   },
 
   getById: async (id: string): Promise<ApiResponse<Category>> => {
-    const response = await fetch(`${API_URL}/categories/${id}`);
-    return response.json();
+    const response = await apiFetch(`${API_URL}/categories/${id}`);
+    return parseApiResponse<Category>(response);
   },
 };

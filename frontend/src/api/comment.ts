@@ -1,3 +1,5 @@
+import { apiFetch, parseApiResponse } from '@/utils/apiClient';
+
 const API_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:8000';
 
 interface ApiResponse<T> {
@@ -24,66 +26,55 @@ export interface CommentCreate {
 export const commentApi = {
   getAll: async (postId?: string): Promise<ApiResponse<Comment[]>> => {
     const queryParams = postId ? `?post_id=${postId}` : '';
-    const response = await fetch(`${API_URL}/comments/${queryParams}`);
-    return response.json();
+    const response = await apiFetch(`${API_URL}/comments/${queryParams}`);
+    return parseApiResponse<Comment[]>(response);
   },
 
   getById: async (id: string): Promise<ApiResponse<Comment>> => {
-    const response = await fetch(`${API_URL}/comments/${id}`);
-    return response.json();
+    const response = await apiFetch(`${API_URL}/comments/${id}`);
+    return parseApiResponse<Comment>(response);
   },
 
-  create: async (data: CommentCreate, token: string): Promise<ApiResponse<Comment>> => {
-    const response = await fetch(`${API_URL}/comments/`, {
+  create: async (data: CommentCreate): Promise<ApiResponse<Comment>> => {
+    const response = await apiFetch(`${API_URL}/comments/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
-    return response.json();
+    return parseApiResponse<Comment>(response);
   },
 
-  update: async (id: string, data: Partial<CommentCreate>, token: string): Promise<ApiResponse<Comment>> => {
-    const response = await fetch(`${API_URL}/comments/${id}`, {
+  update: async (id: string, data: Partial<CommentCreate>): Promise<ApiResponse<Comment>> => {
+    const response = await apiFetch(`${API_URL}/comments/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
-    return response.json();
+    return parseApiResponse<Comment>(response);
   },
 
-  delete: async (id: string, token: string): Promise<ApiResponse<void>> => {
-    const response = await fetch(`${API_URL}/comments/${id}`, {
+  delete: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await apiFetch(`${API_URL}/comments/${id}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
     });
-    return response.json();
+    return parseApiResponse<void>(response);
   },
 
-  like: async (id: string, token: string): Promise<ApiResponse<void>> => {
-    const response = await fetch(`${API_URL}/comments/${id}/like`, {
+  like: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await apiFetch(`${API_URL}/comments/${id}/like`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
     });
-    return response.json();
+    return parseApiResponse<void>(response);
   },
 
-  unlike: async (id: string, token: string): Promise<ApiResponse<void>> => {
-    const response = await fetch(`${API_URL}/comments/${id}/unlike`, {
+  unlike: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await apiFetch(`${API_URL}/comments/${id}/unlike`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
     });
-    return response.json();
+    return parseApiResponse<void>(response);
   },
 };
