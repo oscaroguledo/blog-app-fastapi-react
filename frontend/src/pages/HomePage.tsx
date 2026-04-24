@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { Clock, ArrowRight } from 'lucide-react';
 
 export function HomePage() {
-  const { posts, categories, tags, users, getAuthor } = useBlog();
+  const { posts, categories, users, getAuthor } = useBlog();
   const publishedPosts = posts.filter((p) => p.isPublished);
   const featuredPost = publishedPosts.find((p) => p.featured) || publishedPosts[0];
   const recentPosts = publishedPosts.filter((p) => p.id !== featuredPost?.id).slice(0, 6);
@@ -132,7 +132,6 @@ export function HomePage() {
             <div className="relative">
               <CategorySidebar
                 categories={categories}
-                tags={tags}
                 posts={publishedPosts}
                 users={users}
               />

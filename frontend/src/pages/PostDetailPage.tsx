@@ -135,19 +135,6 @@ export function PostDetailPage() {
               }}
             />
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-12">
-              {post.tags.map((tag) => (
-                <Link
-                  key={tag}
-                  to={`/search?tag=${tag}`}
-                  className="px-4 py-2 bg-muted text-text text-sm font-medium rounded-custom hover:bg-accent hover:text-white transition-all"
-                >
-                  #{tag}
-                </Link>
-              ))}
-            </div>
-
             {/* Author Bio Box */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}

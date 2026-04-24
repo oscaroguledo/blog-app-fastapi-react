@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Image as ImageIcon, Settings, Eye, Edit2, Check } from 'lucide-react';
 export function WritePage() {
   const { isAuthenticated, user } = useAuth();
-  const { addPost, categories, tags } = useBlog();
+  const { addPost, categories } = useBlog();
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -34,7 +34,6 @@ export function WritePage() {
         coverImage: coverImage || 'https://picsum.photos/seed/new/1200/600',
         authorId: user!.id,
         categories: [selectedCategory],
-        tags: ['New'],
         readingTime: Math.ceil(content.split(' ').length / 200),
         isPublished: true
       });

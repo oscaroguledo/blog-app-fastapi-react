@@ -10,12 +10,11 @@ interface CategoryItem {
 
 interface CategorySidebarProps {
   categories: string[];
-  tags: string[];
   posts: Post[];
   users: User[];
 }
 
-export function CategorySidebar({ categories, tags, posts, users }: CategorySidebarProps) {
+export function CategorySidebar({ categories, posts, users }: CategorySidebarProps) {
   // Calculate post counts per category
   const categoryCounts: CategoryItem[] = categories.
   map((category) => ({
@@ -51,24 +50,6 @@ export function CategorySidebar({ categories, tags, posts, users }: CategorySide
             </li>
           )}
         </ul>
-      </div>
-
-      {/* Popular Tags */}
-      <div className="bg-surface rounded-xl border border-border p-6">
-        <h3 className="text-lg font-serif font-bold text-text mb-4">
-          Popular Tags
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          {tags.slice(0, 10).map((tag) =>
-          <Link
-            key={tag}
-            to={`/search?tag=${tag}`}
-            className="inline-block bg-muted hover:bg-accent hover:text-white text-muted-text text-sm px-3 py-1.5 rounded-full transition-colors">
-            
-              {tag}
-            </Link>
-          )}
-        </div>
       </div>
 
       {/* Trending Authors */}

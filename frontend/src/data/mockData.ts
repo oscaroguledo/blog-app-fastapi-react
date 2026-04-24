@@ -30,7 +30,6 @@ export interface Post {
   coverImage: string;
   authorId: string;
   categories: string[];
-  tags: string[];
   createdAt: string;
   readingTime: number;
   likes: number;
@@ -130,7 +129,6 @@ The future is bright, and the ecosystem is adapting rapidly.
   coverImage: 'https://picsum.photos/seed/react/1200/600',
   authorId: 'u1',
   categories: ['Technology', 'Web Dev'],
-  tags: ['React', 'TypeScript'],
   createdAt: '2023-10-15T10:00:00Z',
   readingTime: 6,
   likes: 342,
@@ -147,7 +145,6 @@ The future is bright, and the ecosystem is adapting rapidly.
   coverImage: 'https://picsum.photos/seed/design/800/600',
   authorId: 'u2',
   categories: ['Design'],
-  tags: ['UI/UX', 'Web Dev'],
   createdAt: '2023-10-12T14:30:00Z',
   readingTime: 8,
   likes: 215,
@@ -163,7 +160,6 @@ The future is bright, and the ecosystem is adapting rapidly.
   coverImage: 'https://picsum.photos/seed/ai/800/600',
   authorId: 'u3',
   categories: ['Technology', 'AI', 'Science'],
-  tags: ['Machine Learning'],
   createdAt: '2023-10-10T09:15:00Z',
   readingTime: 12,
   likes: 512,
@@ -179,7 +175,6 @@ The future is bright, and the ecosystem is adapting rapidly.
   coverImage: 'https://picsum.photos/seed/system/800/600',
   authorId: 'u2',
   categories: ['Design', 'Business'],
-  tags: ['UI/UX', 'Productivity'],
   createdAt: '2023-10-05T11:20:00Z',
   readingTime: 10,
   likes: 189,
@@ -195,7 +190,6 @@ The future is bright, and the ecosystem is adapting rapidly.
   coverImage: 'https://picsum.photos/seed/remote/800/600',
   authorId: 'u1',
   categories: ['Business', 'Lifestyle'],
-  tags: ['Productivity', 'Career'],
   createdAt: '2023-10-01T08:00:00Z',
   readingTime: 5,
   likes: 420,

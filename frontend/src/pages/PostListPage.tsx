@@ -33,7 +33,6 @@ export function PostListPage() {
         post.title.toLowerCase().includes(q) ||
         post.excerpt.toLowerCase().includes(q) ||
         post.content.toLowerCase().includes(q) ||
-        post.tags.some((t) => t.toLowerCase().includes(q)) ||
         post.categories.some((c) => c.toLowerCase().includes(q))
       );
     }
