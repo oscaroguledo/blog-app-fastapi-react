@@ -4,13 +4,12 @@ import { categoryApi } from '@/api/category';
 import { commentApi } from '@/api/comment';
 import { Post } from '@/api/post';
 import { Comment } from '@/api/comment';
-import { User } from '@/api/user';
+import { User, userApi } from '@/api/user';
 
-interface PaginationParams {
-  page: number;
+interface PaginationState {
   limit: number;
+  offset: number;
   total: number;
-  totalPages: number;
 }
 
 interface BlogContextType {
@@ -18,32 +17,36 @@ interface BlogContextType {
   comments: Comment[];
   categories: string[];
   users: User[];
-  getPaginatedPosts: (page: number, limit: number) => { posts: Post[]; pagination: PaginationParams };
+  pagination: PaginationState;
+  fetchPosts: (params?: { limit?: number; offset?: number; is_published?: boolean; featured?: boolean }) => Promise<void>;
+  fetchPostsPaginated: (page: number, limit: number) => Promise<{ posts: Post[]; total: number }>;
   addPost: (post: Omit<Post, 'id' | 'createdAt' | 'likes' | 'views'>) => void;
   updatePost: (id: string, post: Partial<Post>) => void;
   deletePost: (id: string) => void;
-  addComment: (
-    comment: Omit<Comment, 'id' | 'createdAt' | 'likes' | 'replies'>)
-  => void;
+  addComment: (comment: Omit<Comment, 'id' | 'createdAt' | 'likes'>) => void;
   deleteComment: (id: string) => void;
   toggleLike: (postId: string) => void;
   getAuthor: (authorId: string) => User | undefined;
 }
+
 const BlogContext = createContext<BlogContextType | undefined>(undefined);
+
 export function BlogProvider({ children }: {children: React.ReactNode;}) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [pagination, setPagination] = useState<PaginationState>({
+    limit: 10,
+    offset: 0,
+    total: 0,
+  });
 
   useEffect(() => {
     // Fetch initial data
     const fetchData = async () => {
       try {
-        const postsRes = await postApi.getAll();
-        if (postsRes.success && postsRes.data) {
-          setPosts(postsRes.data);
-        }
+        await fetchPosts({ limit: 10, offset: 0, is_published: true });
 
         const categoriesRes = await categoryApi.getAll();
         if (categoriesRes.success && categoriesRes.data) {
@@ -54,6 +57,12 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
         if (commentsRes.success && commentsRes.data) {
           setComments(commentsRes.data);
         }
+
+        // Fetch users
+        const usersRes = await userApi.getAll();
+        if (usersRes.success && usersRes.data) {
+          setUsers(usersRes.data);
+        }
       } catch (error) {
         console.error('Failed to fetch data:', error);
       }
@@ -62,22 +71,32 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
     fetchData();
   }, []);
 
-  const getPaginatedPosts = (page: number, limit: number) => {
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedPosts = posts.slice(startIndex, endIndex);
-    const total = posts.length;
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      posts: paginatedPosts,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages
+  const fetchPosts = async (params?: { limit?: number; offset?: number; is_published?: boolean; featured?: boolean }) => {
+    try {
+      const response = await postApi.getAll(params);
+      if (response.success && response.data) {
+        setPosts(response.data.posts);
+        setPagination(response.data.pagination);
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch posts:', error);
+    }
+  };
+
+  const fetchPostsPaginated = async (page: number, limit: number): Promise<{ posts: Post[]; total: number }> => {
+    const offset = (page - 1) * limit;
+    try {
+      const response = await postApi.getAll({ limit, offset, is_published: true });
+      if (response.success && response.data) {
+        setPosts(response.data.posts);
+        setPagination(response.data.pagination);
+        return { posts: response.data.posts, total: response.data.pagination.total };
+      }
+      return { posts: [], total: 0 };
+    } catch (error) {
+      console.error('Failed to fetch posts:', error);
+      return { posts: [], total: 0 };
+    }
   };
   const addPost = (
   postData: Omit<Post, 'id' | 'createdAt' | 'likes' | 'views'>) =>
@@ -107,7 +126,7 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
     setPosts(posts.filter((post) => post.id !== id));
   };
   const addComment = (
-  commentData: Omit<Comment, 'id' | 'createdAt' | 'likes' | 'replies'>) =>
+  commentData: Omit<Comment, 'id' | 'createdAt' | 'likes'>) =>
   {
     const newComment: Comment = {
       ...commentData,
@@ -144,7 +163,9 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
         comments,
         categories,
         users,
-        getPaginatedPosts,
+        pagination,
+        fetchPosts,
+        fetchPostsPaginated,
         addPost,
         updatePost,
         deletePost,
