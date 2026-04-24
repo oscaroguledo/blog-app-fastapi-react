@@ -48,6 +48,8 @@ export const postApi = {
   getAll: async (params?: {
     author_id?: string;
     reading_time?: number;
+    likes?: number;
+    views?: number;
     category_id?: string;
     is_published?: boolean;
     featured?: boolean;
