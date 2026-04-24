@@ -23,7 +23,7 @@ class User(Base):
         Index("role_idx", "role"),
         {"schema": "public"}
     )
-    
+
     id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, index=True, unique=True)
     firstName: Mapped[str] = mapped_column(String, nullable=False)
     lastName: Mapped[str] = mapped_column(String, nullable=False)
@@ -36,7 +36,7 @@ class User(Base):
     # Relationships
     posts = relationship("Post", back_populates="author")
     comments = relationship("Comment", back_populates="author")
-    
+
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 

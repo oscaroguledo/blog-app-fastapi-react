@@ -124,4 +124,14 @@ export const postApi = {
     const response = await axiosInstance.post(`/posts/${id}/unfeature`);
     return response.data;
   },
+
+  bookmark: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await axiosInstance.post(`/posts/${id}/bookmark`);
+    return response.data;
+  },
+
+  unbookmark: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await axiosInstance.post(`/posts/${id}/unbookmark`);
+    return response.data;
+  },
 };

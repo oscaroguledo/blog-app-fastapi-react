@@ -23,7 +23,7 @@ export function PostDetailPage() {
   const { id } = useParams<{
     id: string;
   }>();
-  const { getAuthor, addComment, toggleLike } = useBlog();
+  const { getAuthor, addComment, toggleLike, toggleBookmark, bookmarkedPosts } = useBlog();
   const { user, isAuthenticated } = useAuth();
   const [commentText, setCommentText] = useState('');
   const [post, setPost] = useState<Post | null>(null);
@@ -195,13 +195,6 @@ export function PostDetailPage() {
                     {author.name}
                   </h3>
                   <p className="text-muted-text mb-4 leading-relaxed">{author.bio}</p>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="rounded-custom"
-                  >
-                    Follow
-                  </Button>
                 </div>
               </div>
             </motion.div>
@@ -322,12 +315,13 @@ export function PostDetailPage() {
                     <span>{postComments.length} Comments</span>
                   </a>
                   <Button
+                    onClick={() => toggleBookmark(post.id)}
                     variant="outline"
                     size="md"
                     className="flex items-center justify-center gap-2"
                   >
-                    <Bookmark size={18} />
-                    <span>Save</span>
+                    <Bookmark size={18} fill={bookmarkedPosts.has(post.id) ? 'currentColor' : 'none'} />
+                    <span>{bookmarkedPosts.has(post.id) ? 'Saved' : 'Save'}</span>
                   </Button>
                   <Button
                     variant="outline"

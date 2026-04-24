@@ -492,16 +492,16 @@ async def verify_email(
 ):
     """Resend email verification."""
     user_service = UserService(db)
-    
+
     user = await user_service.get(user_id=None, email=email)
-    
+
     if not user:
         return Response(
             success=False,
             message="User not found",
             status_code=status.HTTP_404_NOT_FOUND
         )
-    
+
     # TODO: Implement actual email sending with verification token
     # For now, just return success
     return Response(

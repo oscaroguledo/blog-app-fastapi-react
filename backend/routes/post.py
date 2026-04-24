@@ -434,7 +434,7 @@ async def feature_post(post_id: str, db: AsyncSession = Depends(get_db)):
 async def unfeature_post(post_id: str, db: AsyncSession = Depends(get_db)):
     """Unfeature a post."""
     post_service = PostService(db)
-    
+
     try:
         post = await post_service.unfeature(uuid.UUID(post_id))
         if not post:
@@ -443,11 +443,87 @@ async def unfeature_post(post_id: str, db: AsyncSession = Depends(get_db)):
                 message="Post not found",
                 status_code=status.HTTP_404_NOT_FOUND
             )
-        
+
         return Response(
             success=True,
             message="Post unfeatured successfully",
             data=post.to_dict()
+        )
+    except ValueError:
+        return Response(
+            success=False,
+            message="Invalid post ID format",
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@router.post("/{post_id}/bookmark")
+async def bookmark_post(
+    post_id: str,
+    current_user = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Bookmark a post for the current user."""
+    from models.post import PostBookmark
+    from sqlalchemy import select
+
+    try:
+        post_uuid = uuid.UUID(post_id)
+        # Check if already bookmarked
+        existing = await db.execute(
+            select(PostBookmark).where(
+                PostBookmark.post_id == post_uuid,
+                PostBookmark.user_id == current_user.id
+            )
+        )
+        if existing.scalar_one_or_none():
+            return Response(
+                success=False,
+                message="Post already bookmarked",
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Create bookmark
+        bookmark = PostBookmark(post_id=post_uuid, user_id=current_user.id)
+        db.add(bookmark)
+        await db.commit()
+
+        return Response(
+            success=True,
+            message="Post bookmarked successfully"
+        )
+    except ValueError:
+        return Response(
+            success=False,
+            message="Invalid post ID format",
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@router.post("/{post_id}/unbookmark")
+async def unbookmark_post(
+    post_id: str,
+    current_user = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Remove bookmark from a post for the current user."""
+    from models.post import PostBookmark
+    from sqlalchemy import select, delete
+
+    try:
+        post_uuid = uuid.UUID(post_id)
+        # Delete bookmark
+        await db.execute(
+            delete(PostBookmark).where(
+                PostBookmark.post_id == post_uuid,
+                PostBookmark.user_id == current_user.id
+            )
+        )
+        await db.commit()
+
+        return Response(
+            success=True,
+            message="Post unbookmarked successfully"
         )
     except ValueError:
         return Response(
