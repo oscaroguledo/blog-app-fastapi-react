@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from core.database import init_db, check_db
-from core.redis import init_redis, close_redis
+from core.redis import redis_client
 from core.utils.logger import info, success, warning, error
 from routes import health_router, user_router, post_router, tag_router, comment_router, category_router, contact_router
 
@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
         warning("⚠️  Application started but database connection failed")
 
     # Check Redis connection
-    redis_connected = await init_redis()
+    redis_connected = await redis_client.init()
     if not redis_connected:
         warning("⚠️  Application started but Redis connection failed")
 
@@ -29,7 +29,7 @@ async def lifespan(app: FastAPI):
 
     # Shutdown
     info("🛑 Shutting down application...")
-    await close_redis()
+    await redis_client.close()
     success("✅ Application shutdown complete")
 
 
