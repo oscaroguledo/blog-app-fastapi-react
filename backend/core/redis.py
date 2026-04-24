@@ -1,5 +1,6 @@
 import redis.asyncio as redis
 from core.config import settings
+from core.utils.logger import success, error, info
 
 redis_client = None
 
@@ -20,10 +21,10 @@ async def init_redis():
     try:
         client = await get_redis()
         await client.ping()
-        print("✅ Redis connected successfully")
+        success("✅ Redis connected successfully")
         return True
     except Exception as e:
-        print(f"❌ Redis connection failed: {e}")
+        error(f"❌ Redis connection failed: {e}")
         return False
 
 
@@ -33,4 +34,4 @@ async def close_redis():
     if redis_client:
         await redis_client.close()
         redis_client = None
-        print("Redis connection closed")
+        info("Redis connection closed")
