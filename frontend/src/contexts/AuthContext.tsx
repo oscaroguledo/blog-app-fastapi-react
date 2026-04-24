@@ -1,5 +1,5 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
-import { usersApi, User } from '@/api/blogApi';
+import { userApi, User } from '@/api/user';
 
 interface AuthContextType {
   user: User | null;
@@ -25,7 +25,7 @@ export function AuthProvider({ children }: {children: React.ReactNode;}) {
 
   const fetchUser = async (authToken: string) => {
     try {
-      const response = await usersApi.getMe(authToken);
+      const response = await userApi.getMe(authToken);
       if (response.success && response.data) {
         setUser(response.data);
       } else {
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: {children: React.ReactNode;}) {
 
   const login = async (email: string, password: string, redirectPath?: string) => {
     try {
-      const response = await usersApi.login({ email, password });
+      const response = await userApi.login({ email, password });
       if (response.success && response.data) {
         const { user: userData, token: authToken } = response.data;
         setUser(userData);
@@ -67,7 +67,7 @@ export function AuthProvider({ children }: {children: React.ReactNode;}) {
 
   const signup = async (firstName: string, lastName: string, email: string, password: string) => {
     try {
-      const response = await usersApi.register({ firstName, lastName, email, password });
+      const response = await userApi.register({ firstName, lastName, email, password });
       if (response.success && response.data) {
         const { user: userData, token: authToken } = response.data;
         setUser(userData);

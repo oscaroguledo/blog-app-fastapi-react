@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { Heart, MessageCircle, Clock, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Post, User } from '@/api/blogApi';
+import { Post } from '@/api/post';
+import { User } from '@/api/user';
 import { motion } from 'framer-motion';
 interface PostCardProps {
   post: Post;

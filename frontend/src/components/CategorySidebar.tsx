@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
-import { User, Post } from '@/api/blogApi';
+import { User } from '@/api/user';
+import { Post } from '@/api/post';
 
 interface CategoryItem {
   name: string;

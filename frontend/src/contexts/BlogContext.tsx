@@ -1,5 +1,10 @@
 import React, { useState, createContext, useContext, useEffect } from 'react';
-import { postsApi, categoriesApi, commentsApi, Post, Comment, User } from '@/api/blogApi';
+import { postApi } from '@/api/post';
+import { categoryApi } from '@/api/category';
+import { commentApi } from '@/api/comment';
+import { Post } from '@/api/post';
+import { Comment } from '@/api/comment';
+import { User } from '@/api/user';
 
 interface PaginationParams {
   page: number;
@@ -35,17 +40,17 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
     // Fetch initial data
     const fetchData = async () => {
       try {
-        const postsRes = await postsApi.getAll();
+        const postsRes = await postApi.getAll();
         if (postsRes.success && postsRes.data) {
           setPosts(postsRes.data);
         }
 
-        const categoriesRes = await categoriesApi.getAll();
+        const categoriesRes = await categoryApi.getAll();
         if (categoriesRes.success && categoriesRes.data) {
-          setCategories(categoriesRes.data.map(c => c.name));
+          setCategories(categoriesRes.data.map((c: any) => c.name));
         }
 
-        const commentsRes = await commentsApi.getAll();
+        const commentsRes = await commentApi.getAll();
         if (commentsRes.success && commentsRes.data) {
           setComments(commentsRes.data);
         }
