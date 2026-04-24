@@ -1,10 +1,11 @@
 from core.types.guid import GUID
-from sqlalchemy import String, Text, Index, DateTime, Boolean, Enum as SAEnum
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, Text, Index, DateTime, Boolean
+from sqlalchemy.orm import Mapped, mapped_column
 import uuid
 from enum import Enum
 from datetime import datetime, timezone
 from core.database import Base
+
 
 class UserRole(Enum):
     WRITER = "Writer"
@@ -21,7 +22,7 @@ class User(Base):
         Index("updated_at_idx", "updated_at"),
         Index("active_idx", "active"),
         Index("role_idx", "role"),
-        {"schema": "blog"}
+        {"schema": "public"},
     )
 
     id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4, index=True, unique=True)
@@ -34,15 +35,14 @@ class User(Base):
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
         return f"<User {self.id} {self.firstName} {self.lastName} {self.email}>"
 
     @property
     def role_enum(self) -> UserRole:
-        """Return role as UserRole enum."""
         return UserRole(self.role)
 
     def to_dict(self):

@@ -87,7 +87,7 @@ class TagService:
         description: Optional[str] = None
     ) -> Optional[Tag]:
         """Update a tag."""
-        tag = await self.get(tag_id, name=name, slug=slug)
+        tag = await self.get(tag_id)
         if not tag:
             return None
         

@@ -5,7 +5,9 @@ from models.category import Category
 from models.tag import Tag
 from typing import Optional, List
 import uuid
+import json
 from datetime import datetime, timezone
+from core.redis import redis_client
 
 
 class PostService:
@@ -290,3 +292,39 @@ class PostService:
         await self.db.commit()
         await self.db.refresh(post)
         return post
+
+    async def get_latest_cached(self, limit: int = 10, cache_ttl: int = 300) -> List[Post]:
+        """Get latest posts with Redis caching fallback to PostgreSQL."""
+        cache_key = f"latest_posts:{limit}"
+        
+        try:
+            # Try to get from Redis
+            redis = await redis_client.get_client()
+            cached_data = await redis.get(cache_key)
+            
+            if cached_data:
+                # Parse cached data and return
+                post_dicts = json.loads(cached_data)
+                # Convert dicts back to Post objects (simplified - just return dicts for now)
+                # For full implementation, you'd need to reconstruct Post objects
+                posts_data = []
+                for post_dict in post_dicts:
+                    posts_data.append(post_dict)
+                return posts_data
+        except Exception as e:
+            # If Redis fails, fall through to PostgreSQL
+            pass
+        
+        # Fallback to PostgreSQL
+        posts = await self.list(limit=limit, is_published=True)
+        
+        try:
+            # Cache the result in Redis
+            redis = await redis_client.get_client()
+            posts_data = [post.to_dict() for post in posts]
+            await redis.setex(cache_key, cache_ttl, json.dumps(posts_data))
+        except Exception as e:
+            # If caching fails, still return the posts
+            pass
+        
+        return posts

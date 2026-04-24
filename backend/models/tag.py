@@ -13,20 +13,19 @@ class Tag(Base):
         Index("ix_tags_slug", "slug"),
         Index("ix_tags_created_at", "created_at"),
         Index("ix_tags_updated_at", "updated_at"),
-        {"schema": "blog"}
+        {"schema": "public"},
     )
-    
+
     id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     slug: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
-    # Relationships
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
     post_tags = relationship("PostTag", back_populates="tag", cascade="all, delete-orphan")
-    
+
     @property
     def posts(self):
         return [pt.post for pt in self.post_tags]

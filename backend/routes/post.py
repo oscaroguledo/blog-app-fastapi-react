@@ -118,18 +118,22 @@ async def latest_posts(
     limit: int = 10,
     db: AsyncSession = Depends(get_db)
 ):
-    """List posts with filtering and pagination."""
+    """Get latest posts with Redis caching fallback to PostgreSQL."""
     post_service = PostService(db)
     
     try:
-        posts = await post_service.list(
-            limit=limit if limit else 10,
-        )
+        result = await post_service.get_latest_cached(limit=limit if limit else 10)
+        
+        # Result may be dicts (from cache) or Post objects (from DB)
+        if result and isinstance(result[0], dict):
+            data = result
+        else:
+            data = [post.to_dict() for post in result]
         
         return Response(
             success=True,
             message="Posts retrieved successfully",
-            data=[post.to_dict() for post in posts]
+            data=data
         )
     except ValueError as e:
         return Response(
