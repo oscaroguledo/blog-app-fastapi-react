@@ -50,18 +50,18 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
 
         const categoriesRes = await categoryApi.getAll();
         if (categoriesRes.success && categoriesRes.data) {
-          setCategories(categoriesRes.data.map((c: any) => c.name));
+          setCategories(categoriesRes.data.categories.map((c: any) => c.name));
         }
 
         const commentsRes = await commentApi.getAll();
         if (commentsRes.success && commentsRes.data) {
-          setComments(commentsRes.data);
+          setComments(commentsRes.data.comments);
         }
 
         // Fetch users
         const usersRes = await userApi.getAll();
         if (usersRes.success && usersRes.data) {
-          setUsers(usersRes.data);
+          setUsers(usersRes.data.users);
         }
       } catch (error) {
         console.error('Failed to fetch data:', error);
