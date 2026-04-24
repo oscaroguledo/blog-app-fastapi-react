@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from models.user import User, UserRole
 from typing import Optional, List
+from datetime import datetime
 import uuid
 from core.utils.encryption.password import password_handler
 from core.utils.encryption.jwt import jwt_handler
