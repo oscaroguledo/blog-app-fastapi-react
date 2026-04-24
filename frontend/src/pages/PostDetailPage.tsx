@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/Button';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { useBlog } from '@/contexts/BlogContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { postApi } from '@/api/post';
+import { commentApi } from '@/api/comment';
+import { Post } from '@/api/post';
+import { Comment } from '@/api/comment';
 import {
   Clock,
   Heart,
@@ -14,16 +18,54 @@ import {
   MoreHorizontal } from
 'lucide-react';
 import { motion } from 'framer-motion';
+
 export function PostDetailPage() {
   const { id } = useParams<{
     id: string;
   }>();
-  const { posts, getAuthor, comments, addComment, toggleLike } = useBlog();
+  const { getAuthor, addComment, toggleLike } = useBlog();
   const { user, isAuthenticated } = useAuth();
   const [commentText, setCommentText] = useState('');
-  const post = posts.find((p) => p.id === id);
+  const [post, setPost] = useState<Post | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!id) return;
+      try {
+        const [postRes, commentsRes] = await Promise.all([
+          postApi.getById(id),
+          commentApi.getAll({ post_id: id })
+        ]);
+        if (postRes.success && postRes.data) {
+          setPost(postRes.data);
+        }
+        if (commentsRes.success && commentsRes.data) {
+          setComments(commentsRes.data.comments);
+        }
+      } catch (error) {
+        console.error('Failed to fetch post:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-[50vh] flex items-center justify-center">
+          <p className="text-xl text-muted-text">Loading...</p>
+        </div>
+      </Layout>);
+  }
+
   const author = post ? getAuthor(post.authorId) : null;
-  const postComments = comments.filter((c) => c.postId === id);
+  const postComments = comments;
+
   if (!post || !author) {
     return (
       <Layout>

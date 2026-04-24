@@ -23,11 +23,11 @@ export function WritePage() {
     navigate('/login');
     return null;
   }
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!title || !content) return;
     setIsPublishing(true);
-    setTimeout(() => {
-      addPost({
+    try {
+      await addPost({
         title,
         content,
         excerpt: excerpt || content.substring(0, 150) + '...',
@@ -37,9 +37,12 @@ export function WritePage() {
         readingTime: Math.ceil(content.split(' ').length / 200),
         isPublished: true
       });
-      setIsPublishing(false);
       navigate('/');
-    }, 1000);
+    } catch (error) {
+      console.error('Failed to publish post:', error);
+    } finally {
+      setIsPublishing(false);
+    }
   };
   return (
     <Layout>

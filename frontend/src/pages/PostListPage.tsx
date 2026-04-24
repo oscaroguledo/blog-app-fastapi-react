@@ -26,12 +26,10 @@ export function PostListPage() {
   const [openModal, setOpenModal] = useState<'category' | 'author' | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
   const limit = 9;
 
   useEffect(() => {
     const fetchPosts = async () => {
-      setLoading(true);
       try {
         const response = await postApi.getAll({
           search_query: query || undefined,
@@ -47,8 +45,6 @@ export function PostListPage() {
         }
       } catch (error) {
         console.error('Failed to fetch posts:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -74,7 +70,6 @@ export function PostListPage() {
     setSearchParams({});
   };
 
-  const paginatedPosts = filteredPosts.slice(offset, offset + limit);
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -208,15 +203,15 @@ export function PostListPage() {
         {/* Results Count */}
         <div className="mb-6">
           <p className="text-sm text-muted-text">
-            {filteredPosts.length}{' '}
-            {filteredPosts.length === 1 ? 'article' : 'articles'} found
+            {total}{' '}
+            {total === 1 ? 'article' : 'articles'} found
           </p>
         </div>
 
         {/* Results Grid */}
-        {paginatedPosts.length > 0 ? (
+        {posts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {paginatedPosts.map((post, index) => (
+            {posts.map((post: Post, index: number) => (
               <PostCard 
                 key={post.id} 
                 post={post} 
@@ -256,7 +251,7 @@ export function PostListPage() {
           <Pagination
             limit={limit}
             offset={offset}
-            total={filteredPosts.length}
+            total={total}
             onPageChange={setOffset}
           />
         </div>
