@@ -20,12 +20,12 @@ interface BlogContextType {
   pagination: PaginationState;
   fetchPosts: (params?: { limit?: number; offset?: number; is_published?: boolean; featured?: boolean }) => Promise<void>;
   fetchPostsPaginated: (page: number, limit: number) => Promise<{ posts: Post[]; total: number }>;
-  addPost: (post: Omit<Post, 'id' | 'createdAt' | 'likes' | 'views'>) => void;
-  updatePost: (id: string, post: Partial<Post>) => void;
-  deletePost: (id: string) => void;
-  addComment: (comment: Omit<Comment, 'id' | 'createdAt' | 'likes'>) => void;
-  deleteComment: (id: string) => void;
-  toggleLike: (postId: string) => void;
+  addPost: (post: Omit<Post, 'id' | 'createdAt' | 'likes' | 'views'>) => Promise<void>;
+  updatePost: (id: string, post: Partial<Post>) => Promise<void>;
+  deletePost: (id: string) => Promise<void>;
+  addComment: (comment: Omit<Comment, 'id' | 'createdAt' | 'likes'>) => Promise<void>;
+  deleteComment: (id: string) => Promise<void>;
+  toggleLike: (postId: string) => Promise<void>;
   getAuthor: (authorId: string) => User | undefined;
 }
 
@@ -98,60 +98,70 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
       return { posts: [], total: 0 };
     }
   };
-  const addPost = (
-  postData: Omit<Post, 'id' | 'createdAt' | 'likes' | 'views'>) =>
-  {
-    const newPost: Post = {
-      ...postData,
-      id: `p${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      likes: 0,
-      views: 0
-    };
-    setPosts([newPost, ...posts]);
+  const addPost = async (postData: Omit<Post, 'id' | 'createdAt' | 'likes' | 'views'>) => {
+    try {
+      const response = await postApi.create(postData as any);
+      if (response.success && response.data) {
+        setPosts([response.data, ...posts]);
+      }
+    } catch (error) {
+      console.error('Failed to add post:', error);
+    }
   };
-  const updatePost = (id: string, updates: Partial<Post>) => {
-    setPosts(
-      posts.map((post) =>
-      post.id === id ?
-      {
-        ...post,
-        ...updates
-      } :
-      post
-      )
-    );
+  const updatePost = async (id: string, updates: Partial<Post>) => {
+    try {
+      const response = await postApi.update(id, updates);
+      if (response.success && response.data) {
+        setPosts(posts.map((post) => post.id === id ? response.data! : post));
+      }
+    } catch (error) {
+      console.error('Failed to update post:', error);
+    }
   };
-  const deletePost = (id: string) => {
-    setPosts(posts.filter((post) => post.id !== id));
+  const deletePost = async (id: string) => {
+    try {
+      const response = await postApi.delete(id);
+      if (response.success) {
+        setPosts(posts.filter((post) => post.id !== id));
+      }
+    } catch (error) {
+      console.error('Failed to delete post:', error);
+    }
   };
-  const addComment = (
-  commentData: Omit<Comment, 'id' | 'createdAt' | 'likes'>) =>
-  {
-    const newComment: Comment = {
-      ...commentData,
-      id: `c${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      likes: 0
-    };
-    setComments([...comments, newComment]);
+  const addComment = async (commentData: Omit<Comment, 'id' | 'createdAt' | 'likes'>) => {
+    try {
+      const response = await commentApi.create(commentData);
+      if (response.success && response.data) {
+        setComments([...comments, response.data]);
+      }
+    } catch (error) {
+      console.error('Failed to add comment:', error);
+    }
   };
-  const deleteComment = (id: string) => {
-    setComments(comments.filter((c) => c.id !== id));
+  const deleteComment = async (id: string) => {
+    try {
+      const response = await commentApi.delete(id);
+      if (response.success) {
+        setComments(comments.filter((c) => c.id !== id));
+      }
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
+    }
   };
-  const toggleLike = (postId: string) => {
-    setPosts(
-      posts.map((post) => {
-        if (post.id === postId) {
-          // Simple toggle logic for mock purposes
-          return {
-            ...post,
-            likes: post.likes + 1
-          };
-        }
-        return post;
-      })
-    );
+  const toggleLike = async (postId: string) => {
+    try {
+      const post = posts.find((p) => p.id === postId);
+      if (!post) return;
+      
+      // Determine whether to like or unlike based on current state
+      // In a real app, you'd track which posts the user has liked
+      const response = await postApi.like(postId);
+      if (response.success) {
+        setPosts(posts.map((p) => p.id === postId ? { ...p, likes: p.likes + 1 } : p));
+      }
+    } catch (error) {
+      console.error('Failed to toggle like:', error);
+    }
   };
   const getAuthor = (authorId: string) => {
     return users.find((u) => u.id === authorId);
