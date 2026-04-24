@@ -52,8 +52,8 @@ class CategoryService:
         search_query: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None
     ) -> List[Category]:
         """List categories with optional search and pagination."""
         query = select(Category)
@@ -68,11 +68,11 @@ class CategoryService:
                 )
             )
         
-        if created_at:
-            query = query.where(Category.created_at == created_at)
+        if start_at:
+            query = query.where(Category.created_at >= start_at)
         
-        if updated_at:
-            query = query.where(Category.updated_at == updated_at)
+        if end_at:
+            query = query.where(Category.created_at <= end_at)
         
         query = query.order_by(Category.name.asc()).offset(offset).limit(limit)
         result = await self.db.execute(query)

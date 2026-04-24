@@ -83,8 +83,8 @@ class PostService:
         search_query: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
         category_id: Optional[uuid.UUID] = None,
         tag_id: Optional[uuid.UUID] = None,
     ) -> List[Post]:
@@ -98,10 +98,10 @@ class PostService:
             conditions.append(Post.isPublished == is_published)
         if featured is not None:
             conditions.append(Post.featured == featured)
-        if created_at is not None:
-            conditions.append(Post.created_at == created_at)
-        if updated_at is not None:
-            conditions.append(Post.updated_at == updated_at)
+        if start_at is not None:
+            conditions.append(Post.created_at >= start_at)
+        if end_at is not None:
+            conditions.append(Post.created_at <= end_at)
         
         if reading_time is not None:
             conditions.append(Post.readingTime == reading_time)

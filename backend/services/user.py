@@ -57,8 +57,42 @@ class UserService:
         }
         return jwt_handler.create_access_token(token_data)
 
-    async def login(self, email: str, password: str) -> Optional[tuple[User, str]]:
-        """Authenticate a user and return the user with access token."""
+    async def create_refresh_token(self, user: User) -> str:
+        """Create a JWT refresh token for a user."""
+        token_data = {
+            "id": str(user.id),
+            "email": user.email
+        }
+        return jwt_handler.create_refresh_token(token_data)
+
+    async def refresh_tokens(self, refresh_token: str) -> Optional[tuple[User, str, str]]:
+        """Refresh access and refresh tokens using a valid refresh token."""
+        if not refresh_token:
+            raise ValueError("Refresh token is required")
+        
+        payload = jwt_handler.verify_token(refresh_token)
+        if not payload:
+            return None, None, None
+        
+        # Verify it's a refresh token
+        if payload.get("type") != "refresh":
+            return None, None, None
+        
+        user_id = payload.get("id")
+        if not user_id:
+            return None, None, None
+        
+        user = await self.get(uuid.UUID(user_id))
+        if not user or not user.active:
+            return None, None, None
+        
+        access_token = await self.create_access_token(user)
+        new_refresh_token = await self.create_refresh_token(user)
+        
+        return user, access_token, new_refresh_token
+
+    async def login(self, email: str, password: str) -> Optional[tuple[User, str, str]]:
+        """Authenticate a user and return the user with access and refresh tokens."""
         if not email:
             raise ValueError("Email is required")
         if not password:
@@ -67,16 +101,17 @@ class UserService:
         user = result.scalar_one_or_none()
         
         if not user:
-            return None, None
+            return None, None, None
         
         if not password_handler.verify_password(password, user.password):
-            return None, None
+            return None, None, None
         
         if not user.active:
-            return None, None
+            return None, None, None
         
-        token = await self.create_access_token(user)
-        return user, token
+        access_token = await self.create_access_token(user)
+        refresh_token = await self.create_refresh_token(user)
+        return user, access_token, refresh_token
 
     async def verify_token(self, token: str) -> Optional[dict]:
         """Verify a JWT token and return the user ID if valid."""
@@ -105,25 +140,36 @@ class UserService:
         lastName: Optional[str] = None,
         email: Optional[str] = None,
         user_id: Optional[uuid.UUID] = None,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
         limit: int = 100, 
         offset: int = 0) -> List[User]:
             """Get all users with pagination."""
-            result = await self.db.execute(
-                select(User).where(
-                    User.active == active,
-                    User.role == role,
-                    User.firstName == firstName,
-                    User.lastName == lastName,
-                    User.email == email,
-                    User.id == user_id,
-                    User.created_at == created_at,
-                    User.updated_at == updated_at
-                )
-                .offset(offset)
-                .limit(limit)
-            )
+            query = select(User)
+            conditions = []
+            
+            if active is not None:
+                conditions.append(User.active == active)
+            if role is not None:
+                conditions.append(User.role == role)
+            if firstName is not None:
+                conditions.append(User.firstName == firstName)
+            if lastName is not None:
+                conditions.append(User.lastName == lastName)
+            if email is not None:
+                conditions.append(User.email == email)
+            if user_id is not None:
+                conditions.append(User.id == user_id)
+            if start_at is not None:
+                conditions.append(User.created_at >= start_at)
+            if end_at is not None:
+                conditions.append(User.created_at <= end_at)
+            
+            if conditions:
+                query = query.where(and_(*conditions))
+            
+            query = query.offset(offset).limit(limit)
+            result = await self.db.execute(query)
             return result.scalars().all()
 
     async def update(

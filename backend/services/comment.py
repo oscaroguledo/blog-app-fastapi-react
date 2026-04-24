@@ -51,8 +51,8 @@ class CommentService:
         search_query: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None
     ) -> List[Comment]:
         """List comments with filtering and pagination."""
         query = select(Comment)
@@ -66,10 +66,10 @@ class CommentService:
             conditions.append(Comment.parent_id == parent_id)
         if likes is not None:
             conditions.append(Comment.likes == likes)
-        if created_at is not None:
-            conditions.append(Comment.created_at == created_at)
-        if updated_at is not None:
-            conditions.append(Comment.updated_at == updated_at)
+        if start_at is not None:
+            conditions.append(Comment.created_at >= start_at)
+        if end_at is not None:
+            conditions.append(Comment.created_at <= end_at)
         
         if conditions:
             query = query.where(and_(*conditions))
