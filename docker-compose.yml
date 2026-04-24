@@ -48,6 +48,23 @@ services:
       - ./backend:/app
     restart: on-failure
 
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: blog_celery_worker
+    command: bash -c "PYTHONPATH=/app celery -A worker.celery_app worker --loglevel=info --concurrency=2"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    restart: on-failure
+
 volumes:
   postgres_data:
   redis_data:

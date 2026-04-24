@@ -9,6 +9,9 @@ import json
 from datetime import datetime, timezone
 from core.redis import redis_client
 
+LATEST_POSTS_KEY = "latest_posts"
+LATEST_POSTS_TTL = 300  # 5 minutes
+
 
 class PostService:
     def __init__(self, db: AsyncSession):
@@ -67,6 +70,14 @@ class PostService:
         
         await self.db.commit()
         await self.db.refresh(post)
+
+        # Trigger background task to refresh the latest-posts cache
+        try:
+            from worker.tasks import cache_latest_posts
+            cache_latest_posts.delay()
+        except Exception:
+            pass  # Never block the response if Celery is unavailable
+
         return post
 
     async def get(self, post_id: uuid.UUID) -> Optional[Post]:
@@ -293,38 +304,30 @@ class PostService:
         await self.db.refresh(post)
         return post
 
-    async def get_latest_cached(self, limit: int = 10, cache_ttl: int = 300) -> List[Post]:
-        """Get latest posts with Redis caching fallback to PostgreSQL."""
-        cache_key = f"latest_posts:{limit}"
-        
+    async def get_latest_cached(self, limit: int = 10) -> List:
+        """
+        Return latest published posts.
+        Serves from Redis cache when available; falls back to Postgres.
+        The cache is populated/refreshed by the Celery task after each new post.
+        """
         try:
-            # Try to get from Redis
             redis = await redis_client.get_client()
-            cached_data = await redis.get(cache_key)
-            
-            if cached_data:
-                # Parse cached data and return
-                post_dicts = json.loads(cached_data)
-                # Convert dicts back to Post objects (simplified - just return dicts for now)
-                # For full implementation, you'd need to reconstruct Post objects
-                posts_data = []
-                for post_dict in post_dicts:
-                    posts_data.append(post_dict)
-                return posts_data
-        except Exception as e:
-            # If Redis fails, fall through to PostgreSQL
+            cached = await redis.get(LATEST_POSTS_KEY)
+            if cached:
+                posts = json.loads(cached)
+                return posts[:limit]
+        except Exception:
             pass
-        
-        # Fallback to PostgreSQL
+
+        # Cache miss or Redis unavailable — query Postgres directly
         posts = await self.list(limit=limit, is_published=True)
-        
+        posts_data = [p.to_dict() for p in posts]
+
+        # Warm the cache so the next request is fast
         try:
-            # Cache the result in Redis
             redis = await redis_client.get_client()
-            posts_data = [post.to_dict() for post in posts]
-            await redis.setex(cache_key, cache_ttl, json.dumps(posts_data))
-        except Exception as e:
-            # If caching fails, still return the posts
+            await redis.setex(LATEST_POSTS_KEY, LATEST_POSTS_TTL, json.dumps(posts_data))
+        except Exception:
             pass
-        
-        return posts
+
+        return posts_data
