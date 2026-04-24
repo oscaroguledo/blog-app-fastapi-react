@@ -17,11 +17,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Make entrypoint executable
-RUN chmod +x entrypoint.sh
-
 # Expose port
 EXPOSE 8000
 
 # Run migrations then start the application
-CMD ["./entrypoint.sh"]
+CMD ["bash", "entrypoint.sh"]
