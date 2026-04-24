@@ -64,6 +64,11 @@ export const postApi = {
     return response.data;
   },
 
+  getLatest: async (limit: number = 10): Promise<ApiResponse<Post[]>> => {
+    const response = await axiosInstance.get('/posts/latest', { params: { limit } });
+    return response.data;
+  },
+
   getById: async (id: string): Promise<ApiResponse<Post>> => {
     const response = await axiosInstance.get(`/posts/${id}`);
     return response.data;

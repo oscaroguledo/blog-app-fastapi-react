@@ -63,6 +63,34 @@ async def create_post(
         )
 
 
+@router.get("/latest")
+async def get_latest_posts(
+    limit: int = 10,
+    db: AsyncSession = Depends(get_db)
+):
+    """Get latest published posts for home page (no pagination)."""
+    post_service = PostService(db)
+    
+    try:
+        posts = await post_service.list(
+            is_published=True,
+            limit=limit,
+            offset=0
+        )
+        
+        return Response(
+            success=True,
+            message="Latest posts retrieved successfully",
+            data=[post.to_dict() for post in posts]
+        )
+    except ValueError as e:
+        return Response(
+            success=False,
+            message=str(e),
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+
 @router.get("/")
 async def list_posts(
     author_id: Optional[str] = None,
@@ -103,7 +131,7 @@ async def list_posts(
         return Response(
             success=True,
             message="Posts retrieved successfully",
-            data={"posts": [post.to_dict() for post in posts]},
+            data=[post.to_dict() for post in posts],
             pagination={"limit": limit, "offset": offset, "total": len(posts)}
         )
     except ValueError as e:
@@ -113,6 +141,32 @@ async def list_posts(
             status_code=status.HTTP_400_BAD_REQUEST
         )
 
+@router.get("/latest")
+async def latest_posts(
+    limit: int = 10,
+    offset: int = 0,
+    db: AsyncSession = Depends(get_db)
+):
+    """List posts with filtering and pagination."""
+    post_service = PostService(db)
+    
+    try:
+        posts = await post_service.list(
+            limit=limit if limit else 10,
+            offset=offset if offset else 0,
+        )
+        
+        return Response(
+            success=True,
+            message="Posts retrieved successfully",
+            data=[post.to_dict() for post in posts]
+        )
+    except ValueError as e:
+        return Response(
+            success=False,
+            message=str(e),
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
 
 @router.get("/{post_id}")
 async def get_post(post_id: str, db: AsyncSession = Depends(get_db)):
