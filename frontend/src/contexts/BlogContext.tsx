@@ -18,6 +18,7 @@ interface BlogContextType {
   categories: string[];
   users: User[];
   pagination: PaginationState;
+  likedPosts: Set<string>;
   fetchPosts: (params?: { limit?: number; offset?: number; is_published?: boolean; featured?: boolean }) => Promise<void>;
   fetchPostsPaginated: (page: number, limit: number) => Promise<{ posts: Post[]; total: number }>;
   addPost: (post: Omit<Post, 'id' | 'createdAt' | 'likes' | 'views'>) => Promise<void>;
@@ -36,6 +37,7 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [pagination, setPagination] = useState<PaginationState>({
     limit: 10,
     offset: 0,
@@ -152,12 +154,26 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
     try {
       const post = posts.find((p) => p.id === postId);
       if (!post) return;
-      
-      // Determine whether to like or unlike based on current state
-      // In a real app, you'd track which posts the user has liked
-      const response = await postApi.like(postId);
+
+      const isLiked = likedPosts.has(postId);
+      const response = isLiked 
+        ? await postApi.unlike(postId)
+        : await postApi.like(postId);
+
       if (response.success) {
-        setPosts(posts.map((p) => p.id === postId ? { ...p, likes: p.likes + 1 } : p));
+        setLikedPosts(prev => {
+          const newSet = new Set(prev);
+          if (isLiked) {
+            newSet.delete(postId);
+          } else {
+            newSet.add(postId);
+          }
+          return newSet;
+        });
+        setPosts(posts.map((p) => p.id === postId 
+          ? { ...p, likes: isLiked ? p.likes - 1 : p.likes + 1 } 
+          : p
+        ));
       }
     } catch (error) {
       console.error('Failed to toggle like:', error);
@@ -174,6 +190,7 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
         categories,
         users,
         pagination,
+        likedPosts,
         fetchPosts,
         fetchPostsPaginated,
         addPost,
