@@ -76,14 +76,36 @@ export function PostDetailPage() {
   }
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!commentText.trim() || !user) return;
+    if (!commentText.trim() || !isAuthenticated) return;
+
     addComment({
       postId: post.id,
-      authorId: user.id,
-      content: commentText
+      content: commentText,
+      authorId: user!.id
     });
     setCommentText('');
   };
+
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    const shareData = {
+      title: post.title,
+      text: post.excerpt,
+      url: shareUrl
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+      alert('Link copied to clipboard!');
+    }
+  };
+
   return (
     <Layout>
       <article className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
@@ -314,6 +336,7 @@ export function PostDetailPage() {
                     <span>{postComments.length} Comments</span>
                   </a>
                   <Button
+                    onClick={handleShare}
                     variant="outline"
                     size="md"
                     className="flex items-center justify-center gap-2"
