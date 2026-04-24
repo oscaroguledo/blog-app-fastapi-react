@@ -41,3 +41,15 @@ async def get_db():
 async def init_db():
     # Tables will be created manually or through Alembic migrations
     pass
+
+
+async def check_db():
+    """Check if database connection is working."""
+    try:
+        async with AsyncSessionLocal() as session:
+            await session.execute("SELECT 1")
+        print("✅ Database connected successfully")
+        return True
+    except Exception as e:
+        print(f"❌ Database connection failed: {e}")
+        return False
