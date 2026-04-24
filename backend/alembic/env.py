@@ -11,7 +11,15 @@ from core.config import settings
 from core.database import Base
 
 # Import all models to ensure they're registered with Base.metadata
-import models
+# Import order is critical - must import User before any model that references it
+from models.user import User, UserRole
+from models.category import Category
+from models.tag import Tag
+from models.post import Post, PostCategory, PostTag
+from models.comment import Comment
+
+# Force metadata to be populated by accessing it
+_ = Base.metadata
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -71,7 +79,8 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection, 
+            target_metadata=target_metadata
         )
 
         with context.begin_transaction():

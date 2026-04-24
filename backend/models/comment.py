@@ -22,7 +22,7 @@ class Comment(Base):
     author_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     likes: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    parent_id: Mapped[uuid.UUID | None] = mapped_column(GUID, ForeignKey('comments.id', ondelete='CASCADE'), nullable=True)
+    parent_id: Mapped[uuid.UUID | None] = mapped_column(GUID, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
