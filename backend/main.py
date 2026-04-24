@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from core.database import init_db, check_db
 from core.redis import redis_client
 from core.utils.logger import info, success, warning, error
+from core.utils.rate_limit import check_rate_limit
 from routes import health_router, user_router, post_router, tag_router, comment_router, category_router, contact_router
 
 
@@ -48,6 +49,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    """Apply rate limiting to all requests."""
+    # Skip rate limiting for health check
+    if request.url.path == "/health":
+        return await call_next(request)
+
+    # Apply rate limiting (100 requests per 60 seconds)
+    await check_rate_limit(request, requests=100, window=60, key_prefix="global")
+
+    response = await call_next(request)
+    return response
+
 
 # Include routers
 app.include_router(health_router)
