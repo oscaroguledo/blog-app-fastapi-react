@@ -30,9 +30,7 @@ class Comment(Base):
     # Relationships
     post = relationship("Post", back_populates="comments")
     author = relationship("User", back_populates="comments")
-    parent = relationship("Comment", remote_side=[id], back_populates="replies")
-    replies = relationship("Comment", back_populates="parent", cascade="all, delete-orphan")
-
+    
     def __repr__(self):
         return f"<Comment {self.id} {self.post_id} {self.author_id}>"
 
@@ -43,6 +41,5 @@ class Comment(Base):
             "authorId": str(self.author_id),
             "content": self.content,
             "createdAt": self.created_at.isoformat(),
-            "likes": self.likes,
-            "replies": [reply.to_dict() for reply in self.replies]
+            "likes": self.likes
         }
