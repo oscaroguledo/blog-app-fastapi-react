@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/Button';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { Toast } from '@/components/ui/Toast';
 import { useBlog } from '@/contexts/BlogContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { postApi } from '@/api/post';
@@ -28,6 +29,7 @@ export function PostDetailPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<{ message: string } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,7 +104,7 @@ export function PostDetailPage() {
       }
     } else {
       await navigator.clipboard.writeText(shareUrl);
-      alert('Link copied to clipboard!');
+      setToast({ message: 'Link copied to clipboard!' });
     }
   };
 
@@ -366,6 +368,12 @@ export function PostDetailPage() {
           </div>
         </div>
       </article>
+      {toast && (
+        <Toast
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
     </Layout>
   );
 }
