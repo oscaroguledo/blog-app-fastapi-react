@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from core.database import init_db
-from routes import health_router, user_router, post_router, tag_router, comment_router, category_router
+from routes import health_router, user_router, post_router, tag_router, comment_router, category_router, contact_router
 
 
 @asynccontextmanager
@@ -38,6 +38,7 @@ app.include_router(post_router)
 app.include_router(tag_router)
 app.include_router(comment_router)
 app.include_router(category_router)
+app.include_router(contact_router)
 
 
 if __name__ == "__main__":

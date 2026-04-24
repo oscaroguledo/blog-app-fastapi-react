@@ -116,4 +116,14 @@ export const userApi = {
     const response = await axiosInstance.post(`/users/${id}/deactivate`);
     return response.data;
   },
+
+  resetPassword: async (email: string): Promise<ApiResponse<void>> => {
+    const response = await axiosInstance.post('/users/reset-password', { email });
+    return response.data;
+  },
+
+  verifyEmail: async (email: string): Promise<ApiResponse<void>> => {
+    const response = await axiosInstance.post('/users/verify-email', { email });
+    return response.data;
+  },
 };

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { userApi } from '@/api/user';
 
 export function ResetPasswordPage() {
   const [email, setEmail] = useState('');
@@ -14,11 +15,16 @@ export function ResetPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await userApi.resetPassword(email);
+      if (response.success) {
+        setIsSuccess(true);
+      }
+    } catch (error) {
+      console.error('Failed to send reset email:', error);
+    } finally {
       setIsLoading(false);
-      setIsSuccess(true);
-    }, 1500);
+    }
   };
 
   return (

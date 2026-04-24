@@ -458,3 +458,53 @@ async def deactivate_user(
             message="Invalid user ID format",
             status_code=status.HTTP_400_BAD_REQUEST
         )
+
+
+@router.post("/reset-password")
+async def reset_password(
+    email: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Send password reset email."""
+    user_service = UserService(db)
+    
+    user = await user_service.get(user_id=None, email=email)
+    
+    if not user:
+        # Return success even if user doesn't exist for security
+        return Response(
+            success=True,
+            message="If an account with this email exists, a password reset link has been sent."
+        )
+    
+    # TODO: Implement actual email sending with reset token
+    # For now, just return success
+    return Response(
+        success=True,
+        message="If an account with this email exists, a password reset link has been sent."
+    )
+
+
+@router.post("/verify-email")
+async def verify_email(
+    email: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Resend email verification."""
+    user_service = UserService(db)
+    
+    user = await user_service.get(user_id=None, email=email)
+    
+    if not user:
+        return Response(
+            success=False,
+            message="User not found",
+            status_code=status.HTTP_404_NOT_FOUND
+        )
+    
+    # TODO: Implement actual email sending with verification token
+    # For now, just return success
+    return Response(
+        success=True,
+        message="Verification email sent successfully"
+    )

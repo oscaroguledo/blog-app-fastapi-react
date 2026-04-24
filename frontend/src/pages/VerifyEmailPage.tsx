@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { motion } from 'framer-motion';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
+import { userApi } from '@/api/user';
 
 export function VerifyEmailPage() {
   const [email, setEmail] = useState('');
@@ -22,11 +23,16 @@ export function VerifyEmailPage() {
   const handleResend = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsResending(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await userApi.verifyEmail(email);
+      if (response.success) {
+        setIsSent(true);
+      }
+    } catch (error) {
+      console.error('Failed to resend verification email:', error);
+    } finally {
       setIsResending(false);
-      setIsSent(true);
-    }, 1500);
+    }
   };
 
   return (
