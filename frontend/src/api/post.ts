@@ -53,8 +53,8 @@ export const postApi = {
     featured?: boolean;
     search_query?: string;
     tag_id?: string;
-    created_at?: string;
-    updated_at?: string;
+    start_at?: string;
+    end_at?: string;
     limit?: number;
     offset?: number;
   }): Promise<ApiResponse<PostsResponse>> => {

@@ -25,7 +25,7 @@ export interface CategoriesResponse {
 }
 
 export const categoryApi = {
-  getAll: async (params?: { search_query?: string; limit?: number; offset?: number }): Promise<ApiResponse<CategoriesResponse>> => {
+  getAll: async (params?: { search_query?: string; start_at?: string; end_at?: string; limit?: number; offset?: number }): Promise<ApiResponse<CategoriesResponse>> => {
     const response = await axiosInstance.get('/categories/', { params });
     return response.data;
   },

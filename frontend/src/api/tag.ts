@@ -25,7 +25,7 @@ export interface TagsResponse {
 }
 
 export const tagApi = {
-  getAll: async (params?: { search_query?: string; limit?: number; offset?: number }): Promise<ApiResponse<TagsResponse>> => {
+  getAll: async (params?: { search_query?: string; start_at?: string; end_at?: string; limit?: number; offset?: number }): Promise<ApiResponse<TagsResponse>> => {
     const response = await axiosInstance.get('/tags/', { params });
     return response.data;
   },

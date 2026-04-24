@@ -46,10 +46,20 @@ async def register(
             avatar=avatar,
             bio=bio
         )
+        
+        # Generate tokens
+        access_token = await user_service.create_access_token(user)
+        refresh_token = await user_service.create_refresh_token(user)
+        
         return Response(
             success=True,
             message="User registered successfully",
-            data=user.to_dict(),
+            data={
+                "user": user.to_dict(),
+                "token_type": "Bearer",
+                "access_token": access_token,
+                "refresh_token": refresh_token
+            },
             status_code=status.HTTP_201_CREATED
         )
     except Exception as e:
@@ -66,10 +76,10 @@ async def login(
     password: str,
     db: AsyncSession = Depends(get_db)
 ):
-    """Login user and return JWT token."""
+    """Login user and return JWT tokens."""
     user_service = UserService(db)
     
-    user, token = await user_service.login(email, password)
+    user, access_token, refresh_token = await user_service.login(email, password)
     
     if not user:
         return Response(
@@ -84,9 +94,46 @@ async def login(
         data={
             "user": user.to_dict(),
             "token_type": "Bearer",
-            "access_token": token
+            "access_token": access_token,
+            "refresh_token": refresh_token
         }
     )
+
+
+@router.post("/refresh")
+async def refresh_token(
+    refresh_token: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Refresh access and refresh tokens."""
+    user_service = UserService(db)
+    
+    try:
+        user, access_token, new_refresh_token = await user_service.refresh_tokens(refresh_token)
+        
+        if not user:
+            return Response(
+                success=False,
+                message="Invalid or expired refresh token",
+                status_code=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        return Response(
+            success=True,
+            message="Tokens refreshed successfully",
+            data={
+                "user": user.to_dict(),
+                "token_type": "Bearer",
+                "access_token": access_token,
+                "refresh_token": new_refresh_token
+            }
+        )
+    except ValueError as e:
+        return Response(
+            success=False,
+            message=str(e),
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
 
 
 @router.get("/me")
@@ -215,8 +262,8 @@ async def list_users(
     lastName: Optional[str] = None,
     email: Optional[str] = None,
     user_id: Optional[str] = None,
-    created_at: Optional[datetime] = None,
-    updated_at: Optional[datetime] = None,
+    start_at: Optional[str] = None,
+    end_at: Optional[str] = None,
     limit: int = 100,
     offset: int = 0,
     db: AsyncSession = Depends(get_db)
@@ -231,8 +278,8 @@ async def list_users(
         lastName=lastName,
         email=email,
         user_id=user_id,
-        created_at=created_at,
-        updated_at=updated_at,
+        start_at=datetime.fromisoformat(start_at) if start_at else None,
+        end_at=datetime.fromisoformat(end_at) if end_at else None,
         limit=limit,
         offset=offset
     )

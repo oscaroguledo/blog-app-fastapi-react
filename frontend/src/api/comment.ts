@@ -35,6 +35,8 @@ export const commentApi = {
   getAll: async (params?: {
     post_id?: string;
     author_id?: string;
+    start_at?: string;
+    end_at?: string;
     limit?: number;
     offset?: number;
   }): Promise<ApiResponse<CommentsResponse>> => {

@@ -74,8 +74,8 @@ async def list_posts(
     search_query: Optional[str] = None,
     limit: int = 100,
     offset: int = 0,
-    created_at: Optional[str] = None,
-    updated_at: Optional[str] = None,
+    start_at: Optional[str] = None,
+    end_at: Optional[str] = None,
     category_id: Optional[str] = None,
     tag_id: Optional[str] = None,
     db: AsyncSession = Depends(get_db)
@@ -94,8 +94,8 @@ async def list_posts(
             search_query=search_query,
             limit=limit,
             offset=offset,
-            created_at=datetime.fromisoformat(created_at) if created_at else None,
-            updated_at=datetime.fromisoformat(updated_at) if updated_at else None,
+            start_at=datetime.fromisoformat(start_at) if start_at else None,
+            end_at=datetime.fromisoformat(end_at) if end_at else None,
             category_id=uuid.UUID(category_id) if category_id else None,
             tag_id=uuid.UUID(tag_id) if tag_id else None
         )

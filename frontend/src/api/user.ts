@@ -87,7 +87,7 @@ export const userApi = {
   },
 
   // User management endpoints
-  getAll: async (params?: { active?: boolean; role?: string; limit?: number; offset?: number }): Promise<ApiResponse<UsersResponse>> => {
+  getAll: async (params?: { active?: boolean; role?: string; firstName?: string; lastName?: string; email?: string; user_id?: string; start_at?: string; end_at?: string; limit?: number; offset?: number }): Promise<ApiResponse<UsersResponse>> => {
     const response = await axiosInstance.get('/users/', { params });
     return response.data;
   },
