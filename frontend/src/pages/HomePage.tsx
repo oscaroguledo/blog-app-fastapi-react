@@ -1,17 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { PostCard } from '@/components/PostCard';
 import { CategorySidebar } from '@/components/CategorySidebar';
 import { useBlog } from '@/contexts/BlogContext';
+import { postApi } from '@/api/post';
+import { Post } from '@/api/post';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight } from 'lucide-react';
 
 export function HomePage() {
-  const { posts, categories, users, getAuthor } = useBlog();
-  const publishedPosts = posts.filter((p) => p.isPublished);
-  const featuredPost = publishedPosts.find((p) => p.featured) || publishedPosts[0];
-  const recentPosts = publishedPosts.filter((p) => p.id !== featuredPost?.id).slice(0, 6);
+  const { categories, users, getAuthor } = useBlog();
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    const fetchLatestPosts = async () => {
+      try {
+        const response = await postApi.getLatest(10);
+        if (response.success && response.data) {
+          setPosts(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch latest posts:', error);
+      }
+    };
+
+    fetchLatestPosts();
+  }, []);
+
+  const featuredPost = posts.find((p) => p.featured) || posts[0];
+  const recentPosts = posts.filter((p) => p.id !== featuredPost?.id).slice(0, 6);
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -114,7 +132,7 @@ export function HomePage() {
                 />
               ))}
 
-              {publishedPosts.length > 7 && (
+              {posts.length > 7 && (
                 <div className="mt-10 text-center">
                   <Link
                     to="/search"
@@ -132,7 +150,7 @@ export function HomePage() {
             <div className="relative">
               <CategorySidebar
                 categories={categories}
-                posts={publishedPosts}
+                posts={posts}
                 users={users}
               />
             </div>
