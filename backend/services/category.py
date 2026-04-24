@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, or_
 from models.category import Category
 from typing import Optional, List
 import uuid
@@ -61,7 +61,7 @@ class CategoryService:
         if search_query:
             search_pattern = f"%{search_query}%"
             query = query.where(
-                and_(
+                or_(
                     Category.name.ilike(search_pattern),
                     Category.slug.ilike(search_pattern),
                     Category.description.ilike(search_pattern)

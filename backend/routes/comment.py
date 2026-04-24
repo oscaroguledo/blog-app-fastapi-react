@@ -139,7 +139,7 @@ async def update_comment(
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
-        if comment.author_id != current_user.id and current_user.role.value != "Admin":
+        if comment.author_id != current_user.id and current_user.role != "Admin":
             return Response(
                 success=False,
                 message="You can only update your own comments",
@@ -183,7 +183,7 @@ async def delete_comment(
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
-        if comment.author_id != current_user.id and current_user.role.value != "Admin":
+        if comment.author_id != current_user.id and current_user.role != "Admin":
             return Response(
                 success=False,
                 message="You can only delete your own comments",

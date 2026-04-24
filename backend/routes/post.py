@@ -192,7 +192,7 @@ async def update_post(
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
-        if post.authorId != current_user.id and current_user.role.value != "Admin":
+        if post.authorId != current_user.id and current_user.role != "Admin":
             return Response(
                 success=False,
                 message="You can only update your own posts",
@@ -246,7 +246,7 @@ async def delete_post(
                 status_code=status.HTTP_404_NOT_FOUND
             )
         
-        if post.authorId != current_user.id and current_user.role.value != "Admin":
+        if post.authorId != current_user.id and current_user.role != "Admin":
             return Response(
                 success=False,
                 message="You can only delete your own posts",

@@ -51,17 +51,18 @@ async def get_current_admin(
     current_user = Depends(get_current_user)
 ):
     """Dependency to ensure the current user is an admin."""
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != UserRole.ADMIN.value:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin privileges required"
         )
     return current_user
+
 async def get_current_writer(
     current_user = Depends(get_current_user)
 ):
     """Dependency to ensure the current user is a writer or admin."""
-    if current_user.role not in {UserRole.WRITER, UserRole.ADMIN}:
+    if current_user.role not in {UserRole.WRITER.value, UserRole.ADMIN.value}:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Writer privileges required"
@@ -72,7 +73,7 @@ async def get_current_editor(
     current_user = Depends(get_current_user)
 ):
     """Dependency to ensure the current user is an editor or admin."""
-    if current_user.role not in {UserRole.EDITOR, UserRole.ADMIN}:
+    if current_user.role not in {UserRole.EDITOR.value, UserRole.ADMIN.value}:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Editor privileges required"

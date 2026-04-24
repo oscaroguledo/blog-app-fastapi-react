@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, or_
 from models.tag import Tag
 from typing import Optional, List
 import uuid
@@ -62,7 +62,7 @@ class TagService:
         if search_query:
             search_pattern = f"%{search_query}%"
             query = query.where(
-                and_(
+                or_(
                     Tag.name.ilike(search_pattern),
                     Tag.slug.ilike(search_pattern),
                     Tag.description.ilike(search_pattern)

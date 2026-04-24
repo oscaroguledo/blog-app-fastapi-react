@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, Union
 from fastapi.responses import JSONResponse
 
 class Pagination:
@@ -17,7 +17,7 @@ class Response(JSONResponse):
         success: Optional[bool] = False,
         message: Optional[str] = "",
         data: Optional[Any] = None,
-        pagination: Optional[Pagination] = None,
+        pagination: Optional[Union[Pagination, dict]] = None,
         status_code: int = 200
     ):
         content = {
@@ -26,11 +26,14 @@ class Response(JSONResponse):
             "data": data if data is not None else {}
         }
         if pagination:
-            content["pagination"] = {
-                "limit": pagination.limit,
-                "offset": pagination.offset,
-                "total": pagination.total
-            }
+            if isinstance(pagination, dict):
+                content["pagination"] = pagination
+            else:
+                content["pagination"] = {
+                    "limit": pagination.limit,
+                    "offset": pagination.offset,
+                    "total": pagination.total
+                }
         super().__init__(content=content, status_code=status_code)
     
 

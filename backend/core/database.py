@@ -3,7 +3,6 @@ from sqlalchemy import text
 from core.config import settings
 from core.utils.logger import success, error
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.pool import NullPool
 
 
 class Base(DeclarativeBase):

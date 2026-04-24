@@ -8,13 +8,6 @@ from core.utils.logger import info, success, warning, error
 from core.middleware import rate_limit_middleware
 from routes import health_router, user_router, post_router, tag_router, comment_router, category_router, contact_router
 
-# Import all models to ensure they're registered with Base.metadata
-# Import order matters - User must be imported before Post
-from models.user import User, UserRole
-from models.category import Category
-from models.tag import Tag
-from models.post import Post, PostCategory, PostTag
-from models.comment import Comment
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

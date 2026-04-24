@@ -14,12 +14,12 @@ class Comment(Base):
         Index("ix_comments_parent_id", "parent_id"),
         Index("ix_comments_created_at", "created_at"),
         Index("ix_comments_likes", "likes"),
-        {"schema": "public"}
+        {"schema": "blog"}
     )
     
     id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
-    post_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('posts.id', ondelete='CASCADE'), nullable=False)
-    author_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    post_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('public.posts.id', ondelete='CASCADE'), nullable=False)
+    author_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('public.users.id', ondelete='CASCADE'), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     likes: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     parent_id: Mapped[uuid.UUID | None] = mapped_column(GUID, nullable=True)
@@ -28,8 +28,6 @@ class Comment(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
-    post = relationship("Post", back_populates="comments")
-    author = relationship("User", back_populates="comments")
     
     def __repr__(self):
         return f"<Comment {self.id} {self.post_id} {self.author_id}>"

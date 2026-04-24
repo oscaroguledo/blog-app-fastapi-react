@@ -13,7 +13,7 @@ class Tag(Base):
         Index("ix_tags_slug", "slug"),
         Index("ix_tags_created_at", "created_at"),
         Index("ix_tags_updated_at", "updated_at"),
-        {"schema": "public"}
+        {"schema": "blog"}
     )
     
     id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)

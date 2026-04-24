@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from models.user import User, UserRole
 from typing import Optional, List
 from datetime import datetime
@@ -32,12 +32,16 @@ class UserService:
         if not lastName:
             raise ValueError("Last name is required")
         hashed_password = password_handler.hash_password(password)
+        # Accept string role and convert to enum
+        if isinstance(role, str):
+            role_map = {r.value.lower(): r for r in UserRole}
+            role = role_map.get(role.lower(), UserRole.READER)
         user = User(
             firstName=firstName,
             lastName=lastName,
             email=email,
             password=hashed_password,
-            role=role,
+            role=role.value,
             avatar=avatar,
             bio=bio
         )
@@ -53,7 +57,7 @@ class UserService:
             "email": user.email,
             "firstName": user.firstName,
             "lastName": user.lastName,
-            "role": user.role.value,
+            "role": user.role if isinstance(user.role, str) else user.role.value,
             "active": user.active
         }
         return jwt_handler.create_access_token(token_data)
@@ -152,7 +156,8 @@ class UserService:
             if active is not None:
                 conditions.append(User.active == active)
             if role is not None:
-                conditions.append(User.role == role)
+                role_val = role.value if isinstance(role, UserRole) else role
+                conditions.append(User.role == role_val)
             if firstName is not None:
                 conditions.append(User.firstName == firstName)
             if lastName is not None:
@@ -197,7 +202,7 @@ class UserService:
             if bio is not None:
                 user.bio = bio
             if role is not None:
-                user.role = role
+                user.role = role.value if isinstance(role, UserRole) else role
             if email is not None:
                 user.email = email
             

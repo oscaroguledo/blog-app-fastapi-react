@@ -12,11 +12,7 @@ from core.database import Base
 
 # Import all models to ensure they're registered with Base.metadata
 # Import order is critical - must import User before any model that references it
-from models.user import User, UserRole
-from models.category import Category
-from models.tag import Tag
-from models.post import Post, PostCategory, PostTag
-from models.comment import Comment
+from models import *
 
 # Force metadata to be populated by accessing it
 _ = Base.metadata
@@ -59,6 +55,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_schemas=True,
+        version_table_schema="public"
     )
 
     with context.begin_transaction():
@@ -80,7 +78,9 @@ def run_migrations_online() -> None:
     with connectable.connect() as connection:
         context.configure(
             connection=connection, 
-            target_metadata=target_metadata
+            target_metadata=target_metadata,
+            include_schemas=True,
+            version_table_schema="public"
         )
 
         with context.begin_transaction():

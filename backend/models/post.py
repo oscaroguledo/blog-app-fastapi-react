@@ -12,11 +12,11 @@ class PostCategory(Base):
     __table_args__ = (
         Index("ix_post_category_post_id", "post_id"),
         Index("ix_post_category_category_id", "category_id"),
-        {"schema": "public"}
+        {"schema": "blog"}
     )
     
-    post_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('posts.id', ondelete='CASCADE'), primary_key=True)
-    category_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('categories.id', ondelete='CASCADE'), primary_key=True)
+    post_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('public.posts.id', ondelete='CASCADE'), primary_key=True)
+    category_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('public.categories.id', ondelete='CASCADE'), primary_key=True)
     
     post = relationship("Post", back_populates="post_categories")
     category = relationship("Category", back_populates="post_categories")
@@ -27,11 +27,11 @@ class PostTag(Base):
     __table_args__ = (
         Index("ix_post_tag_post_id", "post_id"),
         Index("ix_post_tag_tag_id", "tag_id"),
-        {"schema": "public"}
+        {"schema": "blog"}
     )
 
-    post_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('posts.id', ondelete='CASCADE'), primary_key=True)
-    tag_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('tags.id', ondelete='CASCADE'), primary_key=True)
+    post_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('public.posts.id', ondelete='CASCADE'), primary_key=True)
+    tag_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('public.tags.id', ondelete='CASCADE'), primary_key=True)
 
     post = relationship("Post", back_populates="post_tags")
     tag = relationship("Tag", back_populates="post_tags")
@@ -48,7 +48,7 @@ class Post(Base):
         Index("ix_posts_likes", "likes"),
         Index("ix_posts_views", "views"),
         Index("ix_posts_readingTime", "readingTime"),
-        {"schema": "public"}
+        {"schema": "blog"}
     )
     
     id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
@@ -56,7 +56,7 @@ class Post(Base):
     excerpt: Mapped[str] = mapped_column(String, nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     coverImage: Mapped[str] = mapped_column(String, nullable=False)
-    authorId: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('users.id'), nullable=False)
+    authorId: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey('public.users.id'), nullable=False)
     readingTime: Mapped[int] = mapped_column(Integer, nullable=False)
     likes: Mapped[int] = mapped_column(Integer, nullable=False)
     views: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -67,10 +67,8 @@ class Post(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
-    author = relationship("User", back_populates="posts")
     post_categories = relationship("PostCategory", back_populates="post", cascade="all, delete-orphan")
     post_tags = relationship("PostTag", back_populates="post", cascade="all, delete-orphan")
-    comments = relationship("Comment", back_populates="post")
     
     @property
     def categories(self):

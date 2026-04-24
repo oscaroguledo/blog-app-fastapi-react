@@ -137,7 +137,7 @@ async def refresh_token(
 
 
 @router.get("/me")
-async def get_current_user(current_user = Depends(get_current_user)):
+async def get_me(current_user = Depends(get_current_user)):
     """Get current user from JWT token."""
     return Response(
         success=True,
@@ -277,7 +277,7 @@ async def list_users(
         firstName=firstName,
         lastName=lastName,
         email=email,
-        user_id=user_id,
+        user_id=uuid.UUID(user_id) if user_id else None,
         start_at=datetime.fromisoformat(start_at) if start_at else None,
         end_at=datetime.fromisoformat(end_at) if end_at else None,
         limit=limit,
