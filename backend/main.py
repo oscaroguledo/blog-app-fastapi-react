@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from core.database import init_db, check_db
 from core.redis import redis_client
+from core.config import settings
 from core.utils.logger import info, success, warning, error
 from core.middleware import rate_limit_middleware
 from routes import health_router, user_router, post_router, tag_router, comment_router, category_router, contact_router
@@ -36,7 +37,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Blog API",
-    description="A modern blog platform API",
+    description="A blog platform API",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -44,10 +45,10 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=settings.CORS_ALLOW_CREDENTIALS,
+    allow_methods=settings.CORS_ALLOW_METHODS,
+    allow_headers=settings.CORS_ALLOW_HEADERS,
 )
 
 # Rate limiting middleware
