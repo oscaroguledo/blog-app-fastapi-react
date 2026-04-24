@@ -63,11 +63,11 @@ export function CategorySidebar({ categories, posts, users }: CategorySidebarPro
           <li key={author.id} className="flex items-center">
               <img
               src={author.avatar}
-              alt={author.name}
+              alt={`${author.firstName} ${author.lastName}`}
               className="h-10 w-10 rounded-full border border-border" />
             
               <div className="ml-3 flex-grow">
-                <p className="text-sm font-medium text-text">{author.name}</p>
+                <p className="text-sm font-medium text-text">{author.firstName} {author.lastName}</p>
                 <p className="text-xs text-muted-text">{author.role}</p>
               </div>
               <button className="text-xs font-medium text-accent hover:text-accent-hover border border-accent hover:bg-accent hover:text-white px-3 py-1 rounded-full transition-colors">

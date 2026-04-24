@@ -149,11 +149,11 @@ export function PostDetailPage() {
           <div className="flex items-center gap-4 py-4 border-y border-border">
             <img
               src={author.avatar}
-              alt={author.name}
+              alt={`${author.firstName} ${author.lastName}`}
               className="w-12 h-12 rounded-custom object-cover"
             />
             <div className="flex-grow">
-              <p className="font-semibold text-text">{author.name}</p>
+              <p className="font-semibold text-text">{author.firstName} {author.lastName}</p>
               <p className="text-sm text-muted-text">{author.bio}</p>
             </div>
             <div className="text-right text-sm text-muted-text">
@@ -210,12 +210,12 @@ export function PostDetailPage() {
               <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
                 <img
                   src={author.avatar}
-                  alt={author.name}
+                  alt={`${author.firstName} ${author.lastName}`}
                   className="w-20 h-20 rounded-custom object-cover"
                 />
                 <div className="flex-grow">
                   <h3 className="text-xl font-serif font-bold text-text mb-2">
-                    {author.name}
+                    {author.firstName} {author.lastName}
                   </h3>
                   <p className="text-muted-text mb-4 leading-relaxed">{author.bio}</p>
                 </div>
@@ -239,7 +239,7 @@ export function PostDetailPage() {
                   <div className="flex gap-4">
                     <img
                       src={user?.avatar}
-                      alt={user?.name}
+                      alt={`${user?.firstName} ${user?.lastName}`}
                       className="w-10 h-10 rounded-custom flex-shrink-0 object-cover"
                     />
                     <div className="flex-grow">
@@ -283,7 +283,7 @@ export function PostDetailPage() {
                     <div key={comment.id} className="flex gap-4">
                       <img
                         src={commentAuthor?.avatar}
-                        alt={commentAuthor?.name}
+                        alt={`${commentAuthor?.firstName} ${commentAuthor?.lastName}`}
                         className="w-10 h-10 rounded-custom flex-shrink-0 object-cover"
                       />
                       <div className="flex-grow">
@@ -291,7 +291,7 @@ export function PostDetailPage() {
                           <div className="flex justify-between items-start mb-3">
                             <div>
                               <span className="font-semibold text-text">
-                                {commentAuthor?.name}
+                                {commentAuthor?.firstName} {commentAuthor?.lastName}
                               </span>
                               <span className="text-xs text-muted-text ml-2">
                                 {new Date(comment.createdAt).toLocaleDateString('en-US', {

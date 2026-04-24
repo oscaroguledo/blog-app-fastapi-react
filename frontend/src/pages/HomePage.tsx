@@ -78,11 +78,11 @@ export function HomePage() {
                     <div className="flex items-center">
                       <img
                         src={getAuthor(featuredPost.authorId)?.avatar}
-                        alt={getAuthor(featuredPost.authorId)?.name}
+                        alt={`${getAuthor(featuredPost.authorId)?.firstName} ${getAuthor(featuredPost.authorId)?.lastName}`}
                         className="h-10 w-10 rounded-custom border-2 border-white/20"
                       />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-white">{getAuthor(featuredPost.authorId)?.name}</p>
+                        <p className="text-sm font-medium text-white">{getAuthor(featuredPost.authorId)?.firstName} {getAuthor(featuredPost.authorId)?.lastName}</p>
                         <div className="flex space-x-1 text-xs text-gray-400">
                           <time dateTime={featuredPost.createdAt}>
                             {new Date(featuredPost.createdAt).toLocaleDateString('en-US', {
