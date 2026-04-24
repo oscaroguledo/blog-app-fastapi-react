@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
-import { useBlog } from '@/contexts/BlogContext';
+import { postApi } from '@/api/post';
+import { userApi } from '@/api/user';
+import { commentApi } from '@/api/comment';
+import { Post } from '@/api/post';
+import { User } from '@/api/user';
+import { Comment } from '@/api/comment';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Search, Filter, MoreHorizontal, Edit2, Trash2, Eye, TrendingUp, Users, FileText, MessageSquare, Edit } from 'lucide-react';
+import { Trash2, Eye, Users, FileText, MessageSquare, Edit } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -17,13 +21,39 @@ import {
   LineChart,
   Line } from
 'recharts';
+
 export function AdminDashboardPage() {
   const { isAuthenticated, user } = useAuth();
-  const { posts, users, comments, deletePost } = useBlog();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'users'>(
-    'overview'
-  );
+  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'users'>('overview');
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [postsRes, usersRes, commentsRes] = await Promise.all([
+          postApi.getAll({ limit: 100, offset: 0 }),
+          userApi.getAll({ limit: 100, offset: 0 }),
+          commentApi.getAll({ limit: 100, offset: 0 })
+        ]);
+        if (postsRes.success && postsRes.data) {
+          setPosts(postsRes.data.posts);
+        }
+        if (usersRes.success && usersRes.data) {
+          setUsers(usersRes.data.users);
+        }
+        if (commentsRes.success && commentsRes.data) {
+          setComments(commentsRes.data.comments);
+        }
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
   // Redirect if not admin
   if (!isAuthenticated || user?.role !== 'Admin') {
     navigate('/');
@@ -282,7 +312,7 @@ export function AdminDashboardPage() {
                             alt="" />
                           
                             <div className="text-sm text-text">
-                              {author?.name}
+                              {author?.firstName} {author?.lastName}
                             </div>
                           </div>
                         </td>
@@ -301,7 +331,10 @@ export function AdminDashboardPage() {
                             <Edit size={16} />
                           </Button>
                           <Button
-                            onClick={() => deletePost(post.id)}
+                            onClick={async () => {
+                              await postApi.delete(post.id);
+                              setPosts(posts.filter(p => p.id !== post.id));
+                            }}
                             variant="ghost"
                             size="sm"
                             className="text-red-500 hover:text-red-600 p-1"
@@ -353,7 +386,7 @@ export function AdminDashboardPage() {
                       
                           <div>
                             <div className="text-sm font-medium text-text">
-                              {u.name}
+                              {u.firstName} {u.lastName}
                             </div>
                             <div className="text-sm text-muted-text">
                               {u.email}
