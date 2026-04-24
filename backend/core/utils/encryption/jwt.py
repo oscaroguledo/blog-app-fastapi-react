@@ -9,6 +9,7 @@ class JWTHandler:
         self.secret_key = settings.SECRET_KEY
         self.algorithm = settings.ALGORITHM
         self.access_token_expire_minutes = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        self.refresh_token_expire_days = getattr(settings, 'REFRESH_TOKEN_EXPIRE_DAYS', 7)
 
     def create_access_token(
         self, 
@@ -23,7 +24,24 @@ class JWTHandler:
         else:
             expire = datetime.utcnow() + timedelta(minutes=self.access_token_expire_minutes)
         
-        to_encode.update({"exp": expire})
+        to_encode.update({"exp": expire, "type": "access"})
+        encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
+        return encoded_jwt
+
+    def create_refresh_token(
+        self, 
+        data: Dict[str, Any], 
+        expires_delta: Optional[timedelta] = None
+    ) -> str:
+        """Create a JWT refresh token."""
+        to_encode = data.copy()
+        
+        if expires_delta:
+            expire = datetime.utcnow() + expires_delta
+        else:
+            expire = datetime.utcnow() + timedelta(days=self.refresh_token_expire_days)
+        
+        to_encode.update({"exp": expire, "type": "refresh"})
         encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
         return encoded_jwt
 
