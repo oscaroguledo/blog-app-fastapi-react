@@ -402,7 +402,7 @@ export function AdminDashboardPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-text">
-                        {u.followers.toLocaleString()}
+                        {(u.followers ?? 0).toLocaleString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Button variant="ghost" size="sm" className="text-accent hover:text-accent-hover mr-3 p-1">
