@@ -30,20 +30,34 @@ export function AdminDashboardPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
+  
+  // Pagination state
+  const [postsPage, setPostsPage] = useState(1);
+  const [usersPage, setUsersPage] = useState(1);
+  const [postsTotal, setPostsTotal] = useState(0);
+  const [usersTotal, setUsersTotal] = useState(0);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [postsRes, usersRes, commentsRes] = await Promise.all([
-          postApi.getAll({ limit: 100, offset: 0 }),
-          userApi.getAll({ limit: 100, offset: 0 }),
+          postApi.getAll({ limit: itemsPerPage, offset: (postsPage - 1) * itemsPerPage }),
+          userApi.getAll({ limit: itemsPerPage, offset: (usersPage - 1) * itemsPerPage }),
           commentApi.getAll({ limit: 100, offset: 0 })
         ]);
         if (postsRes.success && postsRes.data) {
-          setPosts(postsRes.data.posts || postsRes.data);
+          const postsData = 'posts' in postsRes.data ? postsRes.data.posts : postsRes.data;
+          const postsPagination = 'pagination' in postsRes.data ? postsRes.data.pagination : null;
+          setPosts(postsData);
+          setPostsTotal(postsPagination?.total || postsData.length || 0);
         }
         if (usersRes.success && usersRes.data) {
-          setUsers(usersRes.data.users || usersRes.data);
+          const userDataAny = usersRes.data as any;
+          const usersData = Array.isArray(userDataAny) ? userDataAny : userDataAny.users || [];
+          const usersPagination = !Array.isArray(userDataAny) ? userDataAny.pagination : null;
+          setUsers(usersData);
+          setUsersTotal(usersPagination?.total || usersData.length || 0);
         }
         if (commentsRes.success && commentsRes.data) {
           setComments(commentsRes.data.comments || commentsRes.data);
@@ -54,7 +68,7 @@ export function AdminDashboardPage() {
     };
 
     fetchData();
-  }, []);
+  }, [postsPage, usersPage]);
   // Redirect if not admin
   if (!isAuthenticated || user?.role !== 'Admin') {
     navigate('/');
@@ -346,6 +360,30 @@ export function AdminDashboardPage() {
                 </tbody>
               </table>
             </div>
+            {/* Posts Pagination */}
+            <div className="flex items-center justify-between px-6 py-4 border-t border-border">
+              <div className="text-sm text-muted-text">
+                Showing {((postsPage - 1) * itemsPerPage) + 1} to {Math.min(postsPage * itemsPerPage, postsTotal)} of {postsTotal} posts
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPostsPage(p => Math.max(1, p - 1))}
+                  disabled={postsPage === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPostsPage(p => p + 1)}
+                  disabled={postsPage * itemsPerPage >= postsTotal}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
           </div>
         }
 
@@ -413,6 +451,30 @@ export function AdminDashboardPage() {
                 )}
                 </tbody>
               </table>
+            </div>
+            {/* Users Pagination */}
+            <div className="flex items-center justify-between px-6 py-4 border-t border-border">
+              <div className="text-sm text-muted-text">
+                Showing {((usersPage - 1) * itemsPerPage) + 1} to {Math.min(usersPage * itemsPerPage, usersTotal)} of {usersTotal} users
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setUsersPage(p => Math.max(1, p - 1))}
+                  disabled={usersPage === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setUsersPage(p => p + 1)}
+                  disabled={usersPage * itemsPerPage >= usersTotal}
+                >
+                  Next
+                </Button>
+              </div>
             </div>
           </div>
         }
