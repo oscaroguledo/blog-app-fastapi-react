@@ -60,7 +60,7 @@ async def register(
             data={
                 "user": user.to_dict(),
                 "token_type": "Bearer",
-                "access_token": access_token,
+                "token": access_token,
                 "refresh_token": refresh_token
             },
             status_code=status.HTTP_201_CREATED
@@ -100,7 +100,7 @@ async def login(
         data={
             "user": user.to_dict(),
             "token_type": "Bearer",
-            "access_token": access_token,
+            "token": access_token,
             "refresh_token": refresh_token
         }
     )
@@ -130,7 +130,7 @@ async def refresh_token(
             data={
                 "user": user.to_dict(),
                 "token_type": "Bearer",
-                "access_token": access_token,
+                "token": access_token,
                 "refresh_token": new_refresh_token
             }
         )
