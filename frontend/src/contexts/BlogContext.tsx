@@ -115,7 +115,7 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
     try {
       const response = await postApi.create(postData as any);
       if (response.success && response.data) {
-        setPosts([response.data, ...posts]);
+        setPosts((prev) => [response.data, ...(prev ?? [])]);
       }
     } catch (error) {
       console.error('Failed to add post:', error);
@@ -125,7 +125,7 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
     try {
       const response = await postApi.update(id, updates);
       if (response.success && response.data) {
-        setPosts(posts.map((post) => post.id === id ? response.data! : post));
+        setPosts((prev) => (prev ? prev.map((post) => post.id === id ? response.data! : post) : [response.data!]));
       }
     } catch (error) {
       console.error('Failed to update post:', error);
@@ -135,7 +135,7 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
     try {
       const response = await postApi.delete(id);
       if (response.success) {
-        setPosts(posts.filter((post) => post.id !== id));
+        setPosts((prev) => (prev ? prev.filter((post) => post.id !== id) : []));
       }
     } catch (error) {
       console.error('Failed to delete post:', error);
@@ -145,7 +145,7 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
     try {
       const response = await commentApi.create(commentData);
       if (response.success && response.data) {
-        setComments([...comments, response.data]);
+        setComments((prev) => [...(prev ?? []), response.data]);
       }
     } catch (error) {
       console.error('Failed to add comment:', error);
@@ -155,7 +155,7 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
     try {
       const response = await commentApi.delete(id);
       if (response.success) {
-        setComments(comments.filter((c) => c.id !== id));
+        setComments((prev) => (prev ? prev.filter((c) => c.id !== id) : []));
       }
     } catch (error) {
       console.error('Failed to delete comment:', error);
@@ -178,12 +178,10 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
           }
           return newSet;
         });
-        if (posts) {
-          setPosts(posts.map((p) => p.id === postId
+        setPosts((prev) => (prev ? prev.map((p) => p.id === postId
             ? { ...p, likes: isLiked ? p.likes - 1 : p.likes + 1 }
             : p
-          ));
-        }
+          ) : prev));
       }
     } catch (error) {
       console.error('Failed to toggle like:', error);
