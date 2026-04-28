@@ -1,4 +1,4 @@
-"""create messages table
+"""create contacts table
 
 Revision ID: 20260428_2300
 Revises: 20260428_2240
@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade() -> None:
     op.create_table(
-        'messages',
+        'contacts',
         sa.Column('id', GUID(), primary_key=True),
         sa.Column('name', sa.Text(), nullable=False),
         sa.Column('email', sa.Text(), nullable=False),
@@ -29,9 +29,9 @@ def upgrade() -> None:
         sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
         schema='public',
     )
-    op.create_index('ix_messages_email', 'messages', ['email'], schema='public')
-    op.create_index('ix_messages_created_at', 'messages', ['created_at'], schema='public')
+    op.create_index('ix_contacts_email', 'contacts', ['email'], schema='public')
+    op.create_index('ix_contacts_created_at', 'contacts', ['created_at'], schema='public')
 
 
 def downgrade() -> None:
-    op.drop_table('messages', schema='public')
+    op.drop_table('contacts', schema='public')

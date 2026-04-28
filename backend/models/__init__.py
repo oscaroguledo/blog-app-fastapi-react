@@ -5,6 +5,6 @@ from models.tag import Tag
 from models.post import Post, PostCategory, PostTag
 from models.comment import Comment
 from models.analytics import PageView, DailyViewStat
-from models.message import Message
+from models.contact import Contact
 
-__all__ = ['User', 'UserRole', 'Category', 'Tag', 'Post', 'PostCategory', 'PostTag', 'Comment', 'PageView', 'DailyViewStat', 'Message']
+__all__ = ['User', 'UserRole', 'Category', 'Tag', 'Post', 'PostCategory', 'PostTag', 'Comment', 'PageView', 'DailyViewStat', 'Contact']

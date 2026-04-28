@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_db
 from core.utils.response import Response
-from services.message import MessageService
+from services.contact import ContactService
 from routes.user import get_current_admin
 from typing import Optional
 from datetime import datetime
@@ -22,7 +22,7 @@ async def submit_contact(
     subject = data.get("subject")
     message = data.get("message")
 
-    msg_service = MessageService(db)
+    msg_service = ContactService(db)
     try:
         msg = await msg_service.create(name=name, email=email, subject=subject, message=message)
         return Response(
@@ -45,7 +45,7 @@ async def list_messages(
     db: AsyncSession = Depends(get_db)
 ):
     """List contact messages (admin only)."""
-    msg_service = MessageService(db)
+    msg_service = ContactService(db)
     messages = await msg_service.list(limit=limit, offset=offset)
     return Response(success=True, message="Messages retrieved", data=[m.to_dict() for m in messages], pagination={"limit": limit, "offset": offset, "total": len(messages)})
 
@@ -53,7 +53,7 @@ async def list_messages(
 @router.patch("/{message_id}/read")
 async def mark_message_read(message_id: str, current_admin = Depends(get_current_admin), db: AsyncSession = Depends(get_db)):
     """Mark a message as read (admin only)."""
-    msg_service = MessageService(db)
+    msg_service = ContactService(db)
     try:
         msg = await msg_service.mark_read(uuid.UUID(message_id))
         if not msg:
