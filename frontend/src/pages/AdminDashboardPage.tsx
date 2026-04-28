@@ -341,20 +341,24 @@ export function AdminDashboardPage() {
                           {new Date(post.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <Button variant="ghost" size="sm" className="text-accent hover:text-accent-hover p-1">
-                            <Edit size={16} />
-                          </Button>
-                          <Button
-                            onClick={async () => {
-                              await postApi.delete(post.id);
-                              setPosts(posts.filter(p => p.id !== post.id));
-                            }}
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-500 hover:text-red-600 p-1"
-                          >
-                            <Trash2 size={16} />
-                          </Button>
+                          {user?.id === post.authorId && (
+                            <Button variant="ghost" size="sm" className="text-accent hover:text-accent-hover p-1">
+                              <Edit size={16} />
+                            </Button>
+                          )}
+                          {(user?.id === post.authorId || user?.role === 'Admin') && (
+                            <Button
+                              onClick={async () => {
+                                await postApi.delete(post.id);
+                                setPosts(posts.filter(p => p.id !== post.id));
+                              }}
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:text-red-600 p-1"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          )}
                         </td>
                       </tr>);
 
@@ -384,20 +388,24 @@ export function AdminDashboardPage() {
                       {new Date(post.createdAt).toLocaleDateString()}
                     </div>
                     <div className="flex gap-2 pt-2">
-                      <Button variant="outline" size="sm" className="flex-1 text-accent">
-                        <Edit size={14} className="mr-1" /> Edit
-                      </Button>
-                      <Button 
-                        onClick={async () => {
-                          await postApi.delete(post.id);
-                          setPosts(posts.filter(p => p.id !== post.id));
-                        }}
-                        variant="outline" 
-                        size="sm" 
-                        className="text-red-500"
-                      >
-                        <Trash2 size={14} />
-                      </Button>
+                      {user?.id === post.authorId && (
+                        <Button variant="outline" size="sm" className="flex-1 text-accent">
+                          <Edit size={14} className="mr-1" /> Edit
+                        </Button>
+                      )}
+                      {(user?.id === post.authorId || user?.role === 'Admin') && (
+                        <Button 
+                          onClick={async () => {
+                            await postApi.delete(post.id);
+                            setPosts(posts.filter(p => p.id !== post.id));
+                          }}
+                          variant="outline" 
+                          size="sm" 
+                          className={user?.id === post.authorId ? "text-red-500" : "flex-1 text-red-500"}
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 );
