@@ -11,6 +11,7 @@ import { User } from '@/api/user';
 import { Comment } from '@/api/comment';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, Eye, Users, FileText, MessageSquare, Edit, Power, PowerOff, X } from 'lucide-react';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { Pagination } from '@/components/ui/Pagination';
 import {
   BarChart,
@@ -42,6 +43,10 @@ export function AdminDashboardPage() {
   // User modal state
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showUserModal, setShowUserModal] = useState(false);
+  
+  // Delete confirmation modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -526,11 +531,9 @@ export function AdminDashboardPage() {
                           </Button>
                         )}
                         <Button 
-                          onClick={async () => {
-                            if (confirm('Are you sure you want to delete this user?')) {
-                              await userApi.delete(u.id);
-                              setUsers(users.filter(user => user.id !== u.id));
-                            }
+                          onClick={() => {
+                            setUserToDelete(u);
+                            setShowDeleteModal(true);
                           }}
                           variant="ghost" 
                           size="sm" 
@@ -606,11 +609,9 @@ export function AdminDashboardPage() {
                       </Button>
                     )}
                     <Button 
-                      onClick={async () => {
-                        if (confirm('Are you sure you want to delete this user?')) {
-                          await userApi.delete(u.id);
-                          setUsers(users.filter(user => user.id !== u.id));
-                        }
+                      onClick={() => {
+                        setUserToDelete(u);
+                        setShowDeleteModal(true);
                       }}
                       variant="outline" 
                       size="sm" 
@@ -703,6 +704,26 @@ export function AdminDashboardPage() {
           </div>
         </div>
       )}
+      
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setUserToDelete(null);
+        }}
+        onConfirm={async () => {
+          if (userToDelete) {
+            await userApi.delete(userToDelete.id);
+            setUsers(users.filter(user => user.id !== userToDelete.id));
+          }
+        }}
+        title="Delete User"
+        message={`Are you sure you want to delete ${userToDelete?.firstName} ${userToDelete?.lastName}? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </Layout>);
 
 }
