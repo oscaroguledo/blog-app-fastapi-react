@@ -6,13 +6,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { postApi } from '@/api/post';
 import { userApi } from '@/api/user';
 import { commentApi } from '@/api/comment';
+import { contactApi } from '@/api/contact';
 import { analyticsApi } from '@/api/analytics';
 import { Post } from '@/api/post';
 import { User } from '@/api/user';
 import { Comment } from '@/api/comment';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, Eye, Users, FileText, MessageSquare, Edit, Power, PowerOff, X, AlertTriangle } from 'lucide-react';
-import { AdminContactsPage } from '@/pages/AdminContactsPage';
 import { Pagination } from '@/components/ui/Pagination';
 import {
   BarChart,
@@ -29,7 +29,7 @@ import {
 export function AdminDashboardPage() {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'users' | 'contacts'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'users'>('overview');
   const [posts, setPosts] = useState<Post[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -39,6 +39,9 @@ export function AdminDashboardPage() {
   const [usersPage, setUsersPage] = useState(1);
   const [postsTotal, setPostsTotal] = useState(0);
   const [usersTotal, setUsersTotal] = useState(0);
+  const [contacts, setContacts] = useState<any[]>([]);
+  const [contactsPage, setContactsPage] = useState(1);
+  const [contactsTotal, setContactsTotal] = useState(0);
   const itemsPerPage = 10;
   
   // User modal state
@@ -85,6 +88,28 @@ export function AdminDashboardPage() {
     fetchData();
   }, [postsPage, usersPage]);
 
+
+  useEffect(() => {
+    // Load contacts when contacts tab is active or page changes
+    const loadContacts = async () => {
+      try {
+        const offset = (contactsPage - 1) * itemsPerPage;
+        const res = await contactApi.list(itemsPerPage, offset);
+        if (res.success) {
+          setContacts(Array.isArray(res.data) ? res.data : []);
+          const total = (res as any).pagination?.total ?? (Array.isArray(res.data) ? res.data.length : 0);
+          setContactsTotal(total);
+        }
+      } catch (e) {
+        console.error('Failed to load contacts:', e);
+      }
+    };
+
+    if (activeTab === 'contacts') {
+      loadContacts();
+    }
+  }, [activeTab, contactsPage]);
+
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
@@ -120,8 +145,7 @@ export function AdminDashboardPage() {
 
   const categoryData = Object.entries(categoryCounts)
     .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5); // Top 5 categories
+    .sort((a, b) => b.count - a.count);
 
   return (
     <Layout>
@@ -627,6 +651,74 @@ export function AdminDashboardPage() {
               />
             </div>
           </div>
+        }
+
+        {activeTab === 'contacts' &&
+        <div className="bg-surface border border-border rounded-custom overflow-hidden">
+          <div className="hidden md:block overflow-x-auto">
+            <table className="min-w-full divide-y divide-border">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Subject</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Message</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Received</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-text uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-surface divide-y divide-border">
+                {contacts.map((m) => (
+                  <tr key={m.id} className={m.isRead ? 'opacity-60' : ''}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">{m.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">{m.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">{m.subject || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm max-w-2xl truncate">{m.message}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">{new Date(m.createdAt).toLocaleString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      {!m.isRead && (
+                        <Button onClick={async () => {
+                          await contactApi.markRead(m.id);
+                          setContacts(contacts.map(c => c.id === m.id ? { ...c, isRead: true } : c));
+                        }} variant="ghost" size="sm">Mark read</Button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="md:hidden divide-y divide-border">
+            {contacts.map((m) => (
+              <div key={m.id} className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-medium text-text line-clamp-2">{m.name}</div>
+                  <div className="text-xs text-muted-text">{new Date(m.createdAt).toLocaleDateString()}</div>
+                </div>
+                <div className="text-sm text-muted-text">{m.email}</div>
+                <div className="text-sm">{m.subject || '-'}</div>
+                <div className="text-sm truncate">{m.message}</div>
+                {!m.isRead && (
+                  <div className="pt-2">
+                    <Button onClick={async () => {
+                      await contactApi.markRead(m.id);
+                      setContacts(contacts.map(c => c.id === m.id ? { ...c, isRead: true } : c));
+                    }} variant="outline" size="sm">Mark read</Button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="px-6 py-4 border-t border-border">
+            <Pagination
+              limit={itemsPerPage}
+              offset={(contactsPage - 1) * itemsPerPage}
+              total={contactsTotal}
+              onPageChange={(offset) => setContactsPage(Math.floor(offset / itemsPerPage) + 1)}
+            />
+          </div>
+        </div>
         }
 
         {activeTab === 'contacts' &&
