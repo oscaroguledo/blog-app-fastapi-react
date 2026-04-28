@@ -10,7 +10,7 @@ import { Post } from '@/api/post';
 import { User } from '@/api/user';
 import { Comment } from '@/api/comment';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Eye, Users, FileText, MessageSquare, Edit, Power, PowerOff } from 'lucide-react';
+import { Trash2, Eye, Users, FileText, MessageSquare, Edit, Power, PowerOff, X } from 'lucide-react';
 import { Pagination } from '@/components/ui/Pagination';
 import {
   BarChart,
@@ -38,6 +38,10 @@ export function AdminDashboardPage() {
   const [postsTotal, setPostsTotal] = useState(0);
   const [usersTotal, setUsersTotal] = useState(0);
   const itemsPerPage = 10;
+  
+  // User modal state
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showUserModal, setShowUserModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -487,6 +491,10 @@ export function AdminDashboardPage() {
                           size="sm" 
                           className="text-accent hover:text-accent-hover p-1 mr-2"
                           title="View Details"
+                          onClick={() => {
+                            setSelectedUser(u);
+                            setShowUserModal(true);
+                          }}
                         >
                           <Eye size={16} />
                         </Button>
@@ -561,7 +569,15 @@ export function AdminDashboardPage() {
                     </span>
                   </div>
                   <div className="flex gap-2 pt-2">
-                    <Button variant="outline" size="sm" className="flex-1 text-accent">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1 text-accent"
+                      onClick={() => {
+                        setSelectedUser(u);
+                        setShowUserModal(true);
+                      }}
+                    >
                       <Eye size={14} className="mr-1" /> View
                     </Button>
                     {u.active ? (
@@ -618,6 +634,71 @@ export function AdminDashboardPage() {
           </div>
         }
       </div>
+      
+      {/* User Details Modal */}
+      {showUserModal && selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowUserModal(false)} />
+          <div className="relative bg-surface rounded-custom border border-border shadow-lg w-full max-w-md overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h3 className="text-lg font-semibold text-text">User Details</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowUserModal(false)}
+                className="p-2"
+              >
+                <X size={20} />
+              </Button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-4">
+                <Avatar
+                  src={selectedUser.avatar}
+                  alt={`${selectedUser.firstName} ${selectedUser.lastName}`}
+                  size="lg"
+                />
+                <div>
+                  <h4 className="text-xl font-semibold text-text">
+                    {selectedUser.firstName} {selectedUser.lastName}
+                  </h4>
+                  <p className="text-sm text-muted-text">{selectedUser.email}</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-text">Role:</span>
+                  <span className="text-sm font-medium text-text">{selectedUser.role}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-text">Status:</span>
+                  <span className={`text-sm font-medium ${selectedUser.active ? 'text-green-500' : 'text-red-500'}`}>
+                    {selectedUser.active ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-text">Verified:</span>
+                  <span className={`text-sm font-medium ${selectedUser.isVerified ? 'text-green-500' : 'text-orange-500'}`}>
+                    {selectedUser.isVerified ? 'Yes' : 'No'}
+                  </span>
+                </div>
+                {selectedUser.bio && (
+                  <div>
+                    <span className="text-sm text-muted-text block mb-1">Bio:</span>
+                    <p className="text-sm text-text">{selectedUser.bio}</p>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-text">Joined:</span>
+                  <span className="text-sm text-text">
+                    {new Date(selectedUser.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>);
 
 }

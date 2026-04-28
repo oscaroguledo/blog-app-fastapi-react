@@ -25,9 +25,7 @@ export function CategorySidebar({ categories, posts, users }: CategorySidebarPro
   })).
   sort((a, b) => b.count - a.count);
   // Get top authors
-  const topAuthors = [...users].
-  sort((a, b) => b.followers - a.followers).
-  slice(0, 3);
+  const topAuthors = users.slice(0, 3);
   return (
     <aside className="space-y-8">
       {/* Categories */}

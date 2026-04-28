@@ -16,9 +16,9 @@ export interface User {
   bio: string;
   role: string;
   active: boolean;
+  isVerified: boolean;
   createdAt: string;
-  followers: number;
-  following: number;
+  updatedAt: string;
 }
 
 export interface UserCreate {
