@@ -10,7 +10,7 @@ import { Post } from '@/api/post';
 import { User } from '@/api/user';
 import { Comment } from '@/api/comment';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Eye, Users, FileText, MessageSquare, Edit } from 'lucide-react';
+import { Trash2, Eye, Users, FileText, MessageSquare, Edit, Power, PowerOff } from 'lucide-react';
 import { Pagination } from '@/components/ui/Pagination';
 import {
   BarChart,
@@ -482,8 +482,54 @@ export function AdminDashboardPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Button variant="ghost" size="sm" className="text-accent hover:text-accent-hover mr-3 p-1">
-                          Edit
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-accent hover:text-accent-hover p-1 mr-2"
+                          title="View Details"
+                        >
+                          <Eye size={16} />
+                        </Button>
+                        {u.active ? (
+                          <Button 
+                            onClick={async () => {
+                              await userApi.deactivate(u.id);
+                              setUsers(users.map(user => user.id === u.id ? { ...user, active: false } : user));
+                            }}
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-orange-500 hover:text-orange-600 p-1 mr-2"
+                            title="Deactivate"
+                          >
+                            <PowerOff size={16} />
+                          </Button>
+                        ) : (
+                          <Button 
+                            onClick={async () => {
+                              await userApi.activate(u.id);
+                              setUsers(users.map(user => user.id === u.id ? { ...user, active: true } : user));
+                            }}
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-green-500 hover:text-green-600 p-1 mr-2"
+                            title="Activate"
+                          >
+                            <Power size={16} />
+                          </Button>
+                        )}
+                        <Button 
+                          onClick={async () => {
+                            if (confirm('Are you sure you want to delete this user?')) {
+                              await userApi.delete(u.id);
+                              setUsers(users.filter(user => user.id !== u.id));
+                            }
+                          }}
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-600 p-1"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
                         </Button>
                       </td>
                     </tr>
@@ -514,9 +560,47 @@ export function AdminDashboardPage() {
                       {u.active ? 'Active' : 'Inactive'}
                     </span>
                   </div>
-                  <div className="pt-2">
-                    <Button variant="outline" size="sm" className="w-full text-accent">
-                      <Edit size={14} className="mr-1" /> Edit User
+                  <div className="flex gap-2 pt-2">
+                    <Button variant="outline" size="sm" className="flex-1 text-accent">
+                      <Eye size={14} className="mr-1" /> View
+                    </Button>
+                    {u.active ? (
+                      <Button 
+                        onClick={async () => {
+                          await userApi.deactivate(u.id);
+                          setUsers(users.map(user => user.id === u.id ? { ...user, active: false } : user));
+                        }}
+                        variant="outline" 
+                        size="sm" 
+                        className="text-orange-500"
+                      >
+                        <PowerOff size={14} />
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={async () => {
+                          await userApi.activate(u.id);
+                          setUsers(users.map(user => user.id === u.id ? { ...user, active: true } : user));
+                        }}
+                        variant="outline" 
+                        size="sm" 
+                        className="text-green-500"
+                      >
+                        <Power size={14} />
+                      </Button>
+                    )}
+                    <Button 
+                      onClick={async () => {
+                        if (confirm('Are you sure you want to delete this user?')) {
+                          await userApi.delete(u.id);
+                          setUsers(users.filter(user => user.id !== u.id));
+                        }
+                      }}
+                      variant="outline" 
+                      size="sm" 
+                      className="text-red-500"
+                    >
+                      <Trash2 size={14} />
                     </Button>
                   </div>
                 </div>
