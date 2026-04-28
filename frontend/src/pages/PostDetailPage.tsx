@@ -75,16 +75,22 @@ export function PostDetailPage() {
       </Layout>);
 
   }
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim() || !isAuthenticated) return;
 
-    addComment({
+    await addComment({
       postId: post.id,
       content: commentText,
       authorId: user!.id
     });
     setCommentText('');
+    
+    // Refresh comments to get the new one with proper data
+    const commentsRes = await commentApi.getAll({ post_id: id });
+    if (commentsRes.success && commentsRes.data) {
+      setComments(commentsRes.data);
+    }
   };
 
   const handleShare = async () => {
