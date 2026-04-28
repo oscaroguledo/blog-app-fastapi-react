@@ -18,14 +18,19 @@ export function LoginPage() {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted, email:', email);
     setIsLoading(true);
     setError('');
     try {
+      console.log('Calling login...');
       await login(email, password, redirect || undefined);
+      console.log('Login succeeded, redirect:', redirect);
       if (!redirect) {
+        console.log('Navigating to /');
         navigate('/');
       }
     } catch (err) {
+      console.error('Login failed:', err);
       setError('Invalid email or password');
     } finally {
       setIsLoading(false);

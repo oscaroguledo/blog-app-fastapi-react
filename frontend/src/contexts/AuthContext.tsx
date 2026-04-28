@@ -45,23 +45,29 @@ export function AuthProvider({ children }: {children: React.ReactNode;}) {
   };
 
   const login = async (email: string, password: string, redirectPath?: string) => {
+    console.log('AuthContext login called with email:', email, 'redirectPath:', redirectPath);
     try {
       const response = await userApi.login({ email, password });
+      console.log('Login API response:', response);
       if (response.success && response.data) {
         const { user: userData, token: authToken } = response.data;
+        console.log('Login success, user:', userData, 'token:', authToken);
         setUser(userData);
         tokenManager.setTokens({
           access_token: authToken,
           refresh_token: response.data.refresh_token,
         });
         if (redirectPath) {
+          console.log('Redirecting to:', redirectPath);
           window.location.href = redirectPath;
         }
+        console.log('Login function completed');
       } else {
+        console.log('Login failed in response:', response);
         throw new Error(response.message || 'Login failed');
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login error in AuthContext:', error);
       throw error;
     }
   };
