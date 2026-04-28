@@ -1,7 +1,8 @@
 import React from 'react';
 import { Layout } from '@/components/Layout';
 import { motion } from 'framer-motion';
-import { Award, BookOpen, Users, Heart } from 'lucide-react';
+import { Award, BookOpen, Users, Heart, Target } from 'lucide-react';
+import { APP_NAME } from '@/config';
 
 export function AboutPage() {
   return (
@@ -14,7 +15,7 @@ export function AboutPage() {
           className="text-center mb-16"
         >
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-text mb-6">
-            About Chronicle
+            About {APP_NAME}
           </h1>
           <p className="text-xl text-muted-text max-w-3xl mx-auto leading-relaxed">
             A modern platform for sharing ideas, stories, and knowledge. We believe in the power of words to connect, inspire, and transform.
@@ -82,7 +83,7 @@ export function AboutPage() {
           <h2 className="text-3xl font-serif font-bold text-text mb-6">Our Story</h2>
           <div className="prose prose-lg dark:prose-invert max-w-none text-muted-text leading-relaxed">
             <p className="mb-4">
-              Chronicle was born from a simple idea: everyone has a story worth telling. In a world of endless content, we wanted to create a space where quality writing could shine and thoughtful discussions could thrive.
+              {APP_NAME} was born from a simple idea: everyone has a story worth telling. In a world of endless content, we wanted to create a space where quality writing could shine and thoughtful discussions could thrive.
             </p>
             <p className="mb-4">
               Started in 2024, we began as a small team of writers and developers who believed in the transformative power of words. Today, we've grown into a vibrant community of storytellers, thinkers, and creators from around the globe.

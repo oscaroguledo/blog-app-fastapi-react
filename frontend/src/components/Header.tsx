@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, Home, Edit3, User as UserIcon, LogOut, Settings, Tag, Layout as LayoutIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { APP_NAME } from '@/config';
 
 export function Header() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -20,7 +21,7 @@ export function Header() {
       <header className="lg:hidden sticky top-0 bg-transparent backdrop-blur-md border-b border-border p-4 z-40">
         <div className="flex items-center justify-between">
           <Link to="/" className="font-serif text-xl font-bold text-accent">
-            Chronicle.
+            {APP_NAME}
           </Link>
           <Link
             to="/search"
@@ -35,7 +36,7 @@ export function Header() {
       <header className="hidden lg:flex items-center justify-between px-6 py-4 border-b border-border bg-surface">
         <div className="flex items-center space-x-8">
           <Link to="/" className="font-serif text-2xl font-bold text-accent">
-            Chronicle.
+            {APP_NAME}
           </Link>
           <nav className="flex space-x-6">
             {navLinks.map((link) => (

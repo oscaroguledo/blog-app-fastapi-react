@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import { contactApi } from '@/api/contact';
+import { APP_NAME } from '@/config';
 
 export function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,7 +64,7 @@ export function ContactPage() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-text mb-1">Email</h3>
-                <p className="text-muted-text">contact@chronicle.com</p>
+                <p className="text-muted-text">contact@{APP_NAME.toLowerCase()}.com</p>
               </div>
             </motion.div>
 
