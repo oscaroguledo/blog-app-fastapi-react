@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { Input } from '@/components/ui/Input';
@@ -16,10 +16,8 @@ export function LoginPage() {
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get('redirect');
   
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('Form submitted, email:', email, 'event:', e.type);
+  const handleSubmit = async () => {
+    console.log('Button clicked, email:', email);
     
     if (!email || !password) {
       setError('Please enter email and password');
@@ -42,7 +40,6 @@ export function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-    return false;
   };
   return (
     <Layout showFooter={false}>
@@ -73,7 +70,7 @@ export function LoginPage() {
             </p>
           </div>
 
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="mt-8 space-y-6">
             {error &&
             <div className="bg-red-50 text-red-500 p-3 rounded-custom text-sm text-center">
                 {error}
@@ -122,7 +119,8 @@ export function LoginPage() {
             </div>
 
             <Button
-              type="submit"
+              type="button"
+              onClick={handleSubmit}
               disabled={isLoading}
               variant="primary"
               size="md"
@@ -130,7 +128,7 @@ export function LoginPage() {
             >
               {isLoading ? 'Signing in...' : <><span>Sign in</span><ArrowRight className="ml-2 h-5 w-5" /></>}
             </Button>
-          </form>
+          </div>
 
           <div className="mt-6">
             <div className="relative">
