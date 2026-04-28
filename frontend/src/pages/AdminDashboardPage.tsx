@@ -437,7 +437,7 @@ export function AdminDashboardPage() {
                       Role
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">
-                      Followers
+                      Status
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-muted-text uppercase tracking-wider">
                       Actions
@@ -476,8 +476,10 @@ export function AdminDashboardPage() {
                           {u.role}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-text">
-                        {(u.followers ?? 0).toLocaleString()}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${u.active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}>
+                          {u.active ? 'Active' : 'Inactive'}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Button variant="ghost" size="sm" className="text-accent hover:text-accent-hover mr-3 p-1">
@@ -508,8 +510,8 @@ export function AdminDashboardPage() {
                     <span className={`px-2 py-1 text-xs font-semibold rounded-custom ${u.role === 'Admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' : u.role === 'Editor' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}`}>
                       {u.role}
                     </span>
-                    <span className="text-xs text-muted-text">
-                      {(u.followers ?? 0).toLocaleString()} followers
+                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${u.active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}>
+                      {u.active ? 'Active' : 'Inactive'}
                     </span>
                   </div>
                   <div className="pt-2">
