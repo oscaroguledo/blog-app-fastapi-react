@@ -87,7 +87,7 @@ export function Header() {
                     className="border-2 border-transparent hover:border-accent"
                   />
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-surface rounded-lg shadow-lg py-2 border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                <div className="absolute right-0 mt-2 w-48 bg-surface rounded-lg shadow-lg py-2 border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                   <div className="px-4 py-2 border-b border-border">
                     <p className="text-sm font-medium text-text">{user?.firstName} {user?.lastName}</p>
                     <p className="text-xs text-muted-text">{user?.email}</p>
