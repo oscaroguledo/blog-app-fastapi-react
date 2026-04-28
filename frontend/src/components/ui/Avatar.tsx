@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { User } from 'lucide-react';
 
@@ -10,6 +10,8 @@ interface AvatarProps {
 }
 
 export function Avatar({ src, alt, size = 'md', className }: AvatarProps) {
+  const [imageError, setImageError] = useState(false);
+
   const sizes = {
     sm: 'h-8 w-8',
     md: 'h-10 w-10',
@@ -22,7 +24,7 @@ export function Avatar({ src, alt, size = 'md', className }: AvatarProps) {
     lg: 24
   };
 
-  if (!src) {
+  if (!src || imageError) {
     return (
       <div
         className={cn(
@@ -45,10 +47,7 @@ export function Avatar({ src, alt, size = 'md', className }: AvatarProps) {
         'rounded-full border border-border object-cover',
         className
       )}
-      onError={(e) => {
-        e.currentTarget.style.display = 'none';
-        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-      }}
+      onError={() => setImageError(true)}
     />
   );
 }

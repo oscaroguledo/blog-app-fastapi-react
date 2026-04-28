@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Heart, MessageCircle, Clock, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { Avatar } from '@/components/ui/Avatar';
 import { Post } from '@/api/post';
 import { User } from '@/api/user';
 import { motion } from 'framer-motion';
@@ -53,11 +54,12 @@ export function PostCard({ post, author, index = 0 }: PostCardProps) {
 
         <div className="mt-auto pt-5 flex items-center justify-between">
           <div className="flex items-center">
-            <img
+            <Avatar
               src={author?.avatar}
               alt={`${author?.firstName} ${author?.lastName}`}
-              className="h-8 w-8 rounded-full border border-border" />
-            
+              size="sm"
+            />
+
             <div className="ml-3">
               <p className="text-sm font-medium text-text">{`${author?.firstName} ${author?.lastName}`}</p>
               <div className="flex space-x-1 text-xs text-muted-text">

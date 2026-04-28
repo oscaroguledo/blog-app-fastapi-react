@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { PostCard } from '@/components/PostCard';
 import { CategorySidebar } from '@/components/CategorySidebar';
+import { Avatar } from '@/components/ui/Avatar';
 import { useBlog } from '@/contexts/BlogContext';
 import { postApi } from '@/api/post';
 import { Post } from '@/api/post';
@@ -76,10 +77,11 @@ export function HomePage() {
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <img
+                      <Avatar
                         src={getAuthor(featuredPost.authorId)?.avatar}
                         alt={`${getAuthor(featuredPost.authorId)?.firstName} ${getAuthor(featuredPost.authorId)?.lastName}`}
-                        className="h-10 w-10 rounded-custom border-2 border-white/20"
+                        size="md"
+                        className="border-2 border-white/20"
                       />
                       <div className="ml-3">
                         <p className="text-sm font-medium text-white">{getAuthor(featuredPost.authorId)?.firstName} {getAuthor(featuredPost.authorId)?.lastName}</p>
