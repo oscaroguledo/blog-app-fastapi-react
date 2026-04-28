@@ -689,7 +689,7 @@ export function AdminDashboardPage() {
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-sm text-muted-text">Joined:</span>
+                  <span className="text-sm text-muted-text">Created at:</span>
                   <span className="text-sm text-text">
                     {selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleDateString('en-US', {
                       month: 'long',
