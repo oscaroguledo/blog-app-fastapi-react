@@ -12,6 +12,7 @@ import { User } from '@/api/user';
 import { Comment } from '@/api/comment';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, Eye, Users, FileText, MessageSquare, Edit, Power, PowerOff, X, AlertTriangle } from 'lucide-react';
+import { AdminContactsPage } from '@/pages/AdminContactsPage';
 import { Pagination } from '@/components/ui/Pagination';
 import {
   BarChart,
@@ -28,7 +29,7 @@ import {
 export function AdminDashboardPage() {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'users'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'users' | 'contacts'>('overview');
   const [posts, setPosts] = useState<Post[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -138,7 +139,7 @@ export function AdminDashboardPage() {
 
         {/* Tabs */}
         <div className="flex space-x-1 border-b border-border mb-8 overflow-x-auto">
-          {['overview', 'posts', 'users'].map((tab) =>
+          {['overview', 'posts', 'users', 'contacts'].map((tab) =>
           <Button
             key={tab}
             onClick={() => setActiveTab(tab as any)}
@@ -624,6 +625,14 @@ export function AdminDashboardPage() {
                 total={usersTotal}
                 onPageChange={(offset) => setUsersPage(Math.floor(offset / itemsPerPage) + 1)}
               />
+            </div>
+          </div>
+        }
+
+        {activeTab === 'contacts' &&
+          <div className="bg-surface border border-border rounded-custom overflow-hidden">
+            <div className="p-6">
+              <AdminContactsPage />
             </div>
           </div>
         }
