@@ -154,15 +154,18 @@ async def get_me(current_user = Depends(get_current_user)):
 
 @router.patch("/me")
 async def update_current_user(
+    request: Request,
     current_user = Depends(get_current_user),
-    email: Optional[str] = None,
-    firstName: Optional[str] = None,
-    lastName: Optional[str] = None,
-    avatar: Optional[str] = None,
-    bio: Optional[str] = None,
     db: AsyncSession = Depends(get_db)
 ):
     """Update current user."""
+    data = await request.json()
+    email = data.get("email")
+    firstName = data.get("firstName")
+    lastName = data.get("lastName")
+    avatar = data.get("avatar")
+    bio = data.get("bio")
+    
     user_service = UserService(db)
     
     user = await user_service.update(
@@ -328,15 +331,18 @@ async def get_user(user_id: str, db: AsyncSession = Depends(get_db)):
 @router.patch("/{user_id}")
 async def update_user(
     user_id: str,
-    email: Optional[str] = None,
-    firstName: Optional[str] = None,
-    lastName: Optional[str] = None,
-    avatar: Optional[str] = None,
-    bio: Optional[str] = None,
-    role: Optional[UserRole] = None,
+    request: Request,
     db: AsyncSession = Depends(get_db)
 ):
     """Update a user."""
+    data = await request.json()
+    email = data.get("email")
+    firstName = data.get("firstName")
+    lastName = data.get("lastName")
+    avatar = data.get("avatar")
+    bio = data.get("bio")
+    role = data.get("role")
+    
     user_service = UserService(db)
     
     try:
@@ -468,10 +474,13 @@ async def deactivate_user(
 
 @router.post("/reset-password")
 async def reset_password(
-    email: str,
+    request: Request,
     db: AsyncSession = Depends(get_db)
 ):
     """Send password reset email."""
+    data = await request.json()
+    email = data.get("email")
+    
     user_service = UserService(db)
 
     user = await user_service.get(user_id=None, email=email)
@@ -497,10 +506,13 @@ async def reset_password(
 
 @router.post("/verify-email")
 async def verify_email(
-    email: str,
+    request: Request,
     db: AsyncSession = Depends(get_db)
 ):
     """Resend email verification."""
+    data = await request.json()
+    email = data.get("email")
+    
     user_service = UserService(db)
 
     user = await user_service.get(user_id=None, email=email)

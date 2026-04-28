@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 import uuid
@@ -12,12 +12,15 @@ router = APIRouter(prefix="/tags", tags=["tags"])
 
 @router.post("/")
 async def create_tag(
-    name: str,
-    slug: str,
-    description: Optional[str] = None,
+    request: Request,
     db: AsyncSession = Depends(get_db)
 ):
     """Create a new tag."""
+    data = await request.json()
+    name = data.get("name")
+    slug = data.get("slug")
+    description = data.get("description")
+    
     tag_service = TagService(db)
     
     try:
@@ -111,12 +114,15 @@ async def get_tag(tag_id: str, db: AsyncSession = Depends(get_db)):
 @router.patch("/{tag_id}")
 async def update_tag(
     tag_id: str,
-    name: Optional[str] = None,
-    slug: Optional[str] = None,
-    description: Optional[str] = None,
+    request: Request,
     db: AsyncSession = Depends(get_db)
 ):
     """Update a tag."""
+    data = await request.json()
+    name = data.get("name")
+    slug = data.get("slug")
+    description = data.get("description")
+    
     tag_service = TagService(db)
     
     try:

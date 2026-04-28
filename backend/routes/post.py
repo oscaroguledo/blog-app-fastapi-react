@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional, List
 import uuid
@@ -13,18 +13,21 @@ router = APIRouter(prefix="/posts", tags=["posts"])
 
 @router.post("/")
 async def create_post(
-    title: str,
-    excerpt: str,
-    content: str,
-    coverImage: str,
-    category_ids: Optional[str] = None,
-    tag_ids: Optional[str] = None,
-    isPublished: bool = False,
-    featured: bool = False,
+    request: Request,
     current_user = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Create a new post."""
+    data = await request.json()
+    title = data.get("title")
+    excerpt = data.get("excerpt")
+    content = data.get("content")
+    coverImage = data.get("coverImage")
+    category_ids = data.get("category_ids")
+    tag_ids = data.get("tag_ids")
+    isPublished = data.get("isPublished", False)
+    featured = data.get("featured", False)
+    
     post_service = PostService(db)
     
     try:
@@ -174,18 +177,21 @@ async def get_post(post_id: str, db: AsyncSession = Depends(get_db)):
 @router.patch("/{post_id}")
 async def update_post(
     post_id: str,
-    title: Optional[str] = None,
-    excerpt: Optional[str] = None,
-    content: Optional[str] = None,
-    coverImage: Optional[str] = None,
-    isPublished: Optional[bool] = None,
-    featured: Optional[bool] = None,
-    category_ids: Optional[str] = None,
-    tag_ids: Optional[str] = None,
+    request: Request,
     current_user = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Update a post."""
+    data = await request.json()
+    title = data.get("title")
+    excerpt = data.get("excerpt")
+    content = data.get("content")
+    coverImage = data.get("coverImage")
+    isPublished = data.get("isPublished")
+    featured = data.get("featured")
+    category_ids = data.get("category_ids")
+    tag_ids = data.get("tag_ids")
+    
     post_service = PostService(db)
     
     try:

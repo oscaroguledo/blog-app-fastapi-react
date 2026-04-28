@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
-from pydantic import BaseModel
 import uuid
 from datetime import datetime
 from core.database import get_db
@@ -14,13 +13,16 @@ router = APIRouter(prefix="/comments", tags=["comments"])
 
 @router.post("/")
 async def create_comment(
-    post_id: str,
-    content: str,
-    parent_id: Optional[str] = None,
+    request: Request,
     current_user = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Create a new comment."""
+    data = await request.json()
+    post_id = data.get("postId")
+    content = data.get("content")
+    parent_id = data.get("parentId")
+    
     comment_service = CommentService(db)
     
     try:
@@ -123,11 +125,14 @@ async def get_comment(comment_id: str, db: AsyncSession = Depends(get_db)):
 @router.patch("/{comment_id}")
 async def update_comment(
     comment_id: str,
-    content: Optional[str] = None,
+    request: Request,
     current_user = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Update a comment."""
+    data = await request.json()
+    content = data.get("content")
+    
     comment_service = CommentService(db)
     
     try:
