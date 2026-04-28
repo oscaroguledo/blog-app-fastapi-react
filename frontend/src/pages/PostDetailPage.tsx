@@ -26,7 +26,7 @@ export function PostDetailPage() {
   const { id } = useParams<{
     id: string;
   }>();
-  const { getAuthor, addComment, toggleLike } = useBlog();
+  const { getAuthor, addComment, toggleLike, likedPosts } = useBlog();
   const { user, isAuthenticated } = useAuth();
   const [commentText, setCommentText] = useState('');
   const [post, setPost] = useState<Post | null>(null);
@@ -343,12 +343,26 @@ export function PostDetailPage() {
               <div className="bg-surface border border-border rounded-custom p-4">
                 <div className="flex flex-col gap-3">
                   <Button
-                    onClick={() => toggleLike(post.id)}
+                    onClick={async () => {
+                      if (!isAuthenticated) return;
+                      const isLiked = likedPosts.has(post.id);
+                      try {
+                        const response = isLiked
+                          ? await postApi.unlike(post.id)
+                          : await postApi.like(post.id);
+                        if (response.success) {
+                          setPost({ ...post, likes: isLiked ? post.likes - 1 : post.likes + 1 });
+                          toggleLike(post.id);
+                        }
+                      } catch (e) {
+                        console.error('Failed to toggle like:', e);
+                      }
+                    }}
                     variant="outline"
                     size="md"
-                    className="flex items-center justify-center gap-2"
+                    className={`flex items-center justify-center gap-2 ${likedPosts.has(post.id) ? 'text-red-500 border-red-300' : ''}`}
                   >
-                    <Heart size={18} />
+                    <Heart size={18} className={likedPosts.has(post.id) ? 'fill-current' : ''} />
                     <span>{post.likes} Likes</span>
                   </Button>
                   <a
