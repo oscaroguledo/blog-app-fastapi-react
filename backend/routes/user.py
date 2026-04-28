@@ -12,22 +12,25 @@ from core.dependencies import get_current_user, get_current_admin
 
 router = APIRouter(prefix="/users", tags=["users"])
 
+class RegisterRequest(BaseModel):
+    firstName: str
+    lastName: str
+    email: str
+    password: str
+    role: Optional[str] = "Reader"
+    avatar: Optional[str] = None
+    bio: Optional[str] = None
+
 @router.post("/register")
 async def register(
-    firstName: str,
-    lastName: str,
-    email: str,
-    password: str,
-    role: Optional[str] = "Reader",
-    avatar: Optional[str] = None,
-    bio: Optional[str] = None,
+    request: RegisterRequest,
     db: AsyncSession = Depends(get_db)
 ):
     """Register a new user."""
     user_service = UserService(db)
     
     # Check if user already exists
-    existing_user = await user_service.get(user_id=None, email=email)
+    existing_user = await user_service.get(user_id=None, email=request.email)
     if existing_user:
         return Response(
             success=False,
@@ -38,13 +41,13 @@ async def register(
     # Create user
     try:
         user = await user_service.create(
-            firstName=firstName,
-            lastName=lastName,
-            email=email,
-            password=password,
-            role=role,
-            avatar=avatar,
-            bio=bio
+            firstName=request.firstName,
+            lastName=request.lastName,
+            email=request.email,
+            password=request.password,
+            role=request.role,
+            avatar=request.avatar,
+            bio=request.bio
         )
         
         # Generate tokens
@@ -70,16 +73,19 @@ async def register(
         )
 
 
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
 @router.post("/login")
 async def login(
-    email: str,
-    password: str,
+    request: LoginRequest,
     db: AsyncSession = Depends(get_db)
 ):
     """Login user and return JWT tokens."""
     user_service = UserService(db)
     
-    user, access_token, refresh_token = await user_service.login(email, password)
+    user, access_token, refresh_token = await user_service.login(request.email, request.password)
     
     if not user:
         return Response(
