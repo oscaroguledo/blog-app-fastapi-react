@@ -12,11 +12,11 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 INSERT INTO users (id, "firstName", "lastName", email, password, role, bio, active, created_at, updated_at)
 VALUES
-    ('550e8400-e29b-41d4-a716-446655440001', 'John', 'Doe', 'john.doe@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5NU7qvqZQJ0Xe', 'Admin', 'Full-stack developer and tech enthusiast.', true, NOW(), NOW()),
-    ('550e8400-e29b-41d4-a716-446655440002', 'Jane', 'Smith', 'jane.smith@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5NU7qvqZQJ0Xe', 'Writer', 'Tech writer and blogger.', true, NOW(), NOW()),
-    ('550e8400-e29b-41d4-a716-446655440003', 'Bob', 'Johnson', 'bob.johnson@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5NU7qvqZQJ0Xe', 'Editor', 'Content editor and reviewer.', true, NOW(), NOW()),
-    ('550e8400-e29b-41d4-a716-446655440004', 'Alice', 'Williams', 'alice.williams@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5NU7qvqZQJ0Xe', 'Reader', 'Avid reader and subscriber.', true, NOW(), NOW()),
-    ('550e8400-e29b-41d4-a716-446655440005', 'Charlie', 'Brown', 'charlie.brown@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5NU7qvqZQJ0Xe', 'Writer', 'Freelance writer and journalist.', true, NOW(), NOW());
+    ('550e8400-e29b-41d4-a716-446655440001', 'John', 'Doe', 'john.doe@example.com', '$2b$12$VAzzWK7oEppTnAozcEwTJOtV7TfQYwRRoEvael52sVAvOA6OS6a.a', 'Admin', 'Full-stack developer and tech enthusiast.', true, NOW(), NOW()),
+    ('550e8400-e29b-41d4-a716-446655440002', 'Jane', 'Smith', 'jane.smith@example.com', '$2b$12$VAzzWK7oEppTnAozcEwTJOtV7TfQYwRRoEvael52sVAvOA6OS6a.a', 'Writer', 'Tech writer and blogger.', true, NOW(), NOW()),
+    ('550e8400-e29b-41d4-a716-446655440003', 'Bob', 'Johnson', 'bob.johnson@example.com', '$2b$12$VAzzWK7oEppTnAozcEwTJOtV7TfQYwRRoEvael52sVAvOA6OS6a.a', 'Editor', 'Content editor and reviewer.', true, NOW(), NOW()),
+    ('550e8400-e29b-41d4-a716-446655440004', 'Alice', 'Williams', 'alice.williams@example.com', '$2b$12$VAzzWK7oEppTnAozcEwTJOtV7TfQYwRRoEvael52sVAvOA6OS6a.a', 'Reader', 'Avid reader and subscriber.', true, NOW(), NOW()),
+    ('550e8400-e29b-41d4-a716-446655440005', 'Charlie', 'Brown', 'charlie.brown@example.com', '$2b$12$VAzzWK7oEppTnAozcEwTJOtV7TfQYwRRoEvael52sVAvOA6OS6a.a', 'Writer', 'Freelance writer and journalist.', true, NOW(), NOW());
 
 -- ============================================
 -- CATEGORIES
