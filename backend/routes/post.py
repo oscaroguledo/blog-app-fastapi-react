@@ -78,6 +78,7 @@ async def list_posts(
     end_at: Optional[str] = None,
     category_id: Optional[str] = None,
     tag_id: Optional[str] = None,
+    category_name: Optional[str] = None,
     db: AsyncSession = Depends(get_db)
 ):
     """List posts with filtering and pagination."""
@@ -97,7 +98,8 @@ async def list_posts(
             start_at=datetime.fromisoformat(start_at) if start_at else None,
             end_at=datetime.fromisoformat(end_at) if end_at else None,
             category_id=uuid.UUID(category_id) if category_id else None,
-            tag_id=uuid.UUID(tag_id) if tag_id else None
+            tag_id=uuid.UUID(tag_id) if tag_id else None,
+            category_name=category_name
         )
         
         return Response(

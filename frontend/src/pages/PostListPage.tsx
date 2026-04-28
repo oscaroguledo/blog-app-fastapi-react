@@ -33,7 +33,7 @@ export function PostListPage() {
       try {
         const response = await postApi.getAll({
           search_query: query || undefined,
-          category_id: selectedCategory[0] || undefined,
+          category_name: selectedCategory[0] || undefined,
           author_id: selectedAuthor[0] || undefined,
           is_published: true,
           limit,

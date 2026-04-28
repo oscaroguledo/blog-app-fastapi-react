@@ -51,6 +51,7 @@ export const postApi = {
     likes?: number;
     views?: number;
     category_id?: string;
+    category_name?: string;
     is_published?: boolean;
     featured?: boolean;
     search_query?: string;
