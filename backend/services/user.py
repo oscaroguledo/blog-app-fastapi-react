@@ -105,13 +105,22 @@ class UserService:
         result = await self.db.execute(select(User).where(User.email == email))
         user = result.scalar_one_or_none()
         
+        print(f"[DEBUG] UserService - user lookup result: {user}")
+        
         if not user:
+            print("[DEBUG] UserService - user not found")
             return None, None, None
         
-        if not password_handler.verify_password(password, user.password):
+        print(f"[DEBUG] UserService - user found: {user.email}, active: {user.active}, password hash: {user.password[:20]}...")
+        
+        password_valid = password_handler.verify_password(password, user.password)
+        print(f"[DEBUG] UserService - password verification result: {password_valid}")
+        
+        if not password_valid:
             return None, None, None
         
         if not user.active:
+            print("[DEBUG] UserService - user is not active")
             return None, None, None
         
         access_token = await self.create_access_token(user)

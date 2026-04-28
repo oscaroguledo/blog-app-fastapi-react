@@ -83,9 +83,13 @@ async def login(
     email = data.get("email")
     password = data.get("password")
     
+    print(f"[DEBUG] Login attempt - email: {email}, password provided: {bool(password)}")
+    
     user_service = UserService(db)
     
     user, access_token, refresh_token = await user_service.login(email, password)
+    
+    print(f"[DEBUG] Login result - user found: {bool(user)}, token generated: {bool(access_token)}")
     
     if not user:
         return Response(
