@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { postApi } from '@/api/post';
 import { userApi } from '@/api/user';
 import { commentApi } from '@/api/comment';
+import { analyticsApi } from '@/api/analytics';
 import { Post } from '@/api/post';
 import { User } from '@/api/user';
 import { Comment } from '@/api/comment';
@@ -46,6 +47,10 @@ export function AdminDashboardPage() {
   // Delete confirmation modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  
+  // Analytics state
+  const [viewsData, setViewsData] = useState<{name: string; views: number}[]>([]);
+  const [totalViews, setTotalViews] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,7 +74,7 @@ export function AdminDashboardPage() {
           setUsersTotal(usersPagination?.total || usersData.length || 0);
         }
         if (commentsRes.success && commentsRes.data) {
-          setComments(commentsRes.data.comments || commentsRes.data);
+          setComments(Array.isArray(commentsRes.data) ? commentsRes.data : (commentsRes.data as any).comments || []);
         }
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
@@ -78,45 +83,35 @@ export function AdminDashboardPage() {
 
     fetchData();
   }, [postsPage, usersPage]);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const overviewRes = await analyticsApi.getOverview(7);
+        if (overviewRes.success && overviewRes.data) {
+          setTotalViews(overviewRes.data.total_views);
+          setViewsData(overviewRes.data.daily_stats.map((stat: any) => ({
+            name: stat.day,
+            views: stat.total_views
+          })));
+        }
+      } catch (error) {
+        console.error('Failed to fetch analytics:', error);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
+
   // Redirect if not admin
   if (!isAuthenticated || user?.role !== 'Admin') {
     navigate('/');
     return null;
   }
-  // Mock Analytics Data
-  const viewsData = [
-  {
-    name: 'Mon',
-    views: 4000
-  },
-  {
-    name: 'Tue',
-    views: 3000
-  },
-  {
-    name: 'Wed',
-    views: 2000
-  },
-  {
-    name: 'Thu',
-    views: 2780
-  },
-  {
-    name: 'Fri',
-    views: 1890
-  },
-  {
-    name: 'Sat',
-    views: 2390
-  },
-  {
-    name: 'Sun',
-    views: 3490
-  }];
 
   // Calculate category data from posts
   const categoryCounts = posts.reduce((acc, post) => {
-    post.categories.forEach(cat => {
+    post.categories.forEach((cat: string) => {
       acc[cat] = (acc[cat] || 0) + 1;
     });
     return acc;
@@ -127,7 +122,6 @@ export function AdminDashboardPage() {
     .sort((a, b) => b.count - a.count)
     .slice(0, 5); // Top 5 categories
 
-  const totalViews = posts.reduce((sum, post) => sum + post.views, 0);
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -160,7 +154,7 @@ export function AdminDashboardPage() {
         {activeTab === 'overview' &&
         <div className="space-y-8">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
             {
               label: 'Total Posts',

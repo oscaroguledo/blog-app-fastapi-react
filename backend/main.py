@@ -6,7 +6,7 @@ from core.redis import redis_client
 from core.config import settings
 from core.utils.logger import info, success, warning, error
 from core.middleware import rate_limit_middleware
-from routes import health_router, user_router, post_router, tag_router, comment_router, category_router, contact_router
+from routes import health_router, user_router, post_router, tag_router, comment_router, category_router, contact_router, analytics_router
 
 
 @asynccontextmanager
@@ -61,6 +61,7 @@ app.include_router(tag_router)
 app.include_router(comment_router)
 app.include_router(category_router)
 app.include_router(contact_router)
+app.include_router(analytics_router)
 
 
 if __name__ == "__main__":
