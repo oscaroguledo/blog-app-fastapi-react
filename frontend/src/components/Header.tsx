@@ -19,7 +19,7 @@ export function Header() {
   return (
     <>
       {/* Mobile Header */}
-      <header className="lg:hidden sticky top-0 bg-transparent backdrop-blur-md border-b border-border p-4 z-40">
+      <header className="lg:hidden sticky top-0 bg-surface border-b border-border p-4 z-40">
         <div className="flex items-center justify-between">
           <Link to="/" className="font-serif text-xl font-bold text-accent">
             {APP_NAME}
