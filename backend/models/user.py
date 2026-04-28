@@ -20,7 +20,7 @@ class User(Base):
         Index("ix_users_email", "email"),
         Index("created_at_idx", "created_at"),
         Index("updated_at_idx", "updated_at"),
-        Index("active_idx", "active"),
+        Index("active_idx", "isActive"),
         Index("role_idx", "role"),
         {"schema": "public"},
     )
@@ -33,7 +33,8 @@ class User(Base):
     avatar: Mapped[str | None] = mapped_column(String, nullable=True)
     role: Mapped[str] = mapped_column(String, nullable=False, default=UserRole.READER.value)
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
-    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    active: Mapped[bool] = mapped_column('isActive', Boolean, default=True)
+    isVerified: Mapped[bool] = mapped_column('isVerified', Boolean, default=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
@@ -55,6 +56,7 @@ class User(Base):
             "role": self.role,
             "bio": self.bio,
             "active": self.active,
+            "isVerified": self.isVerified,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
         }

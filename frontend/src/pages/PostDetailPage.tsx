@@ -43,7 +43,7 @@ export function PostDetailPage() {
           setPost(postRes.data);
         }
         if (commentsRes.success && commentsRes.data) {
-          setComments(commentsRes.data.comments);
+          setComments(commentsRes.data);
         }
       } catch (error) {
         console.error('Failed to fetch post:', error);

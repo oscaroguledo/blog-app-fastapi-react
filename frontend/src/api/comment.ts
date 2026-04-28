@@ -42,7 +42,7 @@ export const commentApi = {
     end_at?: string;
     limit?: number;
     offset?: number;
-  }): Promise<ApiResponse<CommentsResponse>> => {
+  }): Promise<ApiResponse<Comment[]>> => {
     const response = await axiosInstance.get('/comments/', { params });
     return response.data;
   },

@@ -48,22 +48,30 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
     // Fetch initial data
     const fetchData = async () => {
       try {
-        await fetchPosts({ limit: 10, offset: 0, is_published: true });
+        const postsRes = await postApi.getAll({ limit: 10, offset: 0, is_published: true });
+        console.log('Posts response:', postsRes);
+        if (postsRes.success && postsRes.data) {
+          setPosts(postsRes.data.posts);
+          setPagination(postsRes.data.pagination);
+        }
 
         const categoriesRes = await categoryApi.getAll();
+        console.log('Categories response:', categoriesRes);
         if (categoriesRes.success && categoriesRes.data) {
-          setCategories(categoriesRes.data.categories.map((c: any) => c.name));
+          setCategories(categoriesRes.data.map((c: any) => c.name));
         }
 
         const commentsRes = await commentApi.getAll();
+        console.log('Comments response:', commentsRes);
         if (commentsRes.success && commentsRes.data) {
-          setComments(commentsRes.data.comments);
+          setComments(commentsRes.data);
         }
 
         // Fetch users
         const usersRes = await userApi.getAll();
+        console.log('Users response:', usersRes);
         if (usersRes.success && usersRes.data) {
-          setUsers(usersRes.data.users);
+          setUsers(usersRes.data);
         }
       } catch (error) {
         console.error('Failed to fetch data:', error);

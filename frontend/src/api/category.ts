@@ -15,17 +15,8 @@ export interface Category {
   createdAt: string;
 }
 
-export interface CategoriesResponse {
-  categories: Category[];
-  pagination: {
-    limit: number;
-    offset: number;
-    total: number;
-  };
-}
-
 export const categoryApi = {
-  getAll: async (params?: { search_query?: string; start_at?: string; end_at?: string; limit?: number; offset?: number }): Promise<ApiResponse<CategoriesResponse>> => {
+  getAll: async (params?: { search_query?: string; start_at?: string; end_at?: string; limit?: number; offset?: number }): Promise<ApiResponse<Category[]>> => {
     const response = await axiosInstance.get('/categories/', { params });
     return response.data;
   },
