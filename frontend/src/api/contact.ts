@@ -31,8 +31,12 @@ export const contactApi = {
   },
 
   // Admin endpoints
-  list: async (limit: number = 100, offset: number = 0): Promise<ApiResponse<ContactMessage[]>> => {
-    const response = await axiosInstance.get(`/contact?limit=${limit}&offset=${offset}`);
+  list: async (limit: number = 100, offset: number = 0, q?: string): Promise<ApiResponse<ContactMessage[]>> => {
+    const params = new URLSearchParams();
+    params.set('limit', String(limit));
+    params.set('offset', String(offset));
+    if (q) params.set('q', q);
+    const response = await axiosInstance.get(`/contact?${params.toString()}`);
     return response.data;
   },
 

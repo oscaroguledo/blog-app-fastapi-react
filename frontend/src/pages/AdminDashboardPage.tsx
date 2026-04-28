@@ -663,16 +663,17 @@ export function AdminDashboardPage() {
               <p className="text-sm text-muted-text">{contactsTotal} messages</p>
             </div>
             <div className="flex items-center gap-3 ml-auto">
-              <Input
-                value={contactsQuery}
-                onChange={(e) => setContactsQuery((e.target as HTMLInputElement).value)}
-                placeholder="Search name, email, subject or message"
-                className="w-64"
-              />
+                <Input
+                  value={contactsQuery}
+                  onChange={(e) => { setContactsQuery((e.target as HTMLInputElement).value); setContactsPage(1); }}
+                  placeholder="Search name, email, subject or message"
+                  className="w-64"
+                />
               <Button
                 variant="outline"
                 size="sm"
                 onClick={async () => {
+                  if (!confirm('Mark all messages as read? This cannot be undone.')) return;
                   // optimistic update
                   setContacts((prev) => prev.map(c => ({ ...c, isRead: true })));
                   const unread = contacts.filter(c => !c.isRead).map(c => c.id);
@@ -697,15 +698,8 @@ export function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody className="bg-surface divide-y divide-border">
-                {/** filter client-side by query */}
-                {contacts
-                  .filter((m) => {
-                    if (!contactsQuery) return true;
-                    const q = contactsQuery.toLowerCase();
-                    return [m.name, m.email, m.subject, m.message].some((v: any) => (v || '').toLowerCase().includes(q));
-                  })
-                  .map((m) => (
-                  <tr key={m.id} className={m.isRead ? 'opacity-60' : ''}>
+                {contacts.map((m) => (
+                   <tr key={m.id} className={m.isRead ? 'opacity-60' : ''}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">{m.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">{m.email}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">{m.subject || '-'}</td>
@@ -725,14 +719,8 @@ export function AdminDashboardPage() {
             </table>
           </div>
           <div className="md:hidden divide-y divide-border">
-            {contacts
-              .filter((m) => {
-                if (!contactsQuery) return true;
-                const q = contactsQuery.toLowerCase();
-                return [m.name, m.email, m.subject, m.message].some((v: any) => (v || '').toLowerCase().includes(q));
-              })
-              .map((m) => (
-              <div key={m.id} className="p-4 space-y-3">
+            {contacts.map((m) => (
+               <div key={m.id} className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-medium text-text line-clamp-2">{m.name}</div>
                   <div className="text-xs text-muted-text">{new Date(m.createdAt).toLocaleDateString()}</div>

@@ -47,13 +47,14 @@ async def submit_contact(
 async def list_messages(
     limit: int = 100,
     offset: int = 0,
+    q: Optional[str] = None,
     current_admin = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db)
 ):
-    """List contact messages (admin only)."""
+    """List contact messages (admin only) with optional search query and pagination."""
     msg_service = ContactService(db)
-    messages = await msg_service.list(limit=limit, offset=offset)
-    return Response(success=True, message="Messages retrieved", data=[m.to_dict() for m in messages], pagination={"limit": limit, "offset": offset, "total": len(messages)})
+    messages, total = await msg_service.list(limit=limit, offset=offset, q=q)
+    return Response(success=True, message="Messages retrieved", data=[m.to_dict() for m in messages], pagination={"limit": limit, "offset": offset, "total": total})
 
 
 @router.patch("/{message_id}/read")

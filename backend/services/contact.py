@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func, or_
 from models.contact import Contact
-from typing import Optional, List
+from typing import Optional, List, Tuple
 import uuid
 
 
@@ -35,10 +35,36 @@ class ContactService:
         await self.db.refresh(msg)
         return msg
 
-    async def list(self, limit: int = 100, offset: int = 0) -> List[Contact]:
-        query = select(Contact).order_by(Contact.created_at.desc()).offset(offset).limit(limit)
+    async def list(self, limit: int = 100, offset: int = 0, q: Optional[str] = None) -> Tuple[List[Contact], int]:
+        """Return a list of contacts and the total matching count.
+
+        Args:
+            limit: page size
+            offset: offset
+            q: optional search query (matches name, email, subject, message)
+
+        Returns: (items, total)
+        """
+        base = select(Contact)
+        if q:
+            like = f"%{q}%"
+            base = base.where(
+                or_(
+                    Contact.name.ilike(like),
+                    Contact.email.ilike(like),
+                    Contact.subject.ilike(like),
+                    Contact.message.ilike(like),
+                )
+            )
+
+        total_q = select(func.count()).select_from(base.subquery())
+        total_res = await self.db.execute(total_q)
+        total = int(total_res.scalar() or 0)
+
+        query = base.order_by(Contact.created_at.desc()).offset(offset).limit(limit)
         result = await self.db.execute(query)
-        return result.scalars().all()
+        items = result.scalars().all()
+        return items, total
 
     async def mark_read(self, contact_id: uuid.UUID) -> Optional[Contact]:
         result = await self.db.execute(select(Contact).where(Contact.id == contact_id))
