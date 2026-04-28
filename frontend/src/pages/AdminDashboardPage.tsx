@@ -40,13 +40,13 @@ export function AdminDashboardPage() {
           commentApi.getAll({ limit: 100, offset: 0 })
         ]);
         if (postsRes.success && postsRes.data) {
-          setPosts(postsRes.data.posts);
+          setPosts(postsRes.data.posts || postsRes.data);
         }
         if (usersRes.success && usersRes.data) {
-          setUsers(usersRes.data.users);
+          setUsers(usersRes.data.users || usersRes.data);
         }
         if (commentsRes.success && commentsRes.data) {
-          setComments(commentsRes.data.comments);
+          setComments(commentsRes.data.comments || commentsRes.data);
         }
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
@@ -91,23 +91,18 @@ export function AdminDashboardPage() {
     views: 3490
   }];
 
-  const categoryData = [
-  {
-    name: 'Tech',
-    count: 40
-  },
-  {
-    name: 'Design',
-    count: 30
-  },
-  {
-    name: 'Business',
-    count: 20
-  },
-  {
-    name: 'Life',
-    count: 10
-  }];
+  // Calculate category data from posts
+  const categoryCounts = posts.reduce((acc, post) => {
+    post.categories.forEach(cat => {
+      acc[cat] = (acc[cat] || 0) + 1;
+    });
+    return acc;
+  }, {} as Record<string, number>);
+
+  const categoryData = Object.entries(categoryCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5); // Top 5 categories
 
   const totalViews = posts.reduce((sum, post) => sum + post.views, 0);
   return (

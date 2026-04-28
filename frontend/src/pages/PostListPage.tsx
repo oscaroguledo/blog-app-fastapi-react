@@ -7,6 +7,7 @@ import { Dropdown } from '@/components/ui/Dropdown';
 import { PostCard } from '@/components/PostCard';
 import { Pagination } from '@/components/ui/Pagination';
 import { Modal } from '@/components/ui/Modal';
+import { PostListPageSkeleton } from '@/components/PostListPageSkeleton';
 import { useBlog } from '@/contexts/BlogContext';
 import { postApi } from '@/api/post';
 import { Post } from '@/api/post';
@@ -26,6 +27,7 @@ export function PostListPage() {
   const [openModal, setOpenModal] = useState<'category' | 'author' | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
   const limit = 9;
 
   useEffect(() => {
@@ -53,11 +55,18 @@ export function PostListPage() {
         console.error('Failed to fetch posts:', error);
         setPosts([]);
         setTotal(0);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchPosts();
   }, [query, selectedCategory, selectedAuthor, offset, limit]);
+
+  if (loading) {
+    return <PostListPageSkeleton />;
+  }
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setOffset(0);

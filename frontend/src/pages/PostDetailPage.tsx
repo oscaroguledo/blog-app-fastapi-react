@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Toast } from '@/components/ui/Toast';
 import { Avatar } from '@/components/ui/Avatar';
+import { PostDetailPageSkeleton } from '@/components/PostDetailPageSkeleton';
 import { useBlog } from '@/contexts/BlogContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { postApi } from '@/api/post';
@@ -59,12 +60,7 @@ export function PostDetailPage() {
   }, [id]);
 
   if (loading) {
-    return (
-      <Layout>
-        <div className="min-h-[50vh] flex items-center justify-center">
-          <p className="text-xl text-muted-text">Loading...</p>
-        </div>
-      </Layout>);
+    return <PostDetailPageSkeleton />;
   }
 
   const author = post ? getAuthor(post.authorId) : null;

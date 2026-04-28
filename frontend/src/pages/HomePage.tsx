@@ -4,6 +4,7 @@ import { Layout } from '@/components/Layout';
 import { PostCard } from '@/components/PostCard';
 import { CategorySidebar } from '@/components/CategorySidebar';
 import { Avatar } from '@/components/ui/Avatar';
+import { HomePageSkeleton } from '@/components/HomePageSkeleton';
 import { useBlog } from '@/contexts/BlogContext';
 import { postApi } from '@/api/post';
 import { Post } from '@/api/post';
@@ -13,6 +14,7 @@ import { Clock, ArrowRight } from 'lucide-react';
 export function HomePage() {
   const { categories, users, getAuthor } = useBlog();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLatestPosts = async () => {
@@ -23,11 +25,17 @@ export function HomePage() {
         }
       } catch (error) {
         console.error('Failed to fetch latest posts:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchLatestPosts();
   }, []);
+
+  if (loading) {
+    return <HomePageSkeleton />;
+  }
 
   const featuredPost = posts.find((p) => p.featured) || posts[0];
   const recentPosts = posts.filter((p) => p.id !== featuredPost?.id).slice(0, 6);

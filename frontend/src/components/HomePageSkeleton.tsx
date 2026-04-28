@@ -116,27 +116,36 @@ export function HomePageSkeleton() {
             </div>
           </div>
 
-          {/* Sidebar Skeleton */}
-          <div className="lg:col-span-1">
-            <div className="bg-surface rounded-custom border border-border p-6">
-              {/* Categories section */}
-              <Skeleton width={120} height={24} className="mb-4 rounded" />
-              <div className="space-y-2 mb-8">
+          {/* Sidebar Skeleton - Matches CategorySidebar structure */}
+          <div className="lg:col-span-1 space-y-8">
+            {/* Discover More (Categories) section */}
+            <div className="bg-surface rounded-xl border border-border p-6">
+              <Skeleton width={140} height={24} className="mb-4 rounded" />
+              <div className="space-y-3">
                 {[...Array(5)].map((_, index) => (
                   <div key={index} className="flex items-center justify-between">
                     <Skeleton width={100} height={20} className="rounded" />
-                    <Skeleton width={30} height={20} className="rounded" />
+                    <Skeleton width={30} height={20} className="rounded-full" />
                   </div>
                 ))}
               </div>
+            </div>
 
-              {/* Tags section */}
-              <Skeleton width={80} height={24} className="mb-4 rounded" />
-              <div className="flex flex-wrap gap-2">
-                {[...Array(8)].map((_, index) => (
-                  <Skeleton key={index} width={60} height={24} className="rounded-full" />
+            {/* Trending Authors section */}
+            <div className="bg-surface rounded-xl border border-border p-6">
+              <Skeleton width={140} height={24} className="mb-4 rounded" />
+              <div className="space-y-4">
+                {[...Array(3)].map((_, index) => (
+                  <div key={index} className="flex items-center">
+                    <Skeleton width={40} height={40} variant="circle" className="mr-3" />
+                    <div className="flex-grow">
+                      <Skeleton width={120} height={16} className="mb-1 rounded" />
+                      <Skeleton width={60} height={12} className="rounded" />
+                    </div>
+                  </div>
                 ))}
               </div>
+              <Skeleton width="100%" height={32} className="mt-4 rounded-full" />
             </div>
           </div>
         </div>
