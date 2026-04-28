@@ -28,12 +28,9 @@ export function LoginPage() {
     setError('');
     try {
       console.log('Calling login...');
-      await login(email, password, redirect || undefined);
-      console.log('Login succeeded, redirect:', redirect);
-      if (!redirect) {
-        console.log('Navigating to /');
-        navigate('/', { replace: true });
-      }
+      await login(email, password);
+      console.log('Login succeeded, redirecting to:', redirect || '/');
+      navigate(redirect || '/', { replace: true });
     } catch (err) {
       console.error('Login failed:', err);
       setError('Invalid email or password');

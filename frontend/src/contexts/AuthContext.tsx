@@ -57,10 +57,6 @@ export function AuthProvider({ children }: {children: React.ReactNode;}) {
           access_token: authToken,
           refresh_token: response.data.refresh_token,
         });
-        if (redirectPath) {
-          console.log('Redirecting to:', redirectPath);
-          window.location.href = redirectPath;
-        }
         console.log('Login function completed');
       } else {
         console.log('Login failed in response:', response);
