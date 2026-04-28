@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Header } from './Header';
 import { Home, Tag, Search, LogIn, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { APP_NAME } from '@/config';
 
 export function Layout({ children, showFooter = true }: {children: React.ReactNode; showFooter?: boolean;}) {
   const { user, isAuthenticated } = useAuth();
@@ -73,7 +74,7 @@ export function Layout({ children, showFooter = true }: {children: React.ReactNo
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="col-span-2 md:col-span-1">
               <Link to="/" className="font-serif text-lg font-semibold text-accent">
-                Chronicle.
+                {APP_NAME}
               </Link>
               <p className="mt-3 text-sm text-muted-text leading-relaxed">
                 A modern platform for sharing ideas, stories, and knowledge.
@@ -143,7 +144,7 @@ export function Layout({ children, showFooter = true }: {children: React.ReactNo
           <div className="mt-12 pt-8 border-t border-border/50">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-xs text-muted-text">
-                &copy; {new Date().getFullYear()} Chronicle. All rights reserved.
+                &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
               </p>
               <div className="flex items-center gap-4">
                 <a
