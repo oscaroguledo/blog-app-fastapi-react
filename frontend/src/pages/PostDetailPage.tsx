@@ -10,6 +10,7 @@ import { useBlog } from '@/contexts/BlogContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { postApi } from '@/api/post';
 import { commentApi } from '@/api/comment';
+import { analyticsApi } from '@/api/analytics';
 import { Post } from '@/api/post';
 import { Comment } from '@/api/comment';
 import {
@@ -45,6 +46,18 @@ export function PostDetailPage() {
         console.log('Comments response:', commentsRes);
         if (postRes.success && postRes.data) {
           setPost(postRes.data);
+          // Track page view
+          try {
+            const visitorId = user?.id || `anon_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+            analyticsApi.track({
+              post_id: id,
+              visitor_id: visitorId,
+              path: window.location.pathname,
+              referrer: document.referrer || undefined
+            });
+          } catch (e) {
+            // Silently fail - tracking should not break the page
+          }
         }
         if (commentsRes.success && commentsRes.data) {
           setComments(commentsRes.data);
