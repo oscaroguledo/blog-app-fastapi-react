@@ -28,7 +28,8 @@ export function ContactPage() {
         form.reset();
       }
     } catch (error) {
-      console.error('Failed to submit contact form:', error);
+      // Log axios response body when available to aid backend debugging
+      console.error('Failed to submit contact form:', error, (error as any)?.response?.data);
     } finally {
       setIsSubmitting(false);
     }
