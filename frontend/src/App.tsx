@@ -60,6 +60,14 @@ export function App() {
                   </ProtectedRoute>
                 } 
               />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <PlaceholderPage title="Profile" />
+                  </ProtectedRoute>
+                } 
+              />
               <Route path="/search" element={<PostListPage />} />
               
               
