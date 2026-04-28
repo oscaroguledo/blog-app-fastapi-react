@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { Avatar } from '@/components/ui/Avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { postApi } from '@/api/post';
@@ -42,6 +43,7 @@ export function AdminDashboardPage() {
   const [contacts, setContacts] = useState<any[]>([]);
   const [contactsPage, setContactsPage] = useState(1);
   const [contactsTotal, setContactsTotal] = useState(0);
+  const [contactsQuery, setContactsQuery] = useState('');
   const itemsPerPage = 10;
   
   // User modal state
@@ -655,6 +657,33 @@ export function AdminDashboardPage() {
 
         {activeTab === 'contacts' &&
         <div className="bg-surface border border-border rounded-custom overflow-hidden">
+          <div className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-text">Contact Messages</h3>
+              <p className="text-sm text-muted-text">{contactsTotal} messages</p>
+            </div>
+            <div className="flex items-center gap-3 ml-auto">
+              <Input
+                value={contactsQuery}
+                onChange={(e) => setContactsQuery((e.target as HTMLInputElement).value)}
+                placeholder="Search name, email, subject or message"
+                className="w-64"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  // optimistic update
+                  setContacts((prev) => prev.map(c => ({ ...c, isRead: true })));
+                  const unread = contacts.filter(c => !c.isRead).map(c => c.id);
+                  for (const id of unread) {
+                    try { await contactApi.markRead(id); } catch (e) { console.error('markAllRead failed', e); }
+                  }
+                }}
+              >Mark all read</Button>
+            </div>
+          </div>
+          <div className="border-t border-border" />
           <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full divide-y divide-border">
               <thead className="bg-muted/50">
@@ -668,7 +697,14 @@ export function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody className="bg-surface divide-y divide-border">
-                {contacts.map((m) => (
+                {/** filter client-side by query */}
+                {contacts
+                  .filter((m) => {
+                    if (!contactsQuery) return true;
+                    const q = contactsQuery.toLowerCase();
+                    return [m.name, m.email, m.subject, m.message].some((v: any) => (v || '').toLowerCase().includes(q));
+                  })
+                  .map((m) => (
                   <tr key={m.id} className={m.isRead ? 'opacity-60' : ''}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">{m.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">{m.email}</td>
@@ -689,7 +725,13 @@ export function AdminDashboardPage() {
             </table>
           </div>
           <div className="md:hidden divide-y divide-border">
-            {contacts.map((m) => (
+            {contacts
+              .filter((m) => {
+                if (!contactsQuery) return true;
+                const q = contactsQuery.toLowerCase();
+                return [m.name, m.email, m.subject, m.message].some((v: any) => (v || '').toLowerCase().includes(q));
+              })
+              .map((m) => (
               <div key={m.id} className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-medium text-text line-clamp-2">{m.name}</div>
@@ -721,13 +763,7 @@ export function AdminDashboardPage() {
         </div>
         }
 
-        {activeTab === 'contacts' &&
-          <div className="bg-surface border border-border rounded-custom overflow-hidden">
-            <div className="p-6">
-              <AdminContactsPage />
-            </div>
-          </div>
-        }
+        {activeTab === 'contacts' && null}
       </div>
       
       {/* User Details Modal */}
