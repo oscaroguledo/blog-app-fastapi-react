@@ -4,6 +4,7 @@ import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/Button';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Toast } from '@/components/ui/Toast';
+import { Avatar } from '@/components/ui/Avatar';
 import { useBlog } from '@/contexts/BlogContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { postApi } from '@/api/post';
@@ -39,6 +40,8 @@ export function PostDetailPage() {
           postApi.getById(id),
           commentApi.getAll({ post_id: id })
         ]);
+        console.log('Post response:', postRes);
+        console.log('Comments response:', commentsRes);
         if (postRes.success && postRes.data) {
           setPost(postRes.data);
         }
@@ -67,7 +70,7 @@ export function PostDetailPage() {
   const author = post ? getAuthor(post.authorId) : null;
   const postComments = comments;
 
-  if (!post || !author) {
+  if (!post) {
     return (
       <Layout>
         <div className="min-h-[50vh] flex items-center justify-center">
@@ -147,14 +150,14 @@ export function PostDetailPage() {
 
           {/* Author Meta */}
           <div className="flex items-center gap-4 py-4 border-y border-border">
-            <img
-              src={author.avatar}
-              alt={`${author.firstName} ${author.lastName}`}
-              className="w-12 h-12 rounded-custom object-cover"
+            <Avatar
+              src={author?.avatar}
+              alt={author ? `${author.firstName} ${author.lastName}` : 'Unknown Author'}
+              size="lg"
             />
             <div className="flex-grow">
-              <p className="font-semibold text-text">{author.firstName} {author.lastName}</p>
-              <p className="text-sm text-muted-text">{author.bio}</p>
+              <p className="font-semibold text-text">{author ? `${author.firstName} ${author.lastName}` : 'Unknown Author'}</p>
+              <p className="text-sm text-muted-text">{author?.bio || ''}</p>
             </div>
             <div className="text-right text-sm text-muted-text">
               <time dateTime={post.createdAt}>
@@ -201,6 +204,7 @@ export function PostDetailPage() {
             />
 
             {/* Author Bio Box */}
+            {author && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -208,10 +212,11 @@ export function PostDetailPage() {
               className="bg-surface border border-border rounded-custom p-8 mb-12"
             >
               <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-                <img
+                <Avatar
                   src={author.avatar}
                   alt={`${author.firstName} ${author.lastName}`}
-                  className="w-20 h-20 rounded-custom object-cover"
+                  size="lg"
+                  className="w-20 h-20"
                 />
                 <div className="flex-grow">
                   <h3 className="text-xl font-serif font-bold text-text mb-2">
@@ -221,6 +226,7 @@ export function PostDetailPage() {
                 </div>
               </div>
             </motion.div>
+            )}
 
             {/* Comments Section */}
             <motion.div
@@ -237,10 +243,10 @@ export function PostDetailPage() {
               {isAuthenticated ? (
                 <form onSubmit={handleCommentSubmit} className="mb-12">
                   <div className="flex gap-4">
-                    <img
+                    <Avatar
                       src={user?.avatar}
                       alt={`${user?.firstName} ${user?.lastName}`}
-                      className="w-10 h-10 rounded-custom flex-shrink-0 object-cover"
+                      size="md"
                     />
                     <div className="flex-grow">
                       <textarea
@@ -281,10 +287,10 @@ export function PostDetailPage() {
                   const commentAuthor = getAuthor(comment.authorId);
                   return (
                     <div key={comment.id} className="flex gap-4">
-                      <img
+                      <Avatar
                         src={commentAuthor?.avatar}
                         alt={`${commentAuthor?.firstName} ${commentAuthor?.lastName}`}
-                        className="w-10 h-10 rounded-custom flex-shrink-0 object-cover"
+                        size="md"
                       />
                       <div className="flex-grow">
                         <div className="bg-surface border border-border rounded-custom p-5">

@@ -45,31 +45,34 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
   });
 
   useEffect(() => {
-    // Fetch initial data
+    // Fetch initial data in parallel
     const fetchData = async () => {
       try {
-        const postsRes = await postApi.getAll({ limit: 10, offset: 0, is_published: true });
+        const [postsRes, categoriesRes, commentsRes, usersRes] = await Promise.all([
+          postApi.getAll({ limit: 10, offset: 0, is_published: true }),
+          categoryApi.getAll(),
+          commentApi.getAll(),
+          userApi.getAll()
+        ]);
+
         console.log('Posts response:', postsRes);
+        console.log('Categories response:', categoriesRes);
+        console.log('Comments response:', commentsRes);
+        console.log('Users response:', usersRes);
+
         if (postsRes.success && postsRes.data) {
           setPosts(postsRes.data.posts);
           setPagination(postsRes.data.pagination);
         }
 
-        const categoriesRes = await categoryApi.getAll();
-        console.log('Categories response:', categoriesRes);
         if (categoriesRes.success && categoriesRes.data) {
           setCategories(categoriesRes.data.map((c: any) => c.name));
         }
 
-        const commentsRes = await commentApi.getAll();
-        console.log('Comments response:', commentsRes);
         if (commentsRes.success && commentsRes.data) {
           setComments(commentsRes.data);
         }
 
-        // Fetch users
-        const usersRes = await userApi.getAll();
-        console.log('Users response:', usersRes);
         if (usersRes.success && usersRes.data) {
           setUsers(usersRes.data);
         }

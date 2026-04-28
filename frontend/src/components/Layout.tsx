@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { Avatar } from '@/components/ui/Avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { Header } from './Header';
 import { Home, Tag, Search, LogIn, Facebook, Instagram, Linkedin } from 'lucide-react';
@@ -48,10 +49,11 @@ export function Layout({ children, showFooter = true }: {children: React.ReactNo
               to="/profile"
               className="flex flex-col items-center justify-center w-full py-2 rounded-lg transition-all text-muted-text hover:text-text"
             >
-              <img
+              <Avatar
                 src={user?.avatar}
                 alt={user?.firstName}
-                className="h-5 w-5 rounded-full border border-border"
+                size="sm"
+                className="h-5 w-5"
               />
               <span className="text-xs mt-1">Profile</span>
             </Link>

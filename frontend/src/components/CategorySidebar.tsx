@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
+import { Avatar } from '@/components/ui/Avatar';
 import { User } from '@/api/user';
 import { Post } from '@/api/post';
 
@@ -61,21 +62,25 @@ export function CategorySidebar({ categories, posts, users }: CategorySidebarPro
         <ul className="space-y-4">
           {topAuthors.map((author) =>
           <li key={author.id} className="flex items-center">
-              <img
-              src={author.avatar}
-              alt={`${author.firstName} ${author.lastName}`}
-              className="h-10 w-10 rounded-full border border-border" />
-            
+              <Avatar
+                src={author.avatar}
+                alt={`${author.firstName} ${author.lastName}`}
+                size="md"
+              />
+
               <div className="ml-3 flex-grow">
                 <p className="text-sm font-medium text-text">{author.firstName} {author.lastName}</p>
                 <p className="text-xs text-muted-text">{author.role}</p>
               </div>
-              <button className="text-xs font-medium text-accent hover:text-accent-hover border border-accent hover:bg-accent hover:text-white px-3 py-1 rounded-full transition-colors">
-                View All
-              </button>
             </li>
           )}
         </ul>
+        <Link
+          to="/search"
+          className="block text-center text-xs font-medium text-accent hover:text-accent-hover border border-accent hover:bg-accent hover:text-white px-3 py-2 rounded-full transition-colors mt-4"
+        >
+          View All
+        </Link>
       </div>
     </aside>
   );

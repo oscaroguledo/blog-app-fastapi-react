@@ -1,8 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_
+from sqlalchemy.orm import selectinload
 from models.post import Post, PostCategory, PostTag
 from models.category import Category
 from models.tag import Tag
+from services.category import CategoryService
 from typing import Optional, List
 import uuid
 import json
@@ -100,6 +102,7 @@ class PostService:
         end_at: Optional[datetime] = None,
         category_id: Optional[uuid.UUID] = None,
         tag_id: Optional[uuid.UUID] = None,
+        category_name: Optional[str] = None,
     ) -> List[Post]:
         """List posts with filtering and pagination."""
         query = select(Post)
@@ -137,6 +140,13 @@ class PostService:
                 )
             )
         
+        # Filter by category name (lookup ID first)
+        if category_name and not category_id:
+            cat_service = CategoryService(self.db)
+            cat = await cat_service.get(name=category_name)
+            if cat:
+                category_id = cat.id
+        
         # Filter by category
         if category_id:
             query = query.join(PostCategory).where(PostCategory.category_id == category_id)
@@ -146,6 +156,10 @@ class PostService:
             query = query.join(PostTag).where(PostTag.tag_id == tag_id)
         
         query = query.order_by(Post.created_at.desc()).offset(offset).limit(limit)
+        query = query.options(
+            selectinload(Post.post_categories).selectinload(PostCategory.category),
+            selectinload(Post.post_tags).selectinload(PostTag.tag)
+        )
         result = await self.db.execute(query)
         return result.scalars().all()
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, Home, Edit3, User as UserIcon, LogOut, Settings, Tag, Layout as LayoutIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Avatar } from '@/components/ui/Avatar';
 import { APP_NAME } from '@/config';
 
 export function Header() {
@@ -79,10 +80,11 @@ export function Header() {
               )}
               <div className="relative group">
                 <button className="flex items-center focus:outline-none">
-                  <img
+                  <Avatar
                     src={user?.avatar}
-                    alt={user?.name}
-                    className="h-8 w-8 rounded-custom border-2 border-transparent hover:border-accent transition-colors"
+                    alt={user?.firstName || 'User'}
+                    size="md"
+                    className="border-2 border-transparent hover:border-accent"
                   />
                 </button>
                 <div className="absolute right-0 mt-2 w-48 bg-surface rounded-lg shadow-lg py-2 border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">

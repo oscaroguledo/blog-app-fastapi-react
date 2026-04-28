@@ -40,11 +40,19 @@ export function PostListPage() {
           offset
         });
         if (response.success && response.data) {
-          setPosts(response.data.posts);
-          setTotal(response.data.pagination.total);
+          // Handle both response structures: {posts, pagination} or direct array
+          const postsData = response.data.posts || response.data;
+          const totalCount = response.data.pagination?.total || postsData.length;
+          setPosts(Array.isArray(postsData) ? postsData : []);
+          setTotal(totalCount);
+        } else {
+          setPosts([]);
+          setTotal(0);
         }
       } catch (error) {
         console.error('Failed to fetch posts:', error);
+        setPosts([]);
+        setTotal(0);
       }
     };
 

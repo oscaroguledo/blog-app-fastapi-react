@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/Button';
+import { Avatar } from '@/components/ui/Avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { postApi } from '@/api/post';
 import { userApi } from '@/api/user';
@@ -306,11 +307,13 @@ export function AdminDashboardPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <img
-                            className="h-6 w-6 rounded-custom mr-2"
-                            src={author?.avatar}
-                            alt="" />
-                          
+                            <Avatar
+                              src={author?.avatar}
+                              alt={`${author?.firstName} ${author?.lastName}`}
+                              size="sm"
+                              className="mr-2"
+                            />
+
                             <div className="text-sm text-text">
                               {author?.firstName} {author?.lastName}
                             </div>
@@ -379,11 +382,13 @@ export function AdminDashboardPage() {
                   
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <img
-                        className="h-8 w-8 rounded-custom mr-3"
-                        src={u.avatar}
-                        alt="" />
-                      
+                          <Avatar
+                            src={u.avatar}
+                            alt={`${u.firstName} ${u.lastName}`}
+                            size="sm"
+                            className="mr-3"
+                          />
+
                           <div>
                             <div className="text-sm font-medium text-text">
                               {u.firstName} {u.lastName}
