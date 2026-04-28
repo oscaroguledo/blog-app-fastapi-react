@@ -109,9 +109,9 @@ class AnalyticsService:
                     "unique_visitors": 0
                 })
 
-        # Get total views across all posts
+        # Get total views from tracked PageView records (single source of truth)
         total_result = await self.db.execute(
-            select(func.sum(Post.views))
+            select(func.count(PageView.id))
         )
         total_views = total_result.scalar() or 0
 

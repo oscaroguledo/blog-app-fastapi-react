@@ -46,7 +46,9 @@ export const analyticsApi = {
     path: string;
     referrer?: string;
   }): Promise<ApiResponse<void>> => {
+    // Track page view in analytics (DB table)
     const response = await axiosInstance.post('/analytics/track', data);
+
     return response.data;
   },
 

@@ -341,15 +341,13 @@ export function PostDetailPage() {
                   <Button
                     onClick={async () => {
                       if (!isAuthenticated) return;
-                      const isLiked = likedPosts.has(post.id);
+                      const wasLiked = likedPosts.has(post.id);
                       try {
-                        const response = isLiked
-                          ? await postApi.unlike(post.id)
-                          : await postApi.like(post.id);
-                        if (response.success) {
-                          setPost({ ...post, likes: isLiked ? post.likes - 1 : post.likes + 1 });
-                          toggleLike(post.id);
-                        }
+                        // Use the context toggle which handles API + context state update.
+                        await toggleLike(post.id);
+
+                        // Update local post likes immediately based on previous state
+                        setPost((prev) => prev ? { ...prev, likes: wasLiked ? prev.likes - 1 : prev.likes + 1 } : prev);
                       } catch (e) {
                         console.error('Failed to toggle like:', e);
                       }

@@ -101,11 +101,6 @@ export const postApi = {
     return response.data;
   },
 
-  view: async (id: string): Promise<ApiResponse<void>> => {
-    const response = await axiosInstance.post(`/posts/${id}/view`);
-    return response.data;
-  },
-
   publish: async (id: string): Promise<ApiResponse<Post>> => {
     const response = await axiosInstance.post(`/posts/${id}/publish`);
     return response.data;

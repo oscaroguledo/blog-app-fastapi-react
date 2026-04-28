@@ -69,9 +69,11 @@ export function WritePage() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm">
-              <Settings size={20} />
-            </Button>
+            <div className="hidden md:block">
+              <Button variant="ghost" size="sm">
+                <Settings size={20} />
+              </Button>
+            </div>
             <Button
               onClick={handlePublish}
               disabled={isPublishing || !title || !content}
@@ -85,9 +87,9 @@ export function WritePage() {
         </div>
 
         {/* Editor Area */}
-        <div className="flex-grow flex flex-col md:flex-row gap-8 overflow-hidden">
+        <div className="flex-grow flex flex-col md:flex-row gap-8">
           {/* Main Editor */}
-          <div className="flex-grow flex flex-col overflow-y-auto pr-2 custom-scrollbar">
+          <div className="flex-grow flex flex-col overflow-y-auto pr-2 custom-scrollbar min-h-0">
             {!isPreview ?
             <>
                 <Input
@@ -95,14 +97,14 @@ export function WritePage() {
                 placeholder="Title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="text-4xl md:text-5xl font-serif font-bold bg-transparent border-none focus:outline-none focus:ring-0 placeholder-muted-text mb-6"
+                className="w-full text-4xl md:text-5xl font-serif font-bold bg-surface border border-border rounded-custom px-4 py-2 focus:outline-none mb-6 text-text placeholder-muted-text"
                 />
 
                 <textarea
                 placeholder="Tell your story..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="flex-grow text-lg bg-transparent border-none focus:outline-none focus:ring-0 text-text placeholder-muted-text resize-none min-h-[400px]" />
+                className="w-full flex-grow text-lg bg-surface border border-border rounded-custom px-4 py-4 focus:outline-none focus:ring-2 focus:ring-accent text-text placeholder-muted-text resize-none min-h-[400px]" />
               
               </> :
 
@@ -119,8 +121,8 @@ export function WritePage() {
             }
           </div>
 
-          {/* Settings Sidebar */}
-          <div className="w-full md:w-80 flex-shrink-0 space-y-6 overflow-y-auto pr-2 custom-scrollbar border-l border-border pl-6 hidden md:block">
+          {/* Settings Sidebar (visible on mobile below editor) */}
+          <div className="w-full md:w-80 flex-shrink-0 space-y-6 overflow-y-auto pr-2 custom-scrollbar border-t md:border-l border-border pt-6 md:pt-0 pl-0 md:pl-6">
             <div>
               <label className="block text-sm font-medium text-text mb-2">
                 Cover Image URL
