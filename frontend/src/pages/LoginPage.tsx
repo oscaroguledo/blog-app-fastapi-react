@@ -16,9 +16,16 @@ export function LoginPage() {
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get('redirect');
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Form submitted, email:', email);
+    e.stopPropagation();
+    console.log('Form submitted, email:', email, 'event:', e.type);
+    
+    if (!email || !password) {
+      setError('Please enter email and password');
+      return;
+    }
+    
     setIsLoading(true);
     setError('');
     try {
@@ -27,7 +34,7 @@ export function LoginPage() {
       console.log('Login succeeded, redirect:', redirect);
       if (!redirect) {
         console.log('Navigating to /');
-        navigate('/');
+        navigate('/', { replace: true });
       }
     } catch (err) {
       console.error('Login failed:', err);
@@ -35,6 +42,7 @@ export function LoginPage() {
     } finally {
       setIsLoading(false);
     }
+    return false;
   };
   return (
     <Layout showFooter={false}>
