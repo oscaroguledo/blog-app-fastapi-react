@@ -11,6 +11,7 @@ import { User } from '@/api/user';
 import { Comment } from '@/api/comment';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, Eye, Users, FileText, MessageSquare, Edit } from 'lucide-react';
+import { Pagination } from '@/components/ui/Pagination';
 import {
   BarChart,
   Bar,
@@ -361,28 +362,13 @@ export function AdminDashboardPage() {
               </table>
             </div>
             {/* Posts Pagination */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-              <div className="text-sm text-muted-text">
-                Showing {((postsPage - 1) * itemsPerPage) + 1} to {Math.min(postsPage * itemsPerPage, postsTotal)} of {postsTotal} posts
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPostsPage(p => Math.max(1, p - 1))}
-                  disabled={postsPage === 1}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPostsPage(p => p + 1)}
-                  disabled={postsPage * itemsPerPage >= postsTotal}
-                >
-                  Next
-                </Button>
-              </div>
+            <div className="px-6 py-4 border-t border-border">
+              <Pagination
+                limit={itemsPerPage}
+                offset={(postsPage - 1) * itemsPerPage}
+                total={postsTotal}
+                onPageChange={(offset) => setPostsPage(Math.floor(offset / itemsPerPage) + 1)}
+              />
             </div>
           </div>
         }
@@ -453,28 +439,13 @@ export function AdminDashboardPage() {
               </table>
             </div>
             {/* Users Pagination */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-              <div className="text-sm text-muted-text">
-                Showing {((usersPage - 1) * itemsPerPage) + 1} to {Math.min(usersPage * itemsPerPage, usersTotal)} of {usersTotal} users
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setUsersPage(p => Math.max(1, p - 1))}
-                  disabled={usersPage === 1}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setUsersPage(p => p + 1)}
-                  disabled={usersPage * itemsPerPage >= usersTotal}
-                >
-                  Next
-                </Button>
-              </div>
+            <div className="px-6 py-4 border-t border-border">
+              <Pagination
+                limit={itemsPerPage}
+                offset={(usersPage - 1) * itemsPerPage}
+                total={usersTotal}
+                onPageChange={(offset) => setUsersPage(Math.floor(offset / itemsPerPage) + 1)}
+              />
             </div>
           </div>
         }
