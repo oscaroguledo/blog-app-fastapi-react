@@ -48,6 +48,7 @@ export function AdminDashboardPage() {
   const [contactsPage, setContactsPage] = useState(1);
   const [contactsTotal, setContactsTotal] = useState(0);
   const [contactsQuery, setContactsQuery] = useState('');
+  const [contactsSearch, setContactsSearch] = useState('');
   const itemsPerPage = 10;
   
   // User modal state
@@ -99,7 +100,7 @@ export function AdminDashboardPage() {
     const loadContacts = async () => {
       try {
         const offset = (contactsPage - 1) * itemsPerPage;
-        const res = await contactApi.list(itemsPerPage, offset, contactsQuery || undefined);
+        const res = await contactApi.list(itemsPerPage, offset, contactsSearch || undefined);
         if (res.success) {
           setContacts(Array.isArray(res.data) ? res.data : []);
           const total = (res as any).pagination?.total ?? (Array.isArray(res.data) ? res.data.length : 0);
@@ -113,7 +114,7 @@ export function AdminDashboardPage() {
     if (activeTab === 'contacts') {
       loadContacts();
     }
-  }, [activeTab, contactsPage]);
+  }, [activeTab, contactsPage, contactsSearch]);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -325,7 +326,7 @@ export function AdminDashboardPage() {
                 placeholder="Search title, excerpt, content"
                 className="w-64"
               />
-              <Button size="sm" variant="outline" onClick={() => { setPostsSearch(postsQuery); setPostsPage(1); }}>Search</Button>
+              <Button size="sm" onClick={() => { setPostsSearch(postsQuery); setPostsPage(1); }}>Search</Button>
             </div>
           </div>
             {/* Desktop Table */}
@@ -484,7 +485,7 @@ export function AdminDashboardPage() {
                 placeholder="Search name or email"
                 className="w-64"
               />
-              <Button size="sm" variant="outline" onClick={() => { setUsersSearch(usersQuery); setUsersPage(1); }}>Search</Button>
+              <Button size="sm" onClick={() => { setUsersSearch(usersQuery); setUsersPage(1); }}>Search</Button>
             </div>
           </div>
             {/* Desktop Table */}
@@ -689,102 +690,102 @@ export function AdminDashboardPage() {
         }
 
         {activeTab === 'contacts' &&
-        <div className="bg-surface border border-border rounded-custom overflow-hidden">
-          <div className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-semibold text-text">Contact Messages</h3>
-              <p className="text-sm text-muted-text">{contactsTotal} messages</p>
-            </div>
-            <div className="flex items-center gap-3 ml-auto">
-                <Input
-                  value={contactsQuery}
-                  onChange={(e) => { setContactsQuery((e.target as HTMLInputElement).value); setContactsPage(1); }}
-                  placeholder="Search name, email, subject or message"
-                  className="w-64"
-                />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={async () => {
-                  if (!confirm('Mark all messages as read? This cannot be undone.')) return;
-                  // optimistic update
-                  setContacts((prev) => prev.map(c => ({ ...c, isRead: true })));
-                  const unread = contacts.filter(c => !c.isRead).map(c => c.id);
-                  for (const id of unread) {
-                    try { await contactApi.markRead(id); } catch (e) { console.error('markAllRead failed', e); }
-                  }
-                }}
-              >Mark all read</Button>
-            </div>
-          </div>
-          <div className="border-t border-border" />
-          <div className="hidden md:block overflow-x-auto">
-            <table className="min-w-full divide-y divide-border">
-              <thead className="bg-muted/50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Subject</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Message</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Received</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-text uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-surface divide-y divide-border">
-                {contacts.map((m) => (
-                   <tr key={m.id} className={m.isRead ? 'opacity-60' : ''}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">{m.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">{m.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">{m.subject || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm max-w-2xl truncate">{m.message}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">{new Date(m.createdAt).toLocaleString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      {!m.isRead && (
-                        <Button onClick={async () => {
-                          await contactApi.markRead(m.id);
-                          setContacts(contacts.map(c => c.id === m.id ? { ...c, isRead: true } : c));
-                        }} variant="ghost" size="sm">Mark read</Button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="md:hidden divide-y divide-border">
-            {contacts.map((m) => (
-               <div key={m.id} className="p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium text-text line-clamp-2">{m.name}</div>
-                  <div className="text-xs text-muted-text">{new Date(m.createdAt).toLocaleDateString()}</div>
-                </div>
-                <div className="text-sm text-muted-text">{m.email}</div>
-                <div className="text-sm">{m.subject || '-'}</div>
-                <div className="text-sm truncate">{m.message}</div>
-                {!m.isRead && (
-                  <div className="pt-2">
-                    <Button onClick={async () => {
-                      await contactApi.markRead(m.id);
-                      setContacts(contacts.map(c => c.id === m.id ? { ...c, isRead: true } : c));
-                    }} variant="outline" size="sm">Mark read</Button>
-                  </div>
-                )}
+          <div className="bg-surface border border-border rounded-custom overflow-hidden">
+            <div className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-semibold text-text">Contact Messages</h3>
+                <p className="text-sm text-muted-text">{contactsTotal} messages</p>
               </div>
-            ))}
-          </div>
+              <div className="flex items-center gap-3 ml-auto">
+                  <Input
+                    value={contactsQuery}
+                    onChange={(e) => { setContactsQuery((e.target as HTMLInputElement).value); setContactsPage(1); }}
+                    placeholder="Search name, email, subject or message"
+                    className="w-64"
+                  />
+                  <Button size="sm" onClick={() => { setContactsSearch(contactsQuery); setContactsPage(1); }}>Search</Button>
+            
+                <Button
+                  size="sm"
+                  onClick={async () => {
+                    if (!confirm('Mark all messages as read? This cannot be undone.')) return;
+                    // optimistic update
+                    setContacts((prev) => prev.map(c => ({ ...c, isRead: true })));
+                    const unread = contacts.filter(c => !c.isRead).map(c => c.id);
+                    for (const id of unread) {
+                      try { await contactApi.markRead(id); } catch (e) { console.error('markAllRead failed', e); }
+                    }
+                  }}
+                >Mark all read</Button>
+              </div>
+            </div>
+            <div className="border-t border-border" />
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full divide-y divide-border">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Email</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Subject</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Message</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">Received</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-muted-text uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-surface divide-y divide-border">
+                  {contacts.map((m) => (
+                    <tr key={m.id} className={m.isRead ? 'opacity-60' : ''}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{m.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{m.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{m.subject || '-'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm max-w-2xl truncate">{m.message}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{new Date(m.createdAt).toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        {!m.isRead && (
+                          <Button onClick={async () => {
+                            await contactApi.markRead(m.id);
+                            setContacts(contacts.map(c => c.id === m.id ? { ...c, isRead: true } : c));
+                          }} variant="ghost" size="sm">Mark read</Button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="md:hidden divide-y divide-border">
+              {contacts.map((m) => (
+                <div key={m.id} className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-medium text-text line-clamp-2">{m.name}</div>
+                    <div className="text-xs text-muted-text">{new Date(m.createdAt).toLocaleDateString()}</div>
+                  </div>
+                  <div className="text-sm text-muted-text">{m.email}</div>
+                  <div className="text-sm">{m.subject || '-'}</div>
+                  <div className="text-sm truncate">{m.message}</div>
+                  {!m.isRead && (
+                    <div className="pt-2">
+                      <Button onClick={async () => {
+                        await contactApi.markRead(m.id);
+                        setContacts(contacts.map(c => c.id === m.id ? { ...c, isRead: true } : c));
+                      }} variant="outline" size="sm">Mark read</Button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
 
-          <div className="px-6 py-4 border-t border-border">
-            <Pagination
-              limit={itemsPerPage}
-              offset={(contactsPage - 1) * itemsPerPage}
-              total={contactsTotal}
-              onPageChange={(offset) => setContactsPage(Math.floor(offset / itemsPerPage) + 1)}
-            />
+            <div className="px-6 py-4 border-t border-border">
+              <Pagination
+                limit={itemsPerPage}
+                offset={(contactsPage - 1) * itemsPerPage}
+                total={contactsTotal}
+                onPageChange={(offset) => setContactsPage(Math.floor(offset / itemsPerPage) + 1)}
+              />
+            </div>
           </div>
-        </div>
         }
 
-        {activeTab === 'contacts' && null}
       </div>
       
       {/* User Details Modal */}
