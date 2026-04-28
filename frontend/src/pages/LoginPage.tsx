@@ -118,16 +118,14 @@ export function LoginPage() {
               </div>
             </div>
 
-            <Button
+            <button
               type="button"
               onClick={handleSubmit}
               disabled={isLoading}
-              variant="primary"
-              size="md"
-              className="w-full"
+              className="inline-flex items-center justify-center rounded-custom font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-accent hover:bg-accent-hover text-white px-4 py-2 text-sm w-full"
             >
               {isLoading ? 'Signing in...' : <><span>Sign in</span><ArrowRight className="ml-2 h-5 w-5" /></>}
-            </Button>
+            </button>
           </div>
 
           <div className="mt-6">
