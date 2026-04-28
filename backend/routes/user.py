@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 from typing import Optional
@@ -12,25 +12,25 @@ from core.dependencies import get_current_user, get_current_admin
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-class RegisterRequest(BaseModel):
-    firstName: str
-    lastName: str
-    email: str
-    password: str
-    role: Optional[str] = "Reader"
-    avatar: Optional[str] = None
-    bio: Optional[str] = None
-
 @router.post("/register")
 async def register(
-    request: RegisterRequest,
+    request: Request,
     db: AsyncSession = Depends(get_db)
 ):
     """Register a new user."""
+    data = await request.json()
+    email = data.get("email")
+    firstName = data.get("firstName")
+    lastName = data.get("lastName")
+    password = data.get("password")
+    role = data.get("role", "Reader")
+    avatar = data.get("avatar")
+    bio = data.get("bio")
+    
     user_service = UserService(db)
     
     # Check if user already exists
-    existing_user = await user_service.get(user_id=None, email=request.email)
+    existing_user = await user_service.get(user_id=None, email=email)
     if existing_user:
         return Response(
             success=False,
@@ -41,13 +41,13 @@ async def register(
     # Create user
     try:
         user = await user_service.create(
-            firstName=request.firstName,
-            lastName=request.lastName,
-            email=request.email,
-            password=request.password,
-            role=request.role,
-            avatar=request.avatar,
-            bio=request.bio
+            firstName=firstName,
+            lastName=lastName,
+            email=email,
+            password=password,
+            role=role,
+            avatar=avatar,
+            bio=bio
         )
         
         # Generate tokens
@@ -73,19 +73,19 @@ async def register(
         )
 
 
-class LoginRequest(BaseModel):
-    email: str
-    password: str
-
 @router.post("/login")
 async def login(
-    request: LoginRequest,
+    request: Request,
     db: AsyncSession = Depends(get_db)
 ):
     """Login user and return JWT tokens."""
+    data = await request.json()
+    email = data.get("email")
+    password = data.get("password")
+    
     user_service = UserService(db)
     
-    user, access_token, refresh_token = await user_service.login(request.email, request.password)
+    user, access_token, refresh_token = await user_service.login(email, password)
     
     if not user:
         return Response(
