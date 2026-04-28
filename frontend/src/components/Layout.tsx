@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { Header } from './Header';
-import { Home, Tag, Search, LogIn, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Home, Search, LogIn, Facebook, Instagram, Linkedin, Edit3, Settings } from 'lucide-react';
 import { APP_NAME } from '@/config';
 
 export function Layout({ children, showFooter = true }: {children: React.ReactNode; showFooter?: boolean;}) {
@@ -31,13 +31,6 @@ export function Layout({ children, showFooter = true }: {children: React.ReactNo
             <span className="text-xs mt-1">Home</span>
           </Link>
           <Link
-            to="/search?category=News"
-            className="flex flex-col items-center justify-center w-full py-2 rounded-lg transition-all text-muted-text hover:text-text"
-          >
-            <Tag size={20} />
-            <span className="text-xs mt-1">News</span>
-          </Link>
-          <Link
             to="/search"
             className="flex flex-col items-center justify-center w-full py-2 rounded-lg text-muted-text hover:text-text transition-all"
           >
@@ -45,18 +38,36 @@ export function Layout({ children, showFooter = true }: {children: React.ReactNo
             <span className="text-xs mt-1">Search</span>
           </Link>
           {isAuthenticated ? (
-            <Link
-              to="/profile"
-              className="flex flex-col items-center justify-center w-full py-2 rounded-lg transition-all text-muted-text hover:text-text"
-            >
-              <Avatar
-                src={user?.avatar}
-                alt={user?.firstName}
-                size="sm"
-                className="h-5 w-5"
-              />
-              <span className="text-xs mt-1">Profile</span>
-            </Link>
+            <>
+              <Link
+                to="/write"
+                className="flex flex-col items-center justify-center w-full py-2 rounded-lg transition-all text-muted-text hover:text-text"
+              >
+                <Edit3 size={20} />
+                <span className="text-xs mt-1">Write</span>
+              </Link>
+              {user?.role === 'Admin' && (
+                <Link
+                  to="/admin"
+                  className="flex flex-col items-center justify-center w-full py-2 rounded-lg transition-all text-muted-text hover:text-text"
+                >
+                  <Settings size={20} />
+                  <span className="text-xs mt-1">Admin</span>
+                </Link>
+              )}
+              <Link
+                to="/profile"
+                className="flex flex-col items-center justify-center w-full py-2 rounded-lg transition-all text-muted-text hover:text-text"
+              >
+                <Avatar
+                  src={user?.avatar}
+                  alt={user?.firstName}
+                  size="sm"
+                  className="h-5 w-5"
+                />
+                <span className="text-xs mt-1">Profile</span>
+              </Link>
+            </>
           ) : (
             <Link
               to="/login"
