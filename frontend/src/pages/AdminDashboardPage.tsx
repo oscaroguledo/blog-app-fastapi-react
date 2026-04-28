@@ -691,7 +691,7 @@ export function AdminDashboardPage() {
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-text">Created at:</span>
                   <span className="text-sm text-text">
-                    {selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleDateString('en-US', {
+                    {selectedUser.created_at ? new Date(selectedUser.created_at).toLocaleDateString('en-US', {
                       month: 'long',
                       day: 'numeric',
                       year: 'numeric'

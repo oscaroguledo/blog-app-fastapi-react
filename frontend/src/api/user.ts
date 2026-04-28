@@ -17,8 +17,8 @@ export interface User {
   role: string;
   active: boolean;
   isVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface UserCreate {
