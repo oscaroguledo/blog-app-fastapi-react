@@ -10,8 +10,7 @@ import { Post } from '@/api/post';
 import { User } from '@/api/user';
 import { Comment } from '@/api/comment';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Eye, Users, FileText, MessageSquare, Edit, Power, PowerOff, X } from 'lucide-react';
-import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { Trash2, Eye, Users, FileText, MessageSquare, Edit, Power, PowerOff, X, AlertTriangle } from 'lucide-react';
 import { Pagination } from '@/components/ui/Pagination';
 import {
   BarChart,
@@ -706,24 +705,63 @@ export function AdminDashboardPage() {
       )}
       
       {/* Delete Confirmation Modal */}
-      <ConfirmModal
-        isOpen={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setUserToDelete(null);
-        }}
-        onConfirm={async () => {
-          if (userToDelete) {
-            await userApi.delete(userToDelete.id);
-            setUsers(users.filter(user => user.id !== userToDelete.id));
-          }
-        }}
-        title="Delete User"
-        message={`Are you sure you want to delete ${userToDelete?.firstName} ${userToDelete?.lastName}? This action cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
-        variant="danger"
-      />
+      {showDeleteModal && userToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => {
+            setShowDeleteModal(false);
+            setUserToDelete(null);
+          }} />
+          <div className="relative bg-surface rounded-custom border border-border shadow-lg w-full max-w-md overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <div className="flex items-center gap-3">
+                <AlertTriangle size={20} className="text-red-500" />
+                <h3 className="text-lg font-semibold text-text">Delete User</h3>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setUserToDelete(null);
+                }}
+                className="p-2"
+              >
+                <X size={20} />
+              </Button>
+            </div>
+            <div className="p-6">
+              <p className="text-text">
+                Are you sure you want to delete {userToDelete.firstName} {userToDelete.lastName}? This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-border">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setUserToDelete(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                className="bg-red-500 hover:bg-red-600 text-white"
+                onClick={async () => {
+                  await userApi.delete(userToDelete.id);
+                  setUsers(users.filter(user => user.id !== userToDelete.id));
+                  setShowDeleteModal(false);
+                  setUserToDelete(null);
+                }}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>);
 
 }
