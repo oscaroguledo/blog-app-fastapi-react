@@ -163,9 +163,6 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
   };
   const toggleLike = async (postId: string) => {
     try {
-      const post = posts.find((p) => p.id === postId);
-      if (!post) return;
-
       const isLiked = likedPosts.has(postId);
       const response = isLiked
         ? await postApi.unlike(postId)
@@ -181,10 +178,12 @@ export function BlogProvider({ children }: {children: React.ReactNode;}) {
           }
           return newSet;
         });
-        setPosts(posts.map((p) => p.id === postId
-          ? { ...p, likes: isLiked ? p.likes - 1 : p.likes + 1 }
-          : p
-        ));
+        if (posts) {
+          setPosts(posts.map((p) => p.id === postId
+            ? { ...p, likes: isLiked ? p.likes - 1 : p.likes + 1 }
+            : p
+          ));
+        }
       }
     } catch (error) {
       console.error('Failed to toggle like:', error);

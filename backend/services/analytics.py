@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, text
+from sqlalchemy.exc import IntegrityError
 from models.analytics import PageView, DailyViewStat
 from models.post import Post
 from typing import Optional, List
@@ -56,7 +57,21 @@ class AnalyticsService:
             )
             self.db.add(daily_stat)
 
-        await self.db.commit()
+        try:
+            await self.db.commit()
+        except IntegrityError:
+            # Race condition: another request created the daily stat first
+            await self.db.rollback()
+            # Re-fetch and increment instead
+            result = await self.db.execute(
+                select(DailyViewStat).where(DailyViewStat.date == today)
+            )
+            daily_stat = result.scalar_one_or_none()
+            if daily_stat:
+                daily_stat.total_views += 1
+                daily_stat.unique_visitors += 1
+                await self.db.commit()
+
         await self.db.refresh(page_view)
         return page_view
 

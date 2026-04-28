@@ -46,18 +46,14 @@ export function PostDetailPage() {
         console.log('Comments response:', commentsRes);
         if (postRes.success && postRes.data) {
           setPost(postRes.data);
-          // Track page view
-          try {
-            const visitorId = user?.id || `anon_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-            analyticsApi.track({
-              post_id: id,
-              visitor_id: visitorId,
-              path: window.location.pathname,
-              referrer: document.referrer || undefined
-            });
-          } catch (e) {
-            // Silently fail - tracking should not break the page
-          }
+          // Track page view (fire and forget)
+          const visitorId = user?.id || `anon_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+          analyticsApi.track({
+            post_id: id,
+            visitor_id: visitorId,
+            path: window.location.pathname,
+            referrer: document.referrer || undefined
+          }).catch(() => {});
         }
         if (commentsRes.success && commentsRes.data) {
           setComments(commentsRes.data);
