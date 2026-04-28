@@ -6,6 +6,9 @@ from services.contact import ContactService
 from routes.user import get_current_admin
 from typing import Optional
 from datetime import datetime
+import uuid
+import traceback
+from core.utils.logger import error as log_error
 
 router = APIRouter(prefix="/contact", tags=["contact"])
 
@@ -34,7 +37,10 @@ async def submit_contact(
     except ValueError as e:
         return Response(success=False, message=str(e), status_code=400)
     except Exception as e:
-        return Response(success=False, message=f"Failed to submit contact: {e}", status_code=500)
+        # Log full traceback for easier debugging
+        tb = traceback.format_exc()
+        log_error(f"Failed to submit contact: {e}\n{tb}")
+        return Response(success=False, message="Failed to submit contact", status_code=500)
 
 
 @router.get("/")
