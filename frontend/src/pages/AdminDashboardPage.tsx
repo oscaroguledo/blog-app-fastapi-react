@@ -281,7 +281,8 @@ export function AdminDashboardPage() {
 
         {activeTab === 'posts' &&
         <div className="bg-surface border border-border rounded-custom overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full divide-y divide-border">
                 <thead className="bg-muted/50">
                   <tr>
@@ -361,6 +362,47 @@ export function AdminDashboardPage() {
                 </tbody>
               </table>
             </div>
+            {/* Mobile Cards */}
+            <div className="md:hidden divide-y divide-border">
+              {posts.map((post) => {
+                const author = users.find((u) => u.id === post.authorId);
+                return (
+                  <div key={post.id} className="p-4 space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="text-sm font-medium text-text line-clamp-2 flex-1 mr-2">
+                        {post.title}
+                      </div>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-custom shrink-0 ${post.isPublished ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
+                        {post.isPublished ? 'Published' : 'Draft'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Avatar src={author?.avatar} alt={`${author?.firstName} ${author?.lastName}`} size="sm" />
+                      <span className="text-sm text-muted-text">{author?.firstName} {author?.lastName}</span>
+                    </div>
+                    <div className="text-xs text-muted-text">
+                      {new Date(post.createdAt).toLocaleDateString()}
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button variant="outline" size="sm" className="flex-1 text-accent">
+                        <Edit size={14} className="mr-1" /> Edit
+                      </Button>
+                      <Button 
+                        onClick={async () => {
+                          await postApi.delete(post.id);
+                          setPosts(posts.filter(p => p.id !== post.id));
+                        }}
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-500"
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
             {/* Posts Pagination */}
             <div className="px-6 py-4 border-t border-border">
               <Pagination
@@ -375,7 +417,8 @@ export function AdminDashboardPage() {
 
         {activeTab === 'users' &&
         <div className="bg-surface border border-border rounded-custom overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full divide-y divide-border">
                 <thead className="bg-muted/50">
                   <tr>
@@ -437,6 +480,37 @@ export function AdminDashboardPage() {
                 )}
                 </tbody>
               </table>
+            </div>
+            {/* Mobile Cards */}
+            <div className="md:hidden divide-y divide-border">
+              {users.map((u) => (
+                <div key={u.id} className="p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Avatar src={u.avatar} alt={`${u.firstName} ${u.lastName}`} size="md" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-text">
+                        {u.firstName} {u.lastName}
+                      </div>
+                      <div className="text-xs text-muted-text truncate">
+                        {u.email}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className={`px-2 py-1 text-xs font-semibold rounded-custom ${u.role === 'Admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' : u.role === 'Editor' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}`}>
+                      {u.role}
+                    </span>
+                    <span className="text-xs text-muted-text">
+                      {(u.followers ?? 0).toLocaleString()} followers
+                    </span>
+                  </div>
+                  <div className="pt-2">
+                    <Button variant="outline" size="sm" className="w-full text-accent">
+                      <Edit size={14} className="mr-1" /> Edit User
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
             {/* Users Pagination */}
             <div className="px-6 py-4 border-t border-border">
