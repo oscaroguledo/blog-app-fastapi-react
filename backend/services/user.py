@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, func
 from models.user import User, UserRole
 from typing import Optional, List
 from datetime import datetime
@@ -153,12 +153,16 @@ class UserService:
         firstName: Optional[str] = None,
         lastName: Optional[str] = None,
         email: Optional[str] = None,
+        q: Optional[str] = None,
         user_id: Optional[uuid.UUID] = None,
         start_at: Optional[datetime] = None,
         end_at: Optional[datetime] = None,
         limit: int = 100, 
-        offset: int = 0) -> List[User]:
-            """Get all users with pagination."""
+        offset: int = 0) -> tuple[list[User], int]:
+            """Get users with pagination and optional full-text-like search.
+
+            Returns: (items, total)
+            """
             query = select(User)
             conditions = []
             
@@ -179,13 +183,26 @@ class UserService:
                 conditions.append(User.created_at >= start_at)
             if end_at is not None:
                 conditions.append(User.created_at <= end_at)
+
+            if q:
+                like = f"%{q}%"
+                conditions.append(
+                    (User.firstName.ilike(like)) |
+                    (User.lastName.ilike(like)) |
+                    (User.email.ilike(like))
+                )
             
             if conditions:
                 query = query.where(and_(*conditions))
-            
+
+            # total count
+            total_q = select(func.count()).select_from(query.subquery())
+            total_res = await self.db.execute(total_q)
+            total = int(total_res.scalar() or 0)
+
             query = query.offset(offset).limit(limit)
             result = await self.db.execute(query)
-            return result.scalars().all()
+            return result.scalars().all(), total
 
     async def update(
         self,

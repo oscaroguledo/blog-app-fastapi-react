@@ -40,6 +40,10 @@ export function AdminDashboardPage() {
   const [usersPage, setUsersPage] = useState(1);
   const [postsTotal, setPostsTotal] = useState(0);
   const [usersTotal, setUsersTotal] = useState(0);
+  const [postsQuery, setPostsQuery] = useState('');
+  const [postsSearch, setPostsSearch] = useState('');
+  const [usersQuery, setUsersQuery] = useState('');
+  const [usersSearch, setUsersSearch] = useState('');
   const [contacts, setContacts] = useState<any[]>([]);
   const [contactsPage, setContactsPage] = useState(1);
   const [contactsTotal, setContactsTotal] = useState(0);
@@ -62,20 +66,19 @@ export function AdminDashboardPage() {
     const fetchData = async () => {
       try {
         const [postsRes, usersRes, commentsRes] = await Promise.all([
-          postApi.getAll({ limit: itemsPerPage, offset: (postsPage - 1) * itemsPerPage }),
-          userApi.getAll({ limit: itemsPerPage, offset: (usersPage - 1) * itemsPerPage }),
+          postApi.getAll({ limit: itemsPerPage, offset: (postsPage - 1) * itemsPerPage, search_query: postsSearch || undefined }),
+          userApi.getAll({ limit: itemsPerPage, offset: (usersPage - 1) * itemsPerPage, q: usersSearch || undefined }),
           commentApi.getAll({ limit: 100, offset: 0 })
         ]);
         if (postsRes.success && postsRes.data) {
-          const postsData = 'posts' in postsRes.data ? postsRes.data.posts : postsRes.data;
-          const postsPagination = 'pagination' in postsRes.data ? postsRes.data.pagination : null;
+          const postsData = Array.isArray(postsRes.data) ? postsRes.data : (postsRes.data.posts || []);
+          const postsPagination = postsRes.pagination ?? (postsRes.data && (postsRes.data.pagination || null));
           setPosts(postsData);
           setPostsTotal(postsPagination?.total || postsData.length || 0);
         }
         if (usersRes.success && usersRes.data) {
-          const userDataAny = usersRes.data as any;
-          const usersData = Array.isArray(userDataAny) ? userDataAny : userDataAny.users || [];
-          const usersPagination = !Array.isArray(userDataAny) ? userDataAny.pagination : null;
+          const usersData = Array.isArray(usersRes.data) ? usersRes.data : (usersRes.data?.users || []);
+          const usersPagination = usersRes.pagination ?? (usersRes.data && (usersRes.data.pagination || null));
           setUsers(usersData);
           setUsersTotal(usersPagination?.total || usersData.length || 0);
         }
@@ -88,7 +91,7 @@ export function AdminDashboardPage() {
     };
 
     fetchData();
-  }, [postsPage, usersPage]);
+  }, [postsPage, usersPage, postsSearch, usersSearch]);
 
 
   useEffect(() => {
@@ -96,7 +99,7 @@ export function AdminDashboardPage() {
     const loadContacts = async () => {
       try {
         const offset = (contactsPage - 1) * itemsPerPage;
-        const res = await contactApi.list(itemsPerPage, offset);
+        const res = await contactApi.list(itemsPerPage, offset, contactsQuery || undefined);
         if (res.success) {
           setContacts(Array.isArray(res.data) ? res.data : []);
           const total = (res as any).pagination?.total ?? (Array.isArray(res.data) ? res.data.length : 0);
@@ -310,6 +313,21 @@ export function AdminDashboardPage() {
 
         {activeTab === 'posts' &&
         <div className="bg-surface border border-border rounded-custom overflow-hidden">
+          <div className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-text">Posts</h3>
+              <p className="text-sm text-muted-text">{postsTotal} posts</p>
+            </div>
+            <div className="flex items-center gap-3 ml-auto">
+              <Input
+                value={postsQuery}
+                onChange={(e) => setPostsQuery((e.target as HTMLInputElement).value)}
+                placeholder="Search title, excerpt, content"
+                className="w-64"
+              />
+              <Button size="sm" variant="outline" onClick={() => { setPostsSearch(postsQuery); setPostsPage(1); }}>Search</Button>
+            </div>
+          </div>
             {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full divide-y divide-border">
@@ -454,6 +472,21 @@ export function AdminDashboardPage() {
 
         {activeTab === 'users' &&
         <div className="bg-surface border border-border rounded-custom overflow-hidden">
+          <div className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-text">Users</h3>
+              <p className="text-sm text-muted-text">{usersTotal} users</p>
+            </div>
+            <div className="flex items-center gap-3 ml-auto">
+              <Input
+                value={usersQuery}
+                onChange={(e) => setUsersQuery((e.target as HTMLInputElement).value)}
+                placeholder="Search name or email"
+                className="w-64"
+              />
+              <Button size="sm" variant="outline" onClick={() => { setUsersSearch(usersQuery); setUsersPage(1); }}>Search</Button>
+            </div>
+          </div>
             {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full divide-y divide-border">

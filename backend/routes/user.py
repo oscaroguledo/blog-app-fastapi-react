@@ -274,6 +274,7 @@ async def list_users(
     firstName: Optional[str] = None,
     lastName: Optional[str] = None,
     email: Optional[str] = None,
+    q: Optional[str] = None,
     user_id: Optional[str] = None,
     start_at: Optional[str] = None,
     end_at: Optional[str] = None,
@@ -284,12 +285,13 @@ async def list_users(
     """List all users with pagination."""
     user_service = UserService(db)
     
-    users = await user_service.list(
+    users, total = await user_service.list(
         active=active,
         role=role,
         firstName=firstName,
         lastName=lastName,
         email=email,
+        q=q,
         user_id=uuid.UUID(user_id) if user_id else None,
         start_at=datetime.fromisoformat(start_at) if start_at else None,
         end_at=datetime.fromisoformat(end_at) if end_at else None,
@@ -301,7 +303,7 @@ async def list_users(
         success=True,
         message="Users retrieved successfully",
         data=[user.to_dict() for user in users],
-        pagination={"limit": limit, "offset": offset, "total": len(users)}
+        pagination={"limit": limit, "offset": offset, "total": total}
     )
 
 
