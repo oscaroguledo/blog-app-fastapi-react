@@ -14,6 +14,10 @@ export function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const MAX_BIO_LENGTH = 300;
+  const [firstNameError, setFirstNameError] = useState<string | null>(null);
+  const [lastNameError, setLastNameError] = useState<string | null>(null);
+  const [bioError, setBioError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -25,6 +29,13 @@ export function ProfilePage() {
   }, [user]);
 
   const handleSave = async () => {
+    // Validate before saving
+    let hasError = false;
+    if (!firstName || !firstName.trim()) { setFirstNameError('First name is required'); hasError = true; }
+    if (!lastName || !lastName.trim()) { setLastNameError('Last name is required'); hasError = true; }
+    if (bio && bio.length > MAX_BIO_LENGTH) { setBioError(`Bio must be at most ${MAX_BIO_LENGTH} characters`); hasError = true; }
+    if (hasError) return;
+
     setLoading(true);
     try {
       const res = await userApi.updateMe({ firstName, lastName, avatar, bio });
@@ -81,7 +92,7 @@ export function ProfilePage() {
           <div>
             <label className="block text-sm text-muted-text mb-1">First name</label>
             {isEditing ? (
-              <Input value={firstName} onChange={(e) => setFirstName((e.target as HTMLInputElement).value)} />
+              <Input value={firstName} onChange={(e) => { setFirstName((e.target as HTMLInputElement).value); if (firstNameError) setFirstNameError(null); }} error={firstNameError ?? undefined} />
             ) : (
               <p className="text-text">{firstName}</p>
             )}
@@ -89,7 +100,7 @@ export function ProfilePage() {
           <div>
             <label className="block text-sm text-muted-text mb-1">Last name</label>
             {isEditing ? (
-              <Input value={lastName} onChange={(e) => setLastName((e.target as HTMLInputElement).value)} />
+              <Input value={lastName} onChange={(e) => { setLastName((e.target as HTMLInputElement).value); if (lastNameError) setLastNameError(null); }} error={lastNameError ?? undefined} />
             ) : (
               <p className="text-text">{lastName}</p>
             )}
@@ -105,7 +116,13 @@ export function ProfilePage() {
           <div>
             <label className="block text-sm text-muted-text mb-1">Bio</label>
             {isEditing ? (
-              <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="w-full p-3 border border-border rounded-md bg-background text-text" rows={4} />
+              <div>
+                <textarea value={bio} onChange={(e) => { setBio(e.target.value); if (bioError) setBioError(null); }} className={`w-full p-3 border rounded-md bg-background text-text ${bioError ? 'border-red-500' : 'border-border'}`} rows={4} />
+                <div className="flex justify-between text-xs mt-1">
+                  <div className="text-red-500">{bioError}</div>
+                  <div className={bio && bio.length > MAX_BIO_LENGTH ? 'text-red-500' : 'text-muted-text'}>{bio.length}/{MAX_BIO_LENGTH}</div>
+                </div>
+              </div>
             ) : (
               <p className="text-text whitespace-pre-wrap">{bio || <span className="text-muted-text">No bio</span>}</p>
             )}
