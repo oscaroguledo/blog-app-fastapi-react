@@ -36,6 +36,7 @@ export function AdminDashboardPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [commentsTotal, setCommentsTotal] = useState(0);
   
   // Pagination state
   const [postsPage, setPostsPage] = useState(1);
@@ -120,6 +121,7 @@ export function AdminDashboardPage() {
         if (commentsRes && commentsRes.success) {
           const commentsPagination = (commentsRes as any).pagination ?? null;
           setComments(Array.isArray(commentsRes.data) ? commentsRes.data : []);
+          setCommentsTotal(commentsPagination?.total ?? (Array.isArray(commentsRes.data) ? commentsRes.data.length : 0));
         }
         if (categoriesRes && categoriesRes.success) {
           setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : []);
@@ -233,7 +235,7 @@ export function AdminDashboardPage() {
             },
             {
               label: 'Comments',
-              value: comments.length,
+              value: commentsTotal,
               icon: MessageSquare,
               color: 'text-orange-500',
               bg: 'bg-orange-500/10'
