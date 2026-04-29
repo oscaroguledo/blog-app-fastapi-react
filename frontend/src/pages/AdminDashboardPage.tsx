@@ -34,6 +34,7 @@ export function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'users'>('overview');
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [postsByCategory, setPostsByCategory] = useState<{name: string; count: number}[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentsTotal, setCommentsTotal] = useState(0);
@@ -126,6 +127,16 @@ export function AdminDashboardPage() {
         if (categoriesRes && categoriesRes.success) {
           setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : []);
         }
+
+        // Fetch posts-by-category counts from analytics endpoint
+        try {
+          const pbcRes = await analyticsApi.getPostsByCategory();
+          if (pbcRes && pbcRes.success && pbcRes.data) {
+            setPostsByCategory(Array.isArray(pbcRes.data) ? pbcRes.data : []);
+          }
+        } catch (e) {
+          console.error('Failed to fetch posts by category:', e);
+        }
         if (analyticsRes && analyticsRes.success && analyticsRes.data) {
           setTotalViews(analyticsRes.data.total_views);
           setViewsData(analyticsRes.data.daily_stats.map((stat: any) => ({ name: stat.day, views: stat.total_views })));
@@ -168,15 +179,10 @@ export function AdminDashboardPage() {
     return null;
   }
 
-  // Build category counts from loaded posts then ensure all categories appear (count 0 if none)
-  const categoryCounts = posts.reduce((acc, post) => {
-    post.categories.forEach((cat: string) => {
-      acc[cat] = (acc[cat] || 0) + 1;
-    });
-    return acc;
-  }, {} as Record<string, number>);
-
-  const categoryData = (categories.length ? categories.map((c) => ({ name: c.name, count: categoryCounts[c.name] || 0 })) : Object.entries(categoryCounts).map(([name, count]) => ({ name, count }))).sort((a, b) => b.count - a.count);
+  // Prefer server-provided posts-by-category counts; fall back to local computation
+  const categoryData = (postsByCategory && postsByCategory.length > 0)
+    ? postsByCategory.slice().sort((a, b) => b.count - a.count)
+    : (categories.length ? categories.map((c) => ({ name: c.name, count: 0 })) : []);
 
   return (
     <Layout>

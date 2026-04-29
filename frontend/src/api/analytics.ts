@@ -66,4 +66,9 @@ export const analyticsApi = {
     const response = await axiosInstance.get(`/analytics/top-referrers?days=${days}&limit=${limit}`);
     return response.data;
   },
+
+  getPostsByCategory: async (): Promise<ApiResponse<{name: string; count: number}[]>> => {
+    const response = await axiosInstance.get('/analytics/posts-by-category');
+    return response.data;
+  }
 };
