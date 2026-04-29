@@ -3,6 +3,8 @@ from sqlalchemy import select, func, and_, text
 from sqlalchemy.exc import IntegrityError
 from models.analytics import PageView, DailyViewStat
 from models.post import Post
+from models.post import PostCategory
+from models.category import Category
 from typing import Optional, List
 from datetime import datetime, timezone, timedelta
 import uuid
@@ -177,4 +179,20 @@ class AnalyticsService:
         return [
             {"referrer": ref, "count": count}
             for ref, count in referrers
+        ]
+
+    async def get_posts_by_category(self) -> List[dict]:
+        """Return list of categories with post counts (includes zero counts)."""
+        # Left outer join categories -> post_category and count posts per category
+        result = await self.db.execute(
+            select(Category.name, func.count(PostCategory.post_id).label('count'))
+            .outerjoin(PostCategory, PostCategory.category_id == Category.id)
+            .group_by(Category.name)
+            .order_by(func.count(PostCategory.post_id).desc())
+        )
+        rows = result.all()
+
+        return [
+            {"name": name, "count": int(count or 0)}
+            for name, count in rows
         ]

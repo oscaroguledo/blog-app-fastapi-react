@@ -106,3 +106,20 @@ async def get_top_referrers(
         message="Top referrers retrieved",
         data=referrers
     )
+
+
+@router.get("/posts-by-category")
+async def get_posts_by_category(
+    current_admin=Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get post counts per category (admin only)."""
+    analytics_service = AnalyticsService(db)
+
+    data = await analytics_service.get_posts_by_category()
+
+    return Response(
+        success=True,
+        message="Posts by category retrieved",
+        data=data
+    )
