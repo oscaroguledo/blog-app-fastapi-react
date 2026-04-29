@@ -12,6 +12,8 @@ export function ProfilePage() {
   const [avatar, setAvatar] = useState('');
   const [bio, setBio] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -28,6 +30,7 @@ export function ProfilePage() {
       const res = await userApi.updateMe({ firstName, lastName, avatar, bio });
       if (res.success) {
         await refreshUser();
+        setIsEditing(false);
         alert('Profile updated');
       } else {
         alert(res.message || 'Failed to update profile');
@@ -41,7 +44,7 @@ export function ProfilePage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm('Delete your account? This cannot be undone.')) return;
+    setShowDeleteModal(false);
     try {
       const res = await userApi.deleteMe();
       if (res.success) {
@@ -64,31 +67,64 @@ export function ProfilePage() {
   return (
     <Layout>
       <div className="max-w-3xl mx-auto p-6 bg-surface border border-border rounded-custom">
-        <h1 className="text-2xl font-semibold mb-4">Profile</h1>
+        <div className="flex items-start justify-between">
+          <h1 className="text-2xl font-semibold mb-4">Profile</h1>
+          <div className="flex items-center gap-2">
+            {!isEditing && <Button onClick={() => setIsEditing(true)}>Edit</Button>}
+            {isEditing && <Button onClick={handleSave} disabled={loading}>{loading ? 'Saving...' : 'Save'}</Button>}
+            {isEditing && <Button variant="ghost" onClick={() => { setIsEditing(false); setFirstName(user?.firstName || ''); setLastName(user?.lastName || ''); setAvatar(user?.avatar || ''); setBio(user?.bio || ''); }}>Cancel</Button>}
+            <Button variant="outline" className="text-red-500" onClick={() => setShowDeleteModal(true)}>Delete Account</Button>
+          </div>
+        </div>
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm text-muted-text mb-1">First name</label>
-            <Input value={firstName} onChange={(e) => setFirstName((e.target as HTMLInputElement).value)} />
+            {isEditing ? (
+              <Input value={firstName} onChange={(e) => setFirstName((e.target as HTMLInputElement).value)} />
+            ) : (
+              <p className="text-text">{firstName}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm text-muted-text mb-1">Last name</label>
-            <Input value={lastName} onChange={(e) => setLastName((e.target as HTMLInputElement).value)} />
+            {isEditing ? (
+              <Input value={lastName} onChange={(e) => setLastName((e.target as HTMLInputElement).value)} />
+            ) : (
+              <p className="text-text">{lastName}</p>
+            )}
           </div>
           <div>
-            <label className="block text-sm text-muted-text mb-1">Avatar URL</label>
-            <Input value={avatar} onChange={(e) => setAvatar((e.target as HTMLInputElement).value)} />
+            <label className="block text-sm text-muted-text mb-1">Avatar</label>
+            {isEditing ? (
+              <Input value={avatar} onChange={(e) => setAvatar((e.target as HTMLInputElement).value)} />
+            ) : (
+              avatar ? <img src={avatar} alt="avatar" className="w-20 h-20 rounded-full" /> : <p className="text-muted-text">No avatar</p>
+            )}
           </div>
           <div>
             <label className="block text-sm text-muted-text mb-1">Bio</label>
-            <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="w-full p-3 border border-border rounded-md bg-background text-text" rows={4} />
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Button onClick={handleSave} disabled={loading}>{loading ? 'Saving...' : 'Save'}</Button>
-            <Button variant="ghost" onClick={() => { setFirstName(user?.firstName || ''); setLastName(user?.lastName || ''); setAvatar(user?.avatar || ''); setBio(user?.bio || ''); }}>Reset</Button>
-            <Button variant="outline" className="ml-auto text-red-500" onClick={handleDelete}>Delete Account</Button>
+            {isEditing ? (
+              <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="w-full p-3 border border-border rounded-md bg-background text-text" rows={4} />
+            ) : (
+              <p className="text-text whitespace-pre-wrap">{bio || <span className="text-muted-text">No bio</span>}</p>
+            )}
           </div>
         </div>
+
+        {showDeleteModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/50" onClick={() => setShowDeleteModal(false)} />
+            <div className="relative bg-surface rounded-custom border border-border shadow-lg w-full max-w-md p-6">
+              <h3 className="text-lg font-semibold mb-4">Confirm account deletion</h3>
+              <p className="text-sm text-muted-text mb-6">Are you sure you want to delete your account? This action cannot be undone.</p>
+              <div className="flex justify-end gap-3">
+                <Button variant="ghost" onClick={() => setShowDeleteModal(false)}>Cancel</Button>
+                <Button variant="outline" className="text-red-500" onClick={handleDelete}>Delete account</Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
