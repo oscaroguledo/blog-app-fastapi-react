@@ -80,6 +80,17 @@ services:
       - celery_beat_data:/app/celerybeat-schedule
     restart: on-failure
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: blog_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: on-failure
+
 volumes:
   postgres_data:
   redis_data:
