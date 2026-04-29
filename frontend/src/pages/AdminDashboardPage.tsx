@@ -330,10 +330,8 @@ export function AdminDashboardPage() {
                 onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { setPostsSearch(postsQuery); setPostsPage(1); } }}
                 placeholder="Search title, excerpt, content"
                 className="w-64"
+                trailing={<Button type="button" variant="ghost" size="sm" onClick={() => { setPostsQuery(''); setPostsSearch(''); setPostsPage(1); }} title="Clear search"><X size={14} /></Button>}
               />
-              <Button size="sm" variant="ghost" onClick={() => { setPostsQuery(''); setPostsSearch(''); setPostsPage(1); }} title="Clear search">
-                <X size={14} />
-              </Button>
               <Button size="sm" onClick={() => { setPostsSearch(postsQuery); setPostsPage(1); }}>Search</Button>
             </div>
           </div>
@@ -493,10 +491,8 @@ export function AdminDashboardPage() {
                 onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { setUsersSearch(usersQuery); setUsersPage(1); } }}
                 placeholder="Search name or email"
                 className="w-64"
+                trailing={<Button type="button" variant="ghost" size="sm" onClick={() => { setUsersQuery(''); setUsersSearch(''); setUsersPage(1); }} title="Clear search"><X size={14} /></Button>}
               />
-              <Button size="sm" variant="ghost" onClick={() => { setUsersQuery(''); setUsersSearch(''); setUsersPage(1); }} title="Clear search">
-                <X size={14} />
-              </Button>
               <Button size="sm" onClick={() => { setUsersSearch(usersQuery); setUsersPage(1); }}>Search</Button>
             </div>
           </div>
@@ -715,10 +711,8 @@ export function AdminDashboardPage() {
                     onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { setContactsSearch(contactsQuery); setContactsPage(1); } }}
                     placeholder="Search name, email, subject or message"
                     className="w-64"
+                    trailing={<Button type="button" variant="ghost" size="sm" onClick={() => { setContactsQuery(''); setContactsSearch(''); setContactsPage(1); }} title="Clear search"><X size={14} /></Button>}
                   />
-                  <Button size="sm" variant="ghost" onClick={() => { setContactsQuery(''); setContactsSearch(''); setContactsPage(1); }} title="Clear search">
-                    <X size={14} />
-                  </Button>
                   <Button size="sm" onClick={() => { setContactsSearch(contactsQuery); setContactsPage(1); }}>Search</Button>
             
                 <Button
