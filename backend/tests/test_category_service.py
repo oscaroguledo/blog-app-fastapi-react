@@ -189,7 +189,7 @@ class TestCategoryServiceDelete:
         mock_category = MagicMock()
         mock_result = MagicMock()
         mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
-        mock_db_session.delete = MagicMock()
+        mock_db_session.delete = AsyncMock()
         mock_db_session.commit = AsyncMock()
         
         # Act

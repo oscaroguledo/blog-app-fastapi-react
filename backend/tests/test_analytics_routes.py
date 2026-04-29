@@ -87,22 +87,19 @@ class TestAnalyticsRoutesGetTrafficOverview:
         mock_user = override_get_current_user
         mock_user.role = "Admin"
         
-        mock_stat = MagicMock()
-        mock_stat.date = MagicMock()
-        mock_stat.date.isoformat = MagicMock(return_value="2024-01-01")
-        mock_stat.date.strftime = MagicMock(return_value="Mon")
-        mock_stat.total_views = 100
-        mock_stat.unique_visitors = 50
-        mock_stat.to_dict = MagicMock(return_value={
-            "date": "2024-01-01",
-            "day": "Mon",
-            "total_views": 100,
-            "unique_visitors": 50
-        })
+        # Create a list of dicts that the service should return
+        mock_overview = [
+            {
+                "date": "2024-01-01",
+                "day": "Mon",
+                "total_views": 100,
+                "unique_visitors": 50
+            }
+        ]
         
         # Create a mock AnalyticsService instance
         mock_analytics_service = MagicMock()
-        mock_analytics_service.get_traffic_overview = AsyncMock(return_value=[mock_stat])
+        mock_analytics_service.get_traffic_overview = AsyncMock(return_value=mock_overview)
         
         # Patch AnalyticsService in routes module
         with patch('routes.analytics.AnalyticsService', return_value=mock_analytics_service):

@@ -313,7 +313,7 @@ class TestUserServiceDelete:
         mock_user = MagicMock()
         mock_result = MagicMock()
         mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.delete = MagicMock()
+        mock_db_session.delete = AsyncMock()
         mock_db_session.commit = AsyncMock()
         
         # Act

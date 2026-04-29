@@ -64,7 +64,7 @@ def mock_db_session():
     session.add = MagicMock()
     session.commit = AsyncMock()
     session.refresh = AsyncMock()
-    session.delete = MagicMock()
+    session.delete = AsyncMock()
     session.rollback = AsyncMock()
     session.flush = AsyncMock()
     
