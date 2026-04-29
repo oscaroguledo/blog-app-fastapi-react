@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_
+from sqlalchemy import select, and_, or_, func
 from sqlalchemy.orm import selectinload
 from models.post import Post, PostCategory, PostTag
 from models.category import Category
@@ -162,6 +162,71 @@ class PostService:
         )
         result = await self.db.execute(query)
         return result.scalars().all()
+
+    async def count(
+        self,
+        author_id: Optional[uuid.UUID] = None,
+        reading_time: Optional[int] = None,
+        likes: Optional[int] = None,
+        views: Optional[int] = None,
+        is_published: Optional[bool] = None,
+        featured: Optional[bool] = None,
+        search_query: Optional[str] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
+        category_id: Optional[uuid.UUID] = None,
+        tag_id: Optional[uuid.UUID] = None,
+        category_name: Optional[str] = None,
+    ) -> int:
+        """Return total count matching the filters."""
+        query = select(Post)
+        conditions = []
+        if author_id is not None:
+            conditions.append(Post.authorId == author_id)
+        if is_published is not None:
+            conditions.append(Post.isPublished == is_published)
+        if featured is not None:
+            conditions.append(Post.featured == featured)
+        if start_at is not None:
+            conditions.append(Post.created_at >= start_at)
+        if end_at is not None:
+            conditions.append(Post.created_at <= end_at)
+
+        if reading_time is not None:
+            conditions.append(Post.readingTime == reading_time)
+        if likes is not None:
+            conditions.append(Post.likes == likes)
+        if views is not None:
+            conditions.append(Post.views == views)
+
+        if conditions:
+            query = query.where(and_(*conditions))
+
+        if search_query:
+            search_pattern = f"%{search_query}%"
+            query = query.where(
+                or_(
+                    Post.title.ilike(search_pattern),
+                    Post.excerpt.ilike(search_pattern),
+                    Post.content.ilike(search_pattern)
+                )
+            )
+
+        if category_name and not category_id:
+            cat_service = CategoryService(self.db)
+            cat = await cat_service.get(name=category_name)
+            if cat:
+                category_id = cat.id
+
+        if category_id:
+            query = query.join(PostCategory).where(PostCategory.category_id == category_id)
+
+        if tag_id:
+            query = query.join(PostTag).where(PostTag.tag_id == tag_id)
+
+        total_q = select(func.count()).select_from(query.subquery())
+        total_res = await self.db.execute(total_q)
+        return int(total_res.scalar() or 0)
 
     async def update(
         self,
