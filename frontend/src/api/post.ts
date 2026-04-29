@@ -60,6 +60,7 @@ export const postApi = {
     end_at?: string;
     limit?: number;
     offset?: number;
+    sort_by?: string;
   }): Promise<ApiResponse<PostsResponse>> => {
     const response = await axiosInstance.get('/posts/', { params });
     return response.data;

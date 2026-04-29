@@ -19,10 +19,12 @@ export function PostListPage() {
   const { categories, users, getAuthor } = useBlog();
   const initialQuery = searchParams.get('q') || '';
   const initialCategory = searchParams.get('category') || '';
+  const initialAuthor = searchParams.get('author') || '';
+  const initialSort = (searchParams.get('sort') as 'recent' | 'popular' | 'oldest') || 'recent';
   const [query, setQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState<string[]>(initialCategory ? [initialCategory] : []);
-  const [selectedAuthor, setSelectedAuthor] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'oldest'>('recent');
+  const [selectedAuthor, setSelectedAuthor] = useState<string[]>(initialAuthor ? [initialAuthor] : []);
+  const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'oldest'>(initialSort);
   const [offset, setOffset] = useState(0);
   const [openModal, setOpenModal] = useState<'category' | 'author' | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -37,6 +39,7 @@ export function PostListPage() {
           search_query: query || undefined,
           category_name: selectedCategory[0] || undefined,
           author_id: selectedAuthor[0] || undefined,
+          sort_by: sortBy || undefined,
           is_published: true,
           limit,
           offset
@@ -61,7 +64,7 @@ export function PostListPage() {
     };
 
     fetchPosts();
-  }, [query, selectedCategory, selectedAuthor, offset, limit]);
+  }, [query, selectedCategory, selectedAuthor, offset, limit, sortBy]);
 
   if (loading) {
     return <PostListPageSkeleton />;
@@ -72,6 +75,8 @@ export function PostListPage() {
     const params: Record<string, string> = {};
     if (query) params.q = query;
     if (selectedCategory.length > 0) params.category = selectedCategory.join(',');
+    if (selectedAuthor.length > 0) params.author = selectedAuthor.join(',');
+    if (sortBy) params.sort = sortBy;
     setSearchParams(params);
   };
 
