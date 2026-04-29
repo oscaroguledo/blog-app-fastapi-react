@@ -1,27 +1,19 @@
 """
 Shared test fixtures.
-Uses a dedicated Postgres test database (blog_test_db).
-Requires the Postgres container to be running:
-  docker-compose up -d postgres
-
-Each test gets a fresh engine + session to avoid asyncpg event-loop binding issues.
+Uses mocks for DB, Redis, and Celery - no real connections or Docker required.
 """
 import os
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy import text
-from sqlalchemy.pool import NullPool
-from unittest.mock import AsyncMock
+from unittest.mock import MagicMock, AsyncMock, patch
+from fakeredis import FakeStrictRedis
+import uuid
 
 # ---------------------------------------------------------------------------
-# Point at the test DB before any app module loads
+# Set environment variables before any app module loads
 # ---------------------------------------------------------------------------
-os.environ["DATABASE_URL"] = os.getenv(
-    "TEST_DATABASE_URL",
-    "postgresql+asyncpg://postgres:postgres@localhost:5432/blog_test_db",
-)
+os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://test:test@localhost:5432/test_db")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 os.environ.setdefault("SECRET_KEY", "test-secret-key-for-testing-only")
 os.environ.setdefault("ALGORITHM", "HS256")
@@ -31,130 +23,165 @@ os.environ.setdefault("CORS_ALLOW_CREDENTIALS", "true")
 os.environ.setdefault("CORS_ALLOW_METHODS", "*")
 os.environ.setdefault("CORS_ALLOW_HEADERS", "*")
 
+# Set Celery to eager mode for synchronous task execution
+os.environ.setdefault("CELERY_TASK_ALWAYS_EAGER", "True")
+
 # Now safe to import app modules
-from core.database import Base
-import models  # noqa: F401 — registers all models with Base.metadata
-
-TEST_DB_URL = os.environ["DATABASE_URL"]
-
-# Ordered list of tables for truncation (leaf → root to respect FKs)
-_TRUNCATE_ORDER = [
-    "public.comments",
-    "public.post_tag",
-    "public.post_category",
-    "public.posts",
-    "public.tags",
-    "public.categories",
-    "public.users",
-]
-
-
-def _make_engine():
-    """Create a fresh async engine with NullPool (no connection reuse across loops)."""
-    return create_async_engine(TEST_DB_URL, echo=False, poolclass=NullPool)
+from main import app
+from core.database import get_db
 
 
 # ---------------------------------------------------------------------------
-# Session-scoped: create schema + tables once, drop after all tests
-# ---------------------------------------------------------------------------
-@pytest_asyncio.fixture(scope="session", autouse=True)
-async def _init_db():
-    engine = _make_engine()
-    async with engine.begin() as conn:
-        await conn.execute(text("CREATE SCHEMA IF NOT EXISTS public"))
-        await conn.run_sync(Base.metadata.create_all)
-    await engine.dispose()
-    yield
-    engine = _make_engine()
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-    await engine.dispose()
-
-
-# ---------------------------------------------------------------------------
-# Per-test: fresh engine + session + truncate tables after each test
-# ---------------------------------------------------------------------------
-@pytest_asyncio.fixture(autouse=True)
-async def db_session(_init_db):
-    """Yield a fresh DB session per test; truncate all tables after."""
-    engine = _make_engine()
-    session_factory = async_sessionmaker(
-        engine, expire_on_commit=False, class_=AsyncSession,
-        autocommit=False, autoflush=False,
-    )
-    async with session_factory() as session:
-        yield session
-
-    # Cleanup: truncate all tables
-    async with engine.begin() as conn:
-        for table in _TRUNCATE_ORDER:
-            await conn.execute(text(f"TRUNCATE TABLE {table} CASCADE"))
-    await engine.dispose()
-
-
-# ---------------------------------------------------------------------------
-# HTTP client fixture wired to the FastAPI app + test DB
+# Mock DB session fixture
 # ---------------------------------------------------------------------------
 @pytest_asyncio.fixture
-async def client(db_session):
-    mock_redis_client = _make_redis_mock()
+def mock_db_session():
+    """Mock SQLAlchemy AsyncSession for testing."""
+    session = AsyncMock()
+    
+    # Mock query chain
+    mock_query = MagicMock()
+    mock_result = MagicMock()
+    mock_result.scalar_one_or_none = MagicMock(return_value=None)
+    mock_result.scalars = MagicMock(return_value=mock_result)
+    mock_result.all = MagicMock(return_value=[])
+    mock_result.first = MagicMock(return_value=None)
+    mock_query.where = MagicMock(return_value=mock_query)
+    mock_query.filter = MagicMock(return_value=mock_query)
+    mock_query.options = MagicMock(return_value=mock_query)
+    mock_query.join = MagicMock(return_value=mock_query)
+    mock_query.order_by = MagicMock(return_value=mock_query)
+    mock_query.offset = MagicMock(return_value=mock_query)
+    mock_query.limit = MagicMock(return_value=mock_query)
+    session.execute = MagicMock(return_value=mock_result)
+    session.query = MagicMock(return_value=mock_query)
+    
+    # Mock session methods
+    session.add = MagicMock()
+    session.commit = AsyncMock()
+    session.refresh = AsyncMock()
+    session.delete = MagicMock()
+    session.rollback = AsyncMock()
+    
+    return session
+
+
+# ---------------------------------------------------------------------------
+# Fake Redis fixture
+# ---------------------------------------------------------------------------
+@pytest_asyncio.fixture
+def fake_redis():
+    """Fake Redis client using fakeredis."""
+    return FakeStrictRedis(decode_responses=True)
+
+
+# ---------------------------------------------------------------------------
+# Mock Redis client fixture
+# ---------------------------------------------------------------------------
+@pytest_asyncio.fixture
+def mock_redis_client(fake_redis):
+    """Mock RedisClient singleton."""
     mock_redis = AsyncMock()
     mock_redis.init = AsyncMock(return_value=True)
     mock_redis.close = AsyncMock()
-    mock_redis.get_client = AsyncMock(return_value=mock_redis_client)
-
+    mock_redis.get_client = AsyncMock(return_value=fake_redis)
+    
+    # Patch the redis_client singleton
     import core.redis as redis_module
+    original_redis_client = redis_module.redis_client
     redis_module.redis_client = mock_redis
+    
+    yield mock_redis
+    
+    # Restore original
+    redis_module.redis_client = original_redis_client
 
-    from core.database import get_db
-    from main import app
 
+# ---------------------------------------------------------------------------
+# HTTP client fixture with mocked dependencies
+# ---------------------------------------------------------------------------
+@pytest_asyncio.fixture
+async def client(mock_db_session, mock_redis_client):
+    """HTTP client with mocked DB and Redis dependencies."""
+    
     async def override_get_db():
-        yield db_session
-
+        yield mock_db_session
+    
     app.dependency_overrides[get_db] = override_get_db
-
+    
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
         yield ac
-
+    
     app.dependency_overrides.clear()
 
 
-def _make_redis_mock():
-    m = AsyncMock()
-    m.incr = AsyncMock(return_value=1)
-    m.expire = AsyncMock(return_value=True)
-    m.get = AsyncMock(return_value=None)
-    m.ttl = AsyncMock(return_value=-1)
-    m.ping = AsyncMock(return_value=True)
-    return m
+# ---------------------------------------------------------------------------
+# Celery eager mode fixture
+# ---------------------------------------------------------------------------
+@pytest.fixture
+def celery_eager_mode():
+    """Set Celery to eager mode for synchronous task execution."""
+    from worker import celery_app
+    original_mode = celery_app.conf.task_always_eager
+    celery_app.conf.task_always_eager = True
+    yield
+    celery_app.conf.task_always_eager = original_mode
 
 
 # ---------------------------------------------------------------------------
-# Helpers used across test modules
+# Mock user fixture
 # ---------------------------------------------------------------------------
-async def create_test_user(
-    db_session,
-    email="test@example.com",
-    password="TestPass123!",
-    firstName="Test",
-    lastName="User",
-    role="Reader",
-):
-    from services.user import UserService
-    return await UserService(db_session).create(
-        firstName=firstName,
-        lastName=lastName,
-        email=email,
-        password=password,
-        role=role,
-    )
+@pytest.fixture
+def mock_user():
+    """Create a mock User object."""
+    user = MagicMock()
+    user.id = uuid.uuid4()
+    user.email = "test@example.com"
+    user.firstName = "Test"
+    user.lastName = "User"
+    user.role = "Reader"
+    user.active = True
+    user.avatar = None
+    user.bio = None
+    user.isVerified = False
+    user.password = "$2b$12$hashedpassword"
+    user.to_dict = MagicMock(return_value={
+        "id": str(user.id),
+        "firstName": user.firstName,
+        "lastName": user.lastName,
+        "email": user.email,
+        "avatar": user.avatar,
+        "role": user.role,
+        "bio": user.bio,
+        "active": user.active,
+        "isVerified": user.isVerified,
+    })
+    return user
 
 
-async def get_auth_token(client, email="test@example.com", password="TestPass123!"):
-    resp = await client.post(
-        "/users/login", params={"email": email, "password": password}
-    )
-    return resp.json()["data"]["access_token"]
+# ---------------------------------------------------------------------------
+# Mock current user dependency override
+# ---------------------------------------------------------------------------
+@pytest_asyncio.fixture
+def override_get_current_user(mock_user):
+    """Override get_current_user dependency to return mock user."""
+    from core.dependencies import get_current_user
+    
+    async def mock_override():
+        return mock_user
+    
+    app.dependency_overrides[get_current_user] = mock_override
+    yield mock_user
+    app.dependency_overrides.pop(get_current_user, None)
+
+
+# ---------------------------------------------------------------------------
+# Helper: create mock request with JSON body
+# ---------------------------------------------------------------------------
+def mock_request(data: dict):
+    """Create a mock FastAPI Request object with JSON body."""
+    request = MagicMock()
+    request.json = AsyncMock(return_value=data)
+    return request
