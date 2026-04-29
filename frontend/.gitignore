@@ -25,6 +25,15 @@ package-lock.json
 yarn.lock
 .pnpm-debug.log
 
+# Playwright test artifacts
+playwright-report/
+.playwright/
+test-results/
+playwright-report/**
+trace/
+playwright-report/screenshots/
+playwright-report/videos/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
