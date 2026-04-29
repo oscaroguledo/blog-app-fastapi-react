@@ -116,9 +116,7 @@ export function Layout({ children, showFooter = true }: {children: React.ReactNo
               </h4>
               <ul className="space-y-3">
                 <li>
-                  <Link to="/about" className="text-sm text-muted-text hover:text-accent transition-colors">
-                    About
-                  </Link>
+                  {/* About page removed */}
                 </li>
                 <li>
                   <Link to="/contact" className="text-sm text-muted-text hover:text-accent transition-colors">

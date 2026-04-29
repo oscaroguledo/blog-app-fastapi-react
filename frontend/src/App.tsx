@@ -9,7 +9,6 @@ import { LoginPage } from '@/pages/LoginPage';
 import { SignupPage } from '@/pages/SignupPage';
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage';
 import { VerifyEmailPage } from '@/pages/VerifyEmailPage';
-import { AboutPage } from '@/pages/AboutPage';
 import { ContactPage } from '@/pages/ContactPage';
 import { PostDetailPage } from '@/pages/PostDetailPage';
 import { WritePage } from '@/pages/WritePage';
@@ -41,7 +40,7 @@ export function App() {
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/verify-email" element={<VerifyEmailPage />} />
-              <Route path="/about" element={<AboutPage />} />
+              {/* About page removed */}
               <Route path="/contact" element={<ContactPage />} />
               
               <Route path="/post/:id" element={<PostDetailPage />} />

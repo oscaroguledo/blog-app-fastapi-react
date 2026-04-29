@@ -12,7 +12,6 @@ export function Header() {
   const navLinks = [
     { name: 'Home', path: '/', icon: Home },
     { name: 'News', path: '/search?category=News', icon: Tag },
-    { name: 'About', path: '/about', icon: LayoutIcon },
     { name: 'Contact', path: '/contact', icon: LayoutIcon },
   ];
 
