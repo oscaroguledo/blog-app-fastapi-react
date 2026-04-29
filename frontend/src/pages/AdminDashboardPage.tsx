@@ -9,6 +9,7 @@ import { userApi } from '@/api/user';
 import { commentApi } from '@/api/comment';
 import { contactApi } from '@/api/contact';
 import { analyticsApi } from '@/api/analytics';
+import { categoryApi, Category } from '@/api/category';
 import { Post } from '@/api/post';
 import { User } from '@/api/user';
 import { Comment } from '@/api/comment';
@@ -32,6 +33,7 @@ export function AdminDashboardPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'users'>('overview');
   const [posts, setPosts] = useState<Post[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   
@@ -66,10 +68,11 @@ export function AdminDashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [postsRes, usersRes, commentsRes] = await Promise.all([
+        const [postsRes, usersRes, commentsRes, categoriesRes] = await Promise.all([
           postApi.getAll({ limit: itemsPerPage, offset: (postsPage - 1) * itemsPerPage, search_query: postsSearch || undefined }),
           userApi.getAll({ limit: itemsPerPage, offset: (usersPage - 1) * itemsPerPage, q: usersSearch || undefined }),
-          commentApi.getAll({ limit: 100, offset: 0 })
+          commentApi.getAll({ limit: 100, offset: 0 }),
+          categoryApi.getAll({ limit: 1000, offset: 0 })
         ]);
         if (postsRes.success && postsRes.data) {
           const postsData = Array.isArray(postsRes.data) ? postsRes.data : (postsRes.data.posts || []);
@@ -85,6 +88,9 @@ export function AdminDashboardPage() {
         }
         if (commentsRes.success && commentsRes.data) {
           setComments(Array.isArray(commentsRes.data) ? commentsRes.data : (commentsRes.data as any).comments || []);
+        }
+        if (categoriesRes && categoriesRes.success && categoriesRes.data) {
+          setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : []);
         }
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
@@ -141,7 +147,7 @@ export function AdminDashboardPage() {
     return null;
   }
 
-  // Calculate category data from posts
+  // Build category counts from loaded posts then ensure all categories appear (count 0 if none)
   const categoryCounts = posts.reduce((acc, post) => {
     post.categories.forEach((cat: string) => {
       acc[cat] = (acc[cat] || 0) + 1;
@@ -149,9 +155,7 @@ export function AdminDashboardPage() {
     return acc;
   }, {} as Record<string, number>);
 
-  const categoryData = Object.entries(categoryCounts)
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count);
+  const categoryData = (categories.length ? categories.map((c) => ({ name: c.name, count: categoryCounts[c.name] || 0 })) : Object.entries(categoryCounts).map(([name, count]) => ({ name, count }))).sort((a, b) => b.count - a.count);
 
   return (
     <Layout>
@@ -327,6 +331,9 @@ export function AdminDashboardPage() {
                 placeholder="Search title, excerpt, content"
                 className="w-64"
               />
+              <Button size="sm" variant="ghost" onClick={() => { setPostsQuery(''); setPostsSearch(''); setPostsPage(1); }} title="Clear search">
+                <X size={14} />
+              </Button>
               <Button size="sm" onClick={() => { setPostsSearch(postsQuery); setPostsPage(1); }}>Search</Button>
             </div>
           </div>
@@ -487,6 +494,9 @@ export function AdminDashboardPage() {
                 placeholder="Search name or email"
                 className="w-64"
               />
+              <Button size="sm" variant="ghost" onClick={() => { setUsersQuery(''); setUsersSearch(''); setUsersPage(1); }} title="Clear search">
+                <X size={14} />
+              </Button>
               <Button size="sm" onClick={() => { setUsersSearch(usersQuery); setUsersPage(1); }}>Search</Button>
             </div>
           </div>
@@ -706,6 +716,9 @@ export function AdminDashboardPage() {
                     placeholder="Search name, email, subject or message"
                     className="w-64"
                   />
+                  <Button size="sm" variant="ghost" onClick={() => { setContactsQuery(''); setContactsSearch(''); setContactsPage(1); }} title="Clear search">
+                    <X size={14} />
+                  </Button>
                   <Button size="sm" onClick={() => { setContactsSearch(contactsQuery); setContactsPage(1); }}>Search</Button>
             
                 <Button
