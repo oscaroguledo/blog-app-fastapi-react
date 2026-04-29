@@ -71,7 +71,7 @@ docker compose exec postgres psql -U postgres -d blog_db -f /tmp/seed_data.sql
 ```
 
 The application will be available at:
-- **Frontend**: http://localhost:80
+- **Frontend**: http://localhost:5173 (Vite dev server with hot reload)
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
 
