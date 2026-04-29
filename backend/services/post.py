@@ -3,6 +3,7 @@ from sqlalchemy import select, and_, or_, func
 from sqlalchemy.orm import selectinload
 from models.post import Post, PostCategory, PostTag
 from models.category import Category
+from models.user import User
 from models.tag import Tag
 from services.category import CategoryService
 from typing import Optional, List
@@ -129,14 +130,20 @@ class PostService:
         if conditions:
             query = query.where(and_(*conditions))
         
-        # Search in title, excerpt and content
+        # Search in title, excerpt, content and author name/email
         if search_query:
             search_pattern = f"%{search_query}%"
+            # include author name and email in search
+            query = query.outerjoin(User, User.id == Post.authorId)
             query = query.where(
                 or_(
                     Post.title.ilike(search_pattern),
                     Post.excerpt.ilike(search_pattern),
-                    Post.content.ilike(search_pattern)
+                    Post.content.ilike(search_pattern),
+                    User.firstName.ilike(search_pattern),
+                    User.lastName.ilike(search_pattern),
+                    User.email.ilike(search_pattern),
+                    func.concat(User.firstName, ' ', User.lastName).ilike(search_pattern)
                 )
             )
         
@@ -204,11 +211,16 @@ class PostService:
 
         if search_query:
             search_pattern = f"%{search_query}%"
+            query = query.outerjoin(User, User.id == Post.authorId)
             query = query.where(
                 or_(
                     Post.title.ilike(search_pattern),
                     Post.excerpt.ilike(search_pattern),
-                    Post.content.ilike(search_pattern)
+                    Post.content.ilike(search_pattern),
+                    User.firstName.ilike(search_pattern),
+                    User.lastName.ilike(search_pattern),
+                    User.email.ilike(search_pattern),
+                    func.concat(User.firstName, ' ', User.lastName).ilike(search_pattern)
                 )
             )
 
