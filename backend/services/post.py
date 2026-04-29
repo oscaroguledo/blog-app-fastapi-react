@@ -11,6 +11,7 @@ import uuid
 import json
 from datetime import datetime, timezone
 from core.redis import redis_client
+from sqlalchemy import update as sa_update
 
 LATEST_POSTS_KEY = "latest_posts"
 LATEST_POSTS_TTL = 300  # 5 minutes
@@ -246,6 +247,36 @@ class PostService:
         if tag_id:
             query = query.join(PostTag).where(PostTag.tag_id == tag_id)
 
+        # If there are no joins or search filters, use a direct COUNT on posts (fast path)
+        needs_join = bool(search_query or category_id or tag_id or category_name)
+
+        if not needs_join:
+            # Try Redis cached total for unconditional counts
+            try:
+                redis = await redis_client.get_client()
+                cached = await redis.get("posts_total_count")
+                if cached:
+                    return int(cached)
+            except Exception:
+                pass
+
+            # Direct count on posts with WHERE conditions (no subquery)
+            count_q = select(func.count()).select_from(Post)
+            if conditions:
+                count_q = count_q.where(and_(*conditions))
+            res = await self.db.execute(count_q)
+            total = int(res.scalar() or 0)
+
+            # Populate short-lived cache
+            try:
+                redis = await redis_client.get_client()
+                await redis.setex("posts_total_count", 30, str(total))
+            except Exception:
+                pass
+
+            return total
+
+        # Fallback for queries that require joins or search (may be expensive)
         total_q = select(func.count()).select_from(query.subquery())
         total_res = await self.db.execute(total_q)
         return int(total_res.scalar() or 0)

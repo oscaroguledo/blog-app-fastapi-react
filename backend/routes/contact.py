@@ -52,19 +52,47 @@ async def list_messages(
     db: AsyncSession = Depends(get_db)
 ):
     """List contact messages (admin only) with optional search query and pagination."""
+    # Harden inputs
+    try:
+        limit = int(limit)
+        offset = int(offset)
+    except Exception:
+        return Response(success=False, message="Invalid pagination parameters", status_code=400)
+
+    if limit < 1 or limit > 500:
+        return Response(success=False, message="limit must be between 1 and 500", status_code=400)
+    if offset < 0:
+        return Response(success=False, message="offset must be >= 0", status_code=400)
     msg_service = ContactService(db)
     messages, total = await msg_service.list(limit=limit, offset=offset, q=q)
     return Response(success=True, message="Messages retrieved", data=[m.to_dict() for m in messages], pagination={"limit": limit, "offset": offset, "total": total})
 
 
 @router.patch("/{message_id}/read")
-async def mark_message_read(message_id: str, current_admin = Depends(get_current_admin), db: AsyncSession = Depends(get_db)):
+async def mark_message_read(message_id: uuid.UUID, current_admin = Depends(get_current_admin), db: AsyncSession = Depends(get_db)):
     """Mark a message as read (admin only)."""
     msg_service = ContactService(db)
     try:
-        msg = await msg_service.mark_read(uuid.UUID(message_id))
+        # FastAPI already validated `message_id` as UUID; pass through
+        msg = await msg_service.mark_read(message_id)
         if not msg:
             return Response(success=False, message="Message not found", status_code=404)
         return Response(success=True, message="Message marked read", data=msg.to_dict())
     except ValueError:
         return Response(success=False, message="Invalid message ID format", status_code=400)
+
+
+@router.patch("/mark-all-read")
+async def mark_all_read(
+    q: Optional[str] = None,
+    current_admin = Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Mark all contact messages (or filtered set) as read in a single operation."""
+    msg_service = ContactService(db)
+    try:
+        updated = await msg_service.mark_all_read(q=q)
+        return Response(success=True, message=f"Marked {updated} messages as read", data={"updated": updated})
+    except Exception as e:
+        log_error(f"Failed to mark all read: {e}")
+        return Response(success=False, message="Failed to mark messages read", status_code=500)

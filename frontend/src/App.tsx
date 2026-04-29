@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { BlogProvider } from '@/contexts/BlogContext';
@@ -40,7 +40,8 @@ export function App() {
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/verify-email" element={<VerifyEmailPage />} />
-              {/* About page removed */}
+              {/* Redirect any /about requests to home */}
+              <Route path="/about" element={<Navigate to="/" replace />} />
               <Route path="/contact" element={<ContactPage />} />
               
               <Route path="/post/:id" element={<PostDetailPage />} />

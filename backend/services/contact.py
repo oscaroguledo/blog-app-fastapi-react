@@ -3,6 +3,7 @@ from sqlalchemy import select, func, or_
 from models.contact import Contact
 from typing import Optional, List, Tuple
 import uuid
+from sqlalchemy import update, or_, select, func
 
 
 class ContactService:
@@ -75,3 +76,33 @@ class ContactService:
         await self.db.commit()
         await self.db.refresh(msg)
         return msg
+
+    async def mark_all_read(self, q: Optional[str] = None) -> int:
+        """Mark all (or filtered) contact messages as read in a single DB operation.
+
+        Returns the number of rows updated.
+        """
+        conditions = []
+        if q:
+            like = f"%{q}%"
+            conditions.append(
+                or_(
+                    Contact.name.ilike(like),
+                    Contact.email.ilike(like),
+                    Contact.subject.ilike(like),
+                    Contact.message.ilike(like),
+                )
+            )
+
+        # Only update messages that are not already read
+        conditions.append(Contact.is_read == False)
+
+        stmt = update(Contact).where(*conditions).values(is_read=True)
+        result = await self.db.execute(stmt)
+        await self.db.commit()
+
+        # result.rowcount should contain number of rows updated (Postgres)
+        try:
+            return int(result.rowcount or 0)
+        except Exception:
+            return 0
