@@ -97,6 +97,7 @@ class PostService:
         is_published: Optional[bool] = None,
         featured: Optional[bool] = None,
         search_query: Optional[str] = None,
+        sort_by: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
         start_at: Optional[datetime] = None,
@@ -162,7 +163,15 @@ class PostService:
         if tag_id:
             query = query.join(PostTag).where(PostTag.tag_id == tag_id)
         
-        query = query.order_by(Post.created_at.desc()).offset(offset).limit(limit)
+        # Apply sorting
+        if sort_by == 'popular':
+            query = query.order_by(Post.views.desc())
+        elif sort_by == 'oldest':
+            query = query.order_by(Post.created_at.asc())
+        else:
+            query = query.order_by(Post.created_at.desc())
+
+        query = query.offset(offset).limit(limit)
         query = query.options(
             selectinload(Post.post_categories).selectinload(PostCategory.category),
             selectinload(Post.post_tags).selectinload(PostTag.tag)
@@ -184,6 +193,7 @@ class PostService:
         category_id: Optional[uuid.UUID] = None,
         tag_id: Optional[uuid.UUID] = None,
         category_name: Optional[str] = None,
+        sort_by: Optional[str] = None,
     ) -> int:
         """Return total count matching the filters."""
         query = select(Post)

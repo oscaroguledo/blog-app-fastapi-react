@@ -82,6 +82,7 @@ async def list_posts(
     category_id: Optional[str] = None,
     tag_id: Optional[str] = None,
     category_name: Optional[str] = None,
+    sort: Optional[str] = None,
     db: AsyncSession = Depends(get_db)
 ):
     """List posts with filtering and pagination."""
@@ -102,7 +103,8 @@ async def list_posts(
             end_at=datetime.fromisoformat(end_at) if end_at else None,
             category_id=uuid.UUID(category_id) if category_id else None,
             tag_id=uuid.UUID(tag_id) if tag_id else None,
-            category_name=category_name
+            category_name=category_name,
+            sort_by=sort
         )
         total = await post_service.count(
             author_id=uuid.UUID(author_id) if author_id else None,
@@ -116,7 +118,8 @@ async def list_posts(
             end_at=datetime.fromisoformat(end_at) if end_at else None,
             category_id=uuid.UUID(category_id) if category_id else None,
             tag_id=uuid.UUID(tag_id) if tag_id else None,
-            category_name=category_name
+            category_name=category_name,
+            sort_by=sort
         )
 
         return Response(
