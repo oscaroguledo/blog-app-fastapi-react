@@ -16,6 +16,7 @@ import { WritePage } from '@/pages/WritePage';
 import { AdminDashboardPage } from '@/pages/AdminDashboardPage';
 import { PostListPage } from '@/pages/PostListPage';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { ProfilePage } from '@/pages/ProfilePage';
 // Placeholder for unbuilt pages to ensure routing works
 const PlaceholderPage = ({ title }: {title: string;}) =>
 <div className="min-h-screen flex items-center justify-center bg-background text-text">
@@ -65,7 +66,7 @@ export function App() {
                 path="/profile" 
                 element={
                   <ProtectedRoute>
-                    <PlaceholderPage title="Profile" />
+                    <ProfilePage />
                   </ProtectedRoute>
                 } 
               />
