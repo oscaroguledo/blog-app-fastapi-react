@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, KeyboardEvent } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -323,6 +323,7 @@ export function AdminDashboardPage() {
               <Input
                 value={postsQuery}
                 onChange={(e) => setPostsQuery((e.target as HTMLInputElement).value)}
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { setPostsSearch(postsQuery); setPostsPage(1); } }}
                 placeholder="Search title, excerpt, content"
                 className="w-64"
               />
@@ -482,6 +483,7 @@ export function AdminDashboardPage() {
               <Input
                 value={usersQuery}
                 onChange={(e) => setUsersQuery((e.target as HTMLInputElement).value)}
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { setUsersSearch(usersQuery); setUsersPage(1); } }}
                 placeholder="Search name or email"
                 className="w-64"
               />
@@ -700,6 +702,7 @@ export function AdminDashboardPage() {
                   <Input
                     value={contactsQuery}
                     onChange={(e) => { setContactsQuery((e.target as HTMLInputElement).value); setContactsPage(1); }}
+                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { setContactsSearch(contactsQuery); setContactsPage(1); } }}
                     placeholder="Search name, email, subject or message"
                     className="w-64"
                   />
