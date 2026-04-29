@@ -12,6 +12,19 @@ dist
 dist-ssr
 *.local
 
+# Build outputs
+build/
+coverage/
+
+# Local env
+.env.local
+.env.*.local
+
+# Lockfiles
+package-lock.json
+yarn.lock
+.pnpm-debug.log
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
