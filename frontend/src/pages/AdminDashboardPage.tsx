@@ -158,24 +158,7 @@ export function AdminDashboardPage() {
     }
   }, [activeTab, contactsPage, contactsSearch]);
 
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const overviewRes = await analyticsApi.getOverview(7);
-        if (overviewRes.success && overviewRes.data) {
-          setTotalViews(overviewRes.data.total_views);
-          setViewsData(overviewRes.data.daily_stats.map((stat: any) => ({
-            name: stat.day,
-            views: stat.total_views
-          })));
-        }
-      } catch (error) {
-        console.error('Failed to fetch analytics:', error);
-      }
-    };
-
-    fetchAnalytics();
-  }, []);
+  
 
   // Redirect if not admin
   if (!isAuthenticated || user?.role !== 'Admin') {
@@ -229,14 +212,14 @@ export function AdminDashboardPage() {
               {[
             {
               label: 'Total Posts',
-              value: posts.length,
+              value: postsTotal,
               icon: FileText,
               color: 'text-blue-500',
               bg: 'bg-blue-500/10'
             },
             {
               label: 'Total Users',
-              value: users.length,
+              value: usersTotal,
               icon: Users,
               color: 'text-green-500',
               bg: 'bg-green-500/10'
