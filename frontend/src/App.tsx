@@ -19,11 +19,11 @@ import { ProfilePage } from '@/pages/ProfilePage';
 // Placeholder for unbuilt pages to ensure routing works
 const PlaceholderPage = ({ title }: {title: string;}) =>
 <div className="min-h-screen flex items-center justify-center bg-background text-text">
-    <div className="text-center">
+      <div className="text-center">
       <h1 className="text-3xl font-serif mb-4">{title}</h1>
-      <p className="text-muted-text">This page is under construction.</p>
+      <p className="text-muted-text">This page is currently unavailable — we're actively working on it. Please return to the homepage or contact support for assistance.</p>
       <a href="/" className="text-accent hover:underline mt-4 inline-block">
-        Go Home
+        Return to homepage
       </a>
     </div>
   </div>;

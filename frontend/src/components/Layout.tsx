@@ -90,7 +90,7 @@ export function Layout({ children, showFooter = true }: {children: React.ReactNo
                 {APP_NAME}
               </Link>
               <p className="mt-3 text-sm text-muted-text leading-relaxed">
-                A modern platform for sharing ideas, stories, and knowledge.
+                Curated articles and practical insights for modern professionals.
               </p>
             </div>
             <div>
@@ -128,7 +128,7 @@ export function Layout({ children, showFooter = true }: {children: React.ReactNo
               </h4>
               <div className="space-y-3">
                 <p className="text-xs text-muted-text leading-relaxed">
-                  Weekly digest of the best stories, no spam.
+                  Subscribe to our weekly digest for curated articles and platform updates.
                 </p>
                 <form className="space-y-2">
                   <Input
