@@ -75,47 +75,6 @@ The application will be available at:
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
 
-## Development Setup
-
-### Backend (Local)
-
-```bash
-cd backend
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Setup environment variables
-cp .env.example .env
-
-# Run database migrations
-alembic upgrade head
-
-# Start development server
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
-# Start Celery worker (in separate terminal)
-celery -A worker.celery_app worker --loglevel=info
-```
-
-### Frontend (Local)
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-The frontend dev server will start at http://localhost:5173
-
 ## Testing
 
 ### Backend Tests
