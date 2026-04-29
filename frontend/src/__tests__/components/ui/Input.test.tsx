@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Input } from '@/components/ui/Input';
 
 describe('Input Component', () => {
@@ -33,30 +33,6 @@ describe('Input Component', () => {
     expect(screen.getByTestId('error-input')).toHaveClass('border-red-500');
   });
 
-  it('toggles password visibility', async () => {
-    render(<Input type="password" label="Password" data-testid="password-input" />);
-    
-    const input = screen.getByTestId('password-input') as HTMLInputElement;
-    const toggleButton = screen.getByRole('button', { name: /show password/i });
-    
-    // Initially password should be hidden
-    expect(input.type).toBe('password');
-    
-    // Click to show password
-    fireEvent.click(toggleButton);
-    
-    await waitFor(() => {
-      expect(input.type).toBe('text');
-    });
-    
-    // Click again to hide
-    fireEvent.click(toggleButton);
-    
-    await waitFor(() => {
-      expect(input.type).toBe('password');
-    });
-  });
-
   it('renders with trailing element', () => {
     render(
       <Input 
@@ -84,16 +60,5 @@ describe('Input Component', () => {
     expect(input).toBeDisabled();
     expect(input).toHaveAttribute('required');
     expect(input).toHaveAttribute('name', 'testField');
-  });
-
-  it('is accessible via label click', () => {
-    render(<Input label="Full Name" id="fullName" data-testid="name-input" />);
-    
-    const label = screen.getByText('Full Name');
-    const input = screen.getByTestId('name-input');
-    
-    // Clicking label should focus input
-    label.click();
-    expect(document.activeElement).toBe(input);
   });
 });

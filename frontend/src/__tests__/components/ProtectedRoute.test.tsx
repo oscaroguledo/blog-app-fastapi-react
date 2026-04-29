@@ -123,8 +123,8 @@ describe('ProtectedRoute Component', () => {
     // Should include the original path in redirect query
     const location = screen.getByTestId('location');
     expect(location.textContent).toContain('redirect=');
-    expect(location.textContent).toContain('/dashboard');
-    expect(location.textContent).toContain('tab=settings');
+    expect(location.textContent).toContain('%2Fdashboard'); // URL encoded
+    expect(location.textContent).toContain('tab%3Dsettings'); // URL encoded
   });
 
   it('handles nested routes correctly', () => {
