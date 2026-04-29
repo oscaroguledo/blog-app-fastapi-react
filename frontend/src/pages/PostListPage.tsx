@@ -67,13 +67,17 @@ export function PostListPage() {
     return <PostListPageSkeleton />;
   }
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const doSearch = () => {
     setOffset(0);
     const params: Record<string, string> = {};
     if (query) params.q = query;
     if (selectedCategory.length > 0) params.category = selectedCategory.join(',');
     setSearchParams(params);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    doSearch();
   };
   const hasActiveFilters = !!(
   query ||
@@ -111,6 +115,7 @@ export function PostListPage() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => { if ((e as React.KeyboardEvent).key === 'Enter') { e.preventDefault(); doSearch(); } }}
               placeholder="Search articles, topics, authors..."
               className="pl-12 pr-24 bg-surface text-base"
             />
@@ -133,6 +138,7 @@ export function PostListPage() {
               // variant="ghost"
               size="sm"
               className="absolute inset-y-0 right-0 px-4 font-medium"
+              onClick={(e) => { e.preventDefault(); doSearch(); }}
             >
               Search
             </Button>
