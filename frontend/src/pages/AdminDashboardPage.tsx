@@ -65,14 +65,15 @@ export function AdminDashboardPage() {
   const [viewsData, setViewsData] = useState<{name: string; views: number}[]>([]);
   const [totalViews, setTotalViews] = useState(0);
 
+  // Fetch posts/users when their tabs are active (server-side search + pagination)
   useEffect(() => {
+    if (!(activeTab === 'posts' || activeTab === 'users')) return;
+
     const fetchData = async () => {
       try {
-        const [postsRes, usersRes, commentsRes, categoriesRes] = await Promise.all([
+        const [postsRes, usersRes] = await Promise.all([
           postApi.getAll({ limit: itemsPerPage, offset: (postsPage - 1) * itemsPerPage, search_query: postsSearch || undefined }),
           userApi.getAll({ limit: itemsPerPage, offset: (usersPage - 1) * itemsPerPage, q: usersSearch || undefined }),
-          commentApi.getAll({ limit: 100, offset: 0 }),
-          categoryApi.getAll({ limit: 1000, offset: 0 })
         ]);
         if (postsRes.success && postsRes.data) {
           const postsData = Array.isArray(postsRes.data) ? postsRes.data : (postsRes.data.posts || []);
@@ -86,19 +87,54 @@ export function AdminDashboardPage() {
           setUsers(usersData);
           setUsersTotal(usersPagination?.total || usersData.length || 0);
         }
-        if (commentsRes.success && commentsRes.data) {
-          setComments(Array.isArray(commentsRes.data) ? commentsRes.data : (commentsRes.data as any).comments || []);
-        }
-        if (categoriesRes && categoriesRes.success && categoriesRes.data) {
-          setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : []);
-        }
       } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
+        console.error('Failed to fetch posts/users for admin tabs:', error);
       }
     };
 
     fetchData();
-  }, [postsPage, usersPage, postsSearch, usersSearch]);
+  }, [activeTab, postsPage, usersPage, postsSearch, usersSearch]);
+
+  // Overview: fetch totals and full category list independent of posts/users tab state
+  useEffect(() => {
+    if (activeTab !== 'overview') return;
+
+    const fetchOverview = async () => {
+      try {
+        const [postsRes, usersRes, commentsRes, categoriesRes, analyticsRes] = await Promise.all([
+          postApi.getAll({ limit: 1, offset: 0 }),
+          userApi.getAll({ limit: 1, offset: 0 }),
+          commentApi.getAll({ limit: 1, offset: 0 }),
+          categoryApi.getAll({ limit: 1000, offset: 0 }),
+          analyticsApi.getOverview(7)
+        ]);
+
+        if (postsRes && postsRes.success) {
+          const postsPagination = postsRes.pagination ?? (postsRes.data && (postsRes.data.pagination || null));
+          setPostsTotal(postsPagination?.total ?? (Array.isArray(postsRes.data) ? postsRes.data.length : 0));
+        }
+        if (usersRes && usersRes.success) {
+          const usersPagination = usersRes.pagination ?? (usersRes.data && (usersRes.data.pagination || null));
+          setUsersTotal(usersPagination?.total ?? (Array.isArray(usersRes.data) ? usersRes.data.length : 0));
+        }
+        if (commentsRes && commentsRes.success) {
+          const commentsPagination = (commentsRes as any).pagination ?? null;
+          setComments(Array.isArray(commentsRes.data) ? commentsRes.data : []);
+        }
+        if (categoriesRes && categoriesRes.success) {
+          setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : []);
+        }
+        if (analyticsRes && analyticsRes.success && analyticsRes.data) {
+          setTotalViews(analyticsRes.data.total_views);
+          setViewsData(analyticsRes.data.daily_stats.map((stat: any) => ({ name: stat.day, views: stat.total_views })));
+        }
+      } catch (error) {
+        console.error('Failed to fetch overview data:', error);
+      }
+    };
+
+    fetchOverview();
+  }, [activeTab]);
 
 
   useEffect(() => {
