@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { PostListPage } from '@/pages/PostListPage';
-import React from 'react';
 
 // Mock the API and contexts
 vi.mock('@/api/post', () => ({
@@ -29,6 +28,7 @@ describe('PostListPage Search & Filter', () => {
     vi.clearAllMocks();
     vi.mocked(postApi.getAll).mockResolvedValue({
       success: true,
+      message: 'Posts fetched',
       data: {
         posts: [],
         pagination: { total: 0, limit: 9, offset: 0 },
@@ -136,6 +136,7 @@ describe('PostListPage Search & Filter', () => {
   it('handles pagination changes', async () => {
     vi.mocked(postApi.getAll).mockResolvedValue({
       success: true,
+      message: 'Posts fetched',
       data: {
         posts: Array(9).fill({ id: '1', title: 'Test Post' }),
         pagination: { total: 20, limit: 9, offset: 0 },

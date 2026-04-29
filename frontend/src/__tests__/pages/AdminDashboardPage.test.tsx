@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { AdminDashboardPage } from '@/pages/AdminDashboardPage';
-import React from 'react';
 
 // Mock all APIs
 vi.mock('@/api/post', () => ({ postApi: { getAll: vi.fn() } }));
@@ -39,7 +38,7 @@ describe('AdminDashboardPage API Wiring', () => {
       success: true,
       message: 'Overview fetched',
       data: {
-        daily_stats: [{ date: '2024-01-01', views: 100, visitors: 50 }],
+        daily_stats: [{ date: '2024-01-01', day: 'Mon', total_views: 100, unique_visitors: 50 }],
         total_views: 1000,
       },
     });
@@ -57,8 +56,8 @@ describe('AdminDashboardPage API Wiring', () => {
       success: true,
       message: 'Categories fetched',
       data: [
-        { id: '1', name: 'Technology', slug: 'tech' },
-        { id: '2', name: 'Lifestyle', slug: 'lifestyle' },
+        { id: '1', name: 'Technology', slug: 'tech', description: '', createdAt: '' },
+        { id: '2', name: 'Lifestyle', slug: 'lifestyle', description: '', createdAt: '' },
       ],
     });
   });

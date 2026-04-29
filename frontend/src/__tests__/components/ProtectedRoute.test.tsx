@@ -2,8 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import React from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Mock the AuthContext
 vi.mock('@/contexts/AuthContext', () => ({
@@ -17,10 +16,24 @@ function LocationDisplay() {
   return <div data-testid="location">{location.pathname}{location.search}</div>;
 }
 
+const mockUser = {
+  id: '1',
+  firstName: 'Test',
+  lastName: 'User',
+  email: 'test@example.com',
+  avatar: '',
+  bio: '',
+  role: 'Reader',
+  active: true,
+  isVerified: true,
+  created_at: '',
+  updated_at: ''
+};
+
 describe('ProtectedRoute Component', () => {
   it('renders children when user is authenticated', () => {
     vi.mocked(useAuth).mockReturnValue({
-      user: { id: '1', email: 'test@example.com' },
+      user: mockUser,
       isAuthenticated: true,
       login: vi.fn(),
       logout: vi.fn(),
@@ -116,7 +129,7 @@ describe('ProtectedRoute Component', () => {
 
   it('handles nested routes correctly', () => {
     vi.mocked(useAuth).mockReturnValue({
-      user: { id: '1', email: 'test@example.com' },
+      user: mockUser,
       isAuthenticated: true,
       login: vi.fn(),
       logout: vi.fn(),

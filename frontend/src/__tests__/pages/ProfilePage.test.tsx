@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ProfilePage } from '@/pages/ProfilePage';
-import React from 'react';
 
 // Mock window.alert
 const alertMock = vi.fn();
