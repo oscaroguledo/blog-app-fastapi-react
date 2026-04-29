@@ -13,17 +13,35 @@ def _base(title: str, body: str) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{title}</title>
   <style>
-    body {{ font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }}
-    .container {{ max-width: 600px; margin: 40px auto; background: #fff;
-                  border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.1); }}
-    .header {{ background: #1a1a2e; color: #fff; padding: 24px 32px; }}
+    /* Use frontend color variables for consistent branding */
+    :root {
+      --color-background: #f8f9fb;
+      --color-surface: #ffffff;
+      --color-text: #1a1a1a;
+      --color-accent: #445E86;
+      --color-accent-hover: #374d6e;
+      --color-muted: #e2e5ea;
+      --color-muted-text: #666666;
+      --color-border: #e2e5ea;
+      --border-radius: 4px;
+    }
+
+    body {{ font-family: Inter, Arial, sans-serif; background: var(--color-background); margin: 0; padding: 0; color: var(--color-text); }}
+    .container {{ max-width: 600px; margin: 40px auto; background: var(--color-surface);
+                  border-radius: var(--border-radius); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.06); border: 1px solid var(--color-border); }}
+    .header {{ background: var(--color-accent); color: var(--color-surface); padding: 24px 32px; }}
     .header h1 {{ margin: 0; font-size: 22px; }}
-    .body {{ padding: 32px; color: #333; line-height: 1.6; }}
-    .btn {{ display: inline-block; margin: 24px 0; padding: 12px 28px;
-            background: #4f46e5; color: #fff; text-decoration: none;
-            border-radius: 6px; font-weight: bold; }}
-    .footer {{ padding: 16px 32px; background: #f9f9f9; color: #888;
-               font-size: 12px; text-align: center; }}
+    .body {{ padding: 28px; color: var(--color-text); line-height: 1.6; }}
+    .btn {{ display: inline-block; margin: 20px 0; padding: 12px 24px;
+            background: var(--color-accent); color: var(--color-surface); text-decoration: none;
+            border-radius: var(--border-radius); font-weight: 600; }}
+    .btn:hover {{ background: var(--color-accent-hover); }}
+    .footer {{ padding: 16px 24px; background: transparent; color: var(--color-muted-text);
+               font-size: 12px; text-align: center; border-top: 1px solid var(--color-border); }}
+
+    /* Code / pre formatting to match frontend color-coding */
+    .body code {{ background-color: var(--color-muted); padding: 0.2em 0.4em; border-radius: var(--border-radius); font-family: monospace; color: var(--color-text); }}
+    .body pre {{ background: #1a1d23; color: #f8f9fb; padding: 12px; border-radius: var(--border-radius); overflow-x: auto; }}
   </style>
 </head>
 <body>
