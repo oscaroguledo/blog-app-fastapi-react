@@ -4,7 +4,7 @@ Tests for comment routes.
 import pytest
 import uuid
 from httpx import AsyncClient
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import MagicMock, AsyncMock, patch
 
 
 class TestCommentRoutesCreate:
@@ -20,19 +20,21 @@ class TestCommentRoutesCreate:
         mock_comment.content = "Test comment"
         mock_comment.to_dict = MagicMock(return_value={"id": str(mock_comment.id), "content": "Test comment"})
         
-        mock_db_session.add = MagicMock()
-        mock_db_session.commit = AsyncMock()
-        mock_db_session.refresh = AsyncMock()
+        # Create a mock CommentService instance
+        mock_comment_service = MagicMock()
+        mock_comment_service.create = AsyncMock(return_value=mock_comment)
         
-        # Act
-        response = await client.post(
-            "/comments/",
-            json={
-                "postId": str(uuid.uuid4()),
-                "content": "Test comment"
-            },
-            headers={"Authorization": "Bearer test_token"}
-        )
+        # Patch CommentService in routes module
+        with patch('routes.comment.CommentService', return_value=mock_comment_service):
+            # Act
+            response = await client.post(
+                "/comments/",
+                json={
+                    "postId": str(uuid.uuid4()),
+                    "content": "Test comment"
+                },
+                headers={"Authorization": "Bearer test_token"}
+            )
         
         # Assert
         assert response.status_code == 201
@@ -214,16 +216,18 @@ class TestCommentRoutesDelete:
         mock_comment.id = comment_id
         mock_comment.author_id = mock_user.id
         
-        mock_result = MagicMock()
-        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.delete = MagicMock()
-        mock_db_session.commit = AsyncMock()
+        # Create a mock CommentService instance
+        mock_comment_service = MagicMock()
+        mock_comment_service.get = AsyncMock(return_value=mock_comment)
+        mock_comment_service.delete = AsyncMock(return_value=True)
         
-        # Act
-        response = await client.delete(
-            f"/comments/{comment_id}",
-            headers={"Authorization": "Bearer test_token"}
-        )
+        # Patch CommentService in routes module
+        with patch('routes.comment.CommentService', return_value=mock_comment_service):
+            # Act
+            response = await client.delete(
+                f"/comments/{comment_id}",
+                headers={"Authorization": "Bearer test_token"}
+            )
         
         # Assert
         assert response.status_code == 204
@@ -315,14 +319,16 @@ class TestCommentRoutesUnlike:
         mock_comment = MagicMock()
         mock_comment.id = comment_id
         mock_comment.to_dict = MagicMock(return_value={"id": str(comment_id)})
+        mock_comment.likeCount = 1
         
-        mock_result = MagicMock()
-        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.commit = AsyncMock()
-        mock_db_session.refresh = AsyncMock()
+        # Create a mock CommentService instance
+        mock_comment_service = MagicMock()
+        mock_comment_service.decrement_likes = AsyncMock(return_value=mock_comment)
         
-        # Act
-        response = await client.post(f"/comments/{comment_id}/unlike")
+        # Patch CommentService in routes module
+        with patch('routes.comment.CommentService', return_value=mock_comment_service):
+            # Act
+            response = await client.post(f"/comments/{comment_id}/unlike")
         
         # Assert
         assert response.status_code == 200

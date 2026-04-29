@@ -4,7 +4,7 @@ Tests for analytics routes.
 import pytest
 import uuid
 from httpx import AsyncClient
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import MagicMock, AsyncMock, patch
 
 
 class TestAnalyticsRoutesTrackPageView:
@@ -93,17 +93,24 @@ class TestAnalyticsRoutesGetTrafficOverview:
         mock_stat.date.strftime = MagicMock(return_value="Mon")
         mock_stat.total_views = 100
         mock_stat.unique_visitors = 50
+        mock_stat.to_dict = MagicMock(return_value={
+            "date": "2024-01-01",
+            "day": "Mon",
+            "total_views": 100,
+            "unique_visitors": 50
+        })
         
-        mock_result = MagicMock()
-        mock_db_session._mock_result.scalars = MagicMock(return_value=mock_db_session._mock_result)
-        mock_db_session._mock_result.all = MagicMock(return_value=[mock_stat])
-        mock_result.scalar = MagicMock(return_value=100)
+        # Create a mock AnalyticsService instance
+        mock_analytics_service = MagicMock()
+        mock_analytics_service.get_traffic_overview = AsyncMock(return_value=[mock_stat])
         
-        # Act
-        response = await client.get(
-            "/analytics/overview",
-            headers={"Authorization": "Bearer test_token"}
-        )
+        # Patch AnalyticsService in routes module
+        with patch('routes.analytics.AnalyticsService', return_value=mock_analytics_service):
+            # Act
+            response = await client.get(
+                "/analytics/overview",
+                headers={"Authorization": "Bearer test_token"}
+            )
         
         # Assert
         assert response.status_code == 200

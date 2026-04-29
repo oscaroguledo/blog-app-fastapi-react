@@ -2,8 +2,9 @@
 Tests for contact routes.
 """
 import pytest
+import uuid
 from httpx import AsyncClient
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import MagicMock, AsyncMock, patch
 
 
 class TestContactRoutesSubmit:
@@ -13,22 +14,28 @@ class TestContactRoutesSubmit:
     async def test_submit_contact_returns_200_on_success(self, client: AsyncClient, mock_db_session):
         """Test that submitting contact form returns 200 on success."""
         # Arrange
-        mock_db_session.add = MagicMock()
-        mock_db_session.commit = AsyncMock()
-        mock_db_session.refresh = AsyncMock()
+        mock_message = MagicMock()
+        mock_message.id = uuid.uuid4()
+        mock_message.to_dict = MagicMock(return_value={"id": str(mock_message.id)})
         
-        # Act
-        response = await client.post(
-            "/contact/",
-            json={
-                "name": "John Doe",
-                "email": "john@example.com",
-                "message": "Test message"
-            }
-        )
+        # Create a mock ContactService instance
+        mock_contact_service = MagicMock()
+        mock_contact_service.create = AsyncMock(return_value=mock_message)
+        
+        # Patch ContactService in routes module
+        with patch('routes.contact.ContactService', return_value=mock_contact_service):
+            # Act
+            response = await client.post(
+                "/contact/",
+                json={
+                    "name": "John Doe",
+                    "email": "john@example.com",
+                    "message": "Test message"
+                }
+            )
         
         # Assert
-        assert response.status_code == 200
+        assert response.status_code == 201
         data = response.json()
         assert data["success"] is True
 

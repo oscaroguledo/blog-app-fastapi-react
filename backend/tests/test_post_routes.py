@@ -4,7 +4,7 @@ Tests for post routes.
 import pytest
 import uuid
 from httpx import AsyncClient
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import MagicMock, AsyncMock, patch
 
 
 class TestPostRoutesCreate:
@@ -20,22 +20,23 @@ class TestPostRoutesCreate:
         mock_post.title = "Test Post"
         mock_post.to_dict = MagicMock(return_value={"id": str(mock_post.id), "title": "Test Post"})
         
-        mock_db_session.add = MagicMock()
-        mock_db_session.flush = AsyncMock()
-        mock_db_session.commit = AsyncMock()
-        mock_db_session.refresh = AsyncMock()
+        # Create a mock PostService instance
+        mock_post_service = MagicMock()
+        mock_post_service.create = AsyncMock(return_value=mock_post)
         
-        # Act
-        response = await client.post(
-            "/posts/",
-            json={
-                "title": "Test Post",
-                "excerpt": "Test excerpt",
-                "content": "Test content",
-                "coverImage": "http://example.com/image.jpg"
-            },
-            headers={"Authorization": "Bearer test_token"}
-        )
+        # Patch PostService in routes module
+        with patch('routes.post.PostService', return_value=mock_post_service):
+            # Act
+            response = await client.post(
+                "/posts/",
+                json={
+                    "title": "Test Post",
+                    "excerpt": "Test excerpt",
+                    "content": "Test content",
+                    "coverImage": "http://example.com/image.jpg"
+                },
+                headers={"Authorization": "Bearer test_token"}
+            )
         
         # Assert
         assert response.status_code == 201
@@ -57,7 +58,7 @@ class TestPostRoutesCreate:
             }
         )
         
-        # Assert
+        # Assert - route returns 403 when no auth
         assert response.status_code == 403
 
 
@@ -243,16 +244,18 @@ class TestPostRoutesDelete:
         mock_post.id = post_id
         mock_post.authorId = mock_user.id
         
-        mock_result = MagicMock()
-        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.delete = MagicMock()
-        mock_db_session.commit = AsyncMock()
+        # Create a mock PostService instance
+        mock_post_service = MagicMock()
+        mock_post_service.get = AsyncMock(return_value=mock_post)
+        mock_post_service.delete = AsyncMock(return_value=True)
         
-        # Act
-        response = await client.delete(
-            f"/posts/{post_id}",
-            headers={"Authorization": "Bearer test_token"}
-        )
+        # Patch PostService in routes module
+        with patch('routes.post.PostService', return_value=mock_post_service):
+            # Act
+            response = await client.delete(
+                f"/posts/{post_id}",
+                headers={"Authorization": "Bearer test_token"}
+            )
         
         # Assert
         assert response.status_code == 204
@@ -344,14 +347,16 @@ class TestPostRoutesUnlike:
         mock_post = MagicMock()
         mock_post.id = post_id
         mock_post.to_dict = MagicMock(return_value={"id": str(post_id)})
+        mock_post.likeCount = 0
         
-        mock_result = MagicMock()
-        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.commit = AsyncMock()
-        mock_db_session.refresh = AsyncMock()
+        # Create a mock PostService instance
+        mock_post_service = MagicMock()
+        mock_post_service.decrement_likes = AsyncMock(return_value=mock_post)
         
-        # Act
-        response = await client.post(f"/posts/{post_id}/unlike")
+        # Patch PostService in routes module
+        with patch('routes.post.PostService', return_value=mock_post_service):
+            # Act
+            response = await client.post(f"/posts/{post_id}/unlike")
         
         # Assert
         assert response.status_code == 200
