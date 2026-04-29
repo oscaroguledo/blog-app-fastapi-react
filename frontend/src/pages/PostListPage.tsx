@@ -32,20 +32,25 @@ export function PostListPage() {
   const [loading, setLoading] = useState(true);
   const limit = 9;
 
+  // Fetch posts when URL search params (applied filters) change, or pagination changes
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        const q = searchParams.get('q') || '';
+        const category = searchParams.get('category') || '';
+        const author = searchParams.get('author') || '';
+        const sort = (searchParams.get('sort') as 'recent' | 'popular' | 'oldest') || 'recent';
+
         const response = await postApi.getAll({
-          search_query: query || undefined,
-          category_name: selectedCategory[0] || undefined,
-          author_id: selectedAuthor[0] || undefined,
-          sort_by: sortBy || undefined,
+          search_query: q || undefined,
+          category_name: category || undefined,
+          author_id: author || undefined,
+          sort_by: sort || undefined,
           is_published: true,
           limit,
           offset
         });
         if (response.success && response.data) {
-          // Handle both response structures: {posts, pagination} or direct array
           const postsData = response.data.posts || response.data;
           const totalCount = response.data.pagination?.total || postsData.length;
           setPosts(Array.isArray(postsData) ? postsData : []);
@@ -64,7 +69,20 @@ export function PostListPage() {
     };
 
     fetchPosts();
-  }, [query, selectedCategory, selectedAuthor, offset, limit, sortBy]);
+  }, [searchParams.toString(), offset, limit]);
+
+  // Keep UI inputs synced with URL params (so navigation/update preserves filter UI)
+  useEffect(() => {
+    const q = searchParams.get('q') || '';
+    const category = searchParams.get('category') || '';
+    const author = searchParams.get('author') || '';
+    const sort = (searchParams.get('sort') as 'recent' | 'popular' | 'oldest') || 'recent';
+
+    setQuery(q);
+    setSelectedCategory(category ? category.split(',') : []);
+    setSelectedAuthor(author ? author.split(',') : []);
+    setSortBy(sort);
+  }, [searchParams.toString()]);
 
   if (loading) {
     return <PostListPageSkeleton />;
