@@ -355,7 +355,7 @@ export function AdminDashboardPage() {
                 value={postsQuery}
                 onChange={(e) => setPostsQuery((e.target as HTMLInputElement).value)}
                 onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { setPostsSearch(postsQuery); setPostsPage(1); } }}
-                placeholder="Search title, excerpt, content"
+                placeholder="Search title, author"
                 className="w-64"
                 trailing={<Button type="button" variant="ghost" size="sm" onClick={() => { setPostsQuery(''); setPostsSearch(''); setPostsPage(1); }} title="Clear search"><X size={14} /></Button>}
               />
