@@ -14,7 +14,6 @@ import { ContactPage } from '@/pages/ContactPage';
 import { PostDetailPage } from '@/pages/PostDetailPage';
 import { WritePage } from '@/pages/WritePage';
 import { AdminDashboardPage } from '@/pages/AdminDashboardPage';
-import { AdminContactsPage } from '@/pages/AdminContactsPage';
 import { PostListPage } from '@/pages/PostListPage';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 // Placeholder for unbuilt pages to ensure routing works
@@ -61,14 +60,7 @@ export function App() {
                   </ProtectedRoute>
                 } 
               />
-              <Route 
-                path="/admin/contacts"
-                element={
-                  <ProtectedRoute>
-                    <AdminContactsPage />
-                  </ProtectedRoute>
-                }
-              />
+              
               <Route 
                 path="/profile" 
                 element={
