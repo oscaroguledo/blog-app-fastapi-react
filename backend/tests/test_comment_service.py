@@ -99,8 +99,7 @@ class TestCommentServiceGet:
         mock_comment = MagicMock()
         mock_comment.id = comment_id
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         
         # Act
         result = await comment_service.get(comment_id)
@@ -117,8 +116,7 @@ class TestCommentServiceGet:
         comment_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await comment_service.get(comment_id)
@@ -142,8 +140,7 @@ class TestCommentServiceUpdate:
         mock_comment.content = "Old content"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -163,8 +160,7 @@ class TestCommentServiceUpdate:
         comment_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await comment_service.update(comment_id, content="New content")
@@ -185,8 +181,7 @@ class TestCommentServiceDelete:
         
         mock_comment = MagicMock()
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         mock_db_session.delete = MagicMock()
         mock_db_session.commit = AsyncMock()
         
@@ -206,8 +201,7 @@ class TestCommentServiceDelete:
         comment_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await comment_service.delete(comment_id)
@@ -229,8 +223,7 @@ class TestCommentServiceIncrementLikes:
         mock_comment = MagicMock()
         mock_comment.likes = 5
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -250,8 +243,7 @@ class TestCommentServiceIncrementLikes:
         comment_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await comment_service.increment_likes(comment_id)
@@ -273,8 +265,7 @@ class TestCommentServiceDecrementLikes:
         mock_comment = MagicMock()
         mock_comment.likes = 5
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -296,8 +287,7 @@ class TestCommentServiceDecrementLikes:
         mock_comment = MagicMock()
         mock_comment.likes = 0
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         

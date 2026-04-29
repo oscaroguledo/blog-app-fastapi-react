@@ -58,7 +58,7 @@ class TestPostRoutesCreate:
         )
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestPostRoutesList:
@@ -73,9 +73,8 @@ class TestPostRoutesList:
         mock_post.to_dict = MagicMock(return_value={"id": str(mock_post.id)})
         
         mock_result = MagicMock()
-        mock_result.scalars = MagicMock(return_value=mock_result)
-        mock_result.all = MagicMock(return_value=[mock_post])
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalars = MagicMock(return_value=mock_db_session._mock_result)
+        mock_db_session._mock_result.all = MagicMock(return_value=[mock_post])
         
         # Act
         response = await client.get("/posts/")
@@ -99,9 +98,8 @@ class TestPostRoutesGetLatest:
         mock_post.to_dict = MagicMock(return_value={"id": str(mock_post.id)})
         
         mock_result = MagicMock()
-        mock_result.scalars = MagicMock(return_value=mock_result)
-        mock_result.all = MagicMock(return_value=[mock_post])
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalars = MagicMock(return_value=mock_db_session._mock_result)
+        mock_db_session._mock_result.all = MagicMock(return_value=[mock_post])
         
         # Act
         response = await client.get("/posts/latest")
@@ -125,8 +123,7 @@ class TestPostRoutesGetById:
         mock_post.to_dict = MagicMock(return_value={"id": str(post_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         
         # Act
         response = await client.get(f"/posts/{post_id}")
@@ -142,8 +139,7 @@ class TestPostRoutesGetById:
         # Arrange
         post_id = uuid.uuid4()
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         response = await client.get(f"/posts/{post_id}")
@@ -179,8 +175,7 @@ class TestPostRoutesUpdate:
         mock_post.to_dict = MagicMock(return_value={"id": str(post_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -208,8 +203,7 @@ class TestPostRoutesUpdate:
         mock_post.role = "Reader"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         
         # Act
         response = await client.patch(
@@ -233,7 +227,7 @@ class TestPostRoutesUpdate:
         response = await client.patch(f"/posts/{post_id}", json={"title": "Updated Title"})
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestPostRoutesDelete:
@@ -250,8 +244,7 @@ class TestPostRoutesDelete:
         mock_post.authorId = mock_user.id
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.delete = MagicMock()
         mock_db_session.commit = AsyncMock()
         
@@ -276,8 +269,7 @@ class TestPostRoutesDelete:
         mock_post.role = "Reader"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         
         # Act
         response = await client.delete(
@@ -298,7 +290,7 @@ class TestPostRoutesDelete:
         response = await client.delete(f"/posts/{post_id}")
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestPostRoutesLike:
@@ -314,8 +306,7 @@ class TestPostRoutesLike:
         mock_post.to_dict = MagicMock(return_value={"id": str(post_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -333,8 +324,7 @@ class TestPostRoutesLike:
         # Arrange
         post_id = uuid.uuid4()
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         response = await client.post(f"/posts/{post_id}/like")
@@ -356,8 +346,7 @@ class TestPostRoutesUnlike:
         mock_post.to_dict = MagicMock(return_value={"id": str(post_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -383,8 +372,7 @@ class TestPostRoutesView:
         mock_post.to_dict = MagicMock(return_value={"id": str(post_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -410,8 +398,7 @@ class TestPostRoutesPublish:
         mock_post.to_dict = MagicMock(return_value={"id": str(post_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -437,8 +424,7 @@ class TestPostRoutesUnpublish:
         mock_post.to_dict = MagicMock(return_value={"id": str(post_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -464,8 +450,7 @@ class TestPostRoutesFeature:
         mock_post.to_dict = MagicMock(return_value={"id": str(post_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -491,8 +476,7 @@ class TestPostRoutesUnfeature:
         mock_post.to_dict = MagicMock(return_value={"id": str(post_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         

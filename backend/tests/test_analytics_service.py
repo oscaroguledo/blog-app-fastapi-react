@@ -27,8 +27,7 @@ class TestAnalyticsServiceTrackPageView:
         mock_db_session.refresh = AsyncMock()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await analytics_service.track_page_view(
@@ -60,10 +59,9 @@ class TestAnalyticsServiceGetTrafficOverview:
         mock_stat.unique_visitors = 50
         
         mock_result = MagicMock()
-        mock_result.scalars = MagicMock(return_value=mock_result)
-        mock_result.all = MagicMock(return_value=[mock_stat])
+        mock_db_session._mock_result.scalars = MagicMock(return_value=mock_db_session._mock_result)
+        mock_db_session._mock_result.all = MagicMock(return_value=[mock_stat])
         mock_result.scalar = MagicMock(return_value=100)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
         
         # Act
         result = await analytics_service.get_traffic_overview(days=7)
@@ -90,9 +88,8 @@ class TestAnalyticsServiceGetTopPosts:
         mock_post.likes = 10
         
         mock_result = MagicMock()
-        mock_result.scalars = MagicMock(return_value=mock_result)
-        mock_result.all = MagicMock(return_value=[mock_post])
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalars = MagicMock(return_value=mock_db_session._mock_result)
+        mock_db_session._mock_result.all = MagicMock(return_value=[mock_post])
         
         # Act
         result = await analytics_service.get_top_posts(limit=5)
@@ -114,8 +111,7 @@ class TestAnalyticsServiceGetTopReferrers:
         analytics_service = AnalyticsService(mock_db_session)
         
         mock_result = MagicMock()
-        mock_result.all = MagicMock(return_value=[("google.com", 10), ("twitter.com", 5)])
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.all = MagicMock(return_value=[("google.com", 10), ("twitter.com", 5)])
         
         # Act
         result = await analytics_service.get_top_referrers(days=7, limit=5)
@@ -137,8 +133,7 @@ class TestAnalyticsServiceGetPostsByCategory:
         analytics_service = AnalyticsService(mock_db_session)
         
         mock_result = MagicMock()
-        mock_result.all = MagicMock(return_value=[("Technology", 10), ("Health", 5)])
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.all = MagicMock(return_value=[("Technology", 10), ("Health", 5)])
         
         # Act
         result = await analytics_service.get_posts_by_category()

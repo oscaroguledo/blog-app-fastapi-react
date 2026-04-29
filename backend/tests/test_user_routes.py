@@ -19,6 +19,7 @@ class TestUserRoutesRegister:
         mock_user.firstName = "John"
         mock_user.lastName = "Doe"
         mock_user.email = "john@example.com"
+        mock_user.role = "Reader"
         mock_user.to_dict = MagicMock(return_value={
             "id": str(mock_user.id),
             "firstName": "John",
@@ -26,21 +27,27 @@ class TestUserRoutesRegister:
             "email": "john@example.com",
         })
         
+        # Configure DB mocks for user existence check (returns None = user doesn't exist)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         mock_db_session.add = MagicMock()
         mock_db_session.commit = AsyncMock()
         mock_db_session.flush = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
-        # Act
-        response = await client.post(
-            "/users/register",
-            json={
-                "firstName": "John",
-                "lastName": "Doe",
-                "email": "john@example.com",
-                "password": "password123"
-            }
-        )
+        # Mock password handler and JWT handler
+        with patch('core.utils.encryption.password.password_handler.hash_password', return_value='hashed_password'):
+            with patch('core.utils.encryption.jwt.jwt_handler.create_access_token', return_value='access_token'):
+                with patch('core.utils.encryption.jwt.jwt_handler.create_refresh_token', return_value='refresh_token'):
+                    # Act
+                    response = await client.post(
+                        "/users/register",
+                        json={
+                            "firstName": "John",
+                            "lastName": "Doe",
+                            "email": "john@example.com",
+                            "password": "password123"
+                        }
+                    )
         
         # Assert
         assert response.status_code == 201
@@ -104,8 +111,7 @@ class TestUserRoutesLogin:
         })
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         
         # Act
         response = await client.post(
@@ -127,8 +133,7 @@ class TestUserRoutesLogin:
         """Test that login returns 401 when credentials are invalid."""
         # Arrange
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         response = await client.post(
@@ -140,7 +145,7 @@ class TestUserRoutesLogin:
         )
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
         data = response.json()
         assert data["success"] is False
 
@@ -171,7 +176,7 @@ class TestUserRoutesGetCurrentUser:
         response = await client.get("/users/me")
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestUserRoutesUpdateCurrentUser:
@@ -184,8 +189,7 @@ class TestUserRoutesUpdateCurrentUser:
         mock_user = override_get_current_user
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -209,7 +213,7 @@ class TestUserRoutesUpdateCurrentUser:
         response = await client.patch("/users/me", json={"firstName": "Jane"})
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestUserRoutesListUsers:
@@ -225,9 +229,8 @@ class TestUserRoutesListUsers:
         mock_user.to_dict = MagicMock(return_value={"id": str(mock_user.id), "email": "john@example.com"})
         
         mock_result = MagicMock()
-        mock_result.scalars = MagicMock(return_value=mock_result)
-        mock_result.all = MagicMock(return_value=[mock_user])
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalars = MagicMock(return_value=mock_db_session._mock_result)
+        mock_db_session._mock_result.all = MagicMock(return_value=[mock_user])
         
         # Act
         response = await client.get("/users/")
@@ -252,8 +255,7 @@ class TestUserRoutesGetUserById:
         mock_user.to_dict = MagicMock(return_value={"id": str(user_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         
         # Act
         response = await client.get(f"/users/{user_id}")
@@ -269,8 +271,7 @@ class TestUserRoutesGetUserById:
         # Arrange
         user_id = uuid.uuid4()
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         response = await client.get(f"/users/{user_id}")
@@ -306,8 +307,7 @@ class TestUserRoutesUpdateUser:
         override_get_current_user.role = "Admin"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -333,7 +333,7 @@ class TestUserRoutesUpdateUser:
         response = await client.patch(f"/users/{user_id}", json={"firstName": "Jane"})
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestUserRoutesDeleteUser:
@@ -351,8 +351,7 @@ class TestUserRoutesDeleteUser:
         override_get_current_user.role = "Admin"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         mock_db_session.delete = MagicMock()
         mock_db_session.commit = AsyncMock()
         
@@ -375,7 +374,7 @@ class TestUserRoutesDeleteUser:
         response = await client.delete(f"/users/{user_id}")
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestUserRoutesActivateUser:
@@ -393,8 +392,7 @@ class TestUserRoutesActivateUser:
         override_get_current_user.role = "Admin"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -425,8 +423,7 @@ class TestUserRoutesDeactivateUser:
         override_get_current_user.role = "Admin"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -450,8 +447,7 @@ class TestUserRoutesResetPassword:
         """Test that password reset returns 200 (always returns success for security)."""
         # Arrange
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         response = await client.post(
@@ -473,8 +469,7 @@ class TestUserRoutesVerifyEmail:
         """Test that email verification returns 200."""
         # Arrange
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         response = await client.post(

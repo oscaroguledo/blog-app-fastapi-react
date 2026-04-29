@@ -76,8 +76,7 @@ class TestCategoryServiceGet:
         mock_category = MagicMock()
         mock_category.id = category_id
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
         
         # Act
         result = await category_service.get(category_id=category_id)
@@ -95,8 +94,7 @@ class TestCategoryServiceGet:
         mock_category = MagicMock()
         mock_category.slug = "test-category"
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
         
         # Act
         result = await category_service.get(slug="test-category")
@@ -114,8 +112,7 @@ class TestCategoryServiceGet:
         mock_category = MagicMock()
         mock_category.name = "Test Category"
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
         
         # Act
         result = await category_service.get(name="Test Category")
@@ -150,8 +147,7 @@ class TestCategoryServiceUpdate:
         mock_category.name = "Old Name"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -171,8 +167,7 @@ class TestCategoryServiceUpdate:
         category_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await category_service.update(category_id, name="New Name")
@@ -193,8 +188,7 @@ class TestCategoryServiceDelete:
         
         mock_category = MagicMock()
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
         mock_db_session.delete = MagicMock()
         mock_db_session.commit = AsyncMock()
         
@@ -214,8 +208,7 @@ class TestCategoryServiceDelete:
         category_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await category_service.delete(category_id)

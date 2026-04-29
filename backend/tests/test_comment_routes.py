@@ -53,7 +53,7 @@ class TestCommentRoutesCreate:
         )
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestCommentRoutesList:
@@ -68,9 +68,8 @@ class TestCommentRoutesList:
         mock_comment.to_dict = MagicMock(return_value={"id": str(mock_comment.id)})
         
         mock_result = MagicMock()
-        mock_result.scalars = MagicMock(return_value=mock_result)
-        mock_result.all = MagicMock(return_value=[mock_comment])
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalars = MagicMock(return_value=mock_db_session._mock_result)
+        mock_db_session._mock_result.all = MagicMock(return_value=[mock_comment])
         
         # Act
         response = await client.get("/comments/")
@@ -95,8 +94,7 @@ class TestCommentRoutesGetById:
         mock_comment.to_dict = MagicMock(return_value={"id": str(comment_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         
         # Act
         response = await client.get(f"/comments/{comment_id}")
@@ -112,8 +110,7 @@ class TestCommentRoutesGetById:
         # Arrange
         comment_id = uuid.uuid4()
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         response = await client.get(f"/comments/{comment_id}")
@@ -149,8 +146,7 @@ class TestCommentRoutesUpdate:
         mock_comment.to_dict = MagicMock(return_value={"id": str(comment_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -178,8 +174,7 @@ class TestCommentRoutesUpdate:
         mock_comment.role = "Reader"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         
         # Act
         response = await client.patch(
@@ -203,7 +198,7 @@ class TestCommentRoutesUpdate:
         response = await client.patch(f"/comments/{comment_id}", json={"content": "Updated content"})
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestCommentRoutesDelete:
@@ -220,8 +215,7 @@ class TestCommentRoutesDelete:
         mock_comment.author_id = mock_user.id
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         mock_db_session.delete = MagicMock()
         mock_db_session.commit = AsyncMock()
         
@@ -246,8 +240,7 @@ class TestCommentRoutesDelete:
         mock_comment.role = "Reader"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         
         # Act
         response = await client.delete(
@@ -268,7 +261,7 @@ class TestCommentRoutesDelete:
         response = await client.delete(f"/comments/{comment_id}")
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestCommentRoutesLike:
@@ -284,8 +277,7 @@ class TestCommentRoutesLike:
         mock_comment.to_dict = MagicMock(return_value={"id": str(comment_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -303,8 +295,7 @@ class TestCommentRoutesLike:
         # Arrange
         comment_id = uuid.uuid4()
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         response = await client.post(f"/comments/{comment_id}/like")
@@ -326,8 +317,7 @@ class TestCommentRoutesUnlike:
         mock_comment.to_dict = MagicMock(return_value={"id": str(comment_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_comment)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         

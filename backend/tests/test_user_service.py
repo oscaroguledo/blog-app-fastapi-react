@@ -125,8 +125,7 @@ class TestUserServiceGet:
         mock_user = MagicMock()
         mock_user.id = user_id
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         
         # Act
         result = await user_service.get(user_id=user_id)
@@ -144,8 +143,7 @@ class TestUserServiceGet:
         mock_user = MagicMock()
         mock_user.email = "john@example.com"
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         
         # Act
         result = await user_service.get(email="john@example.com")
@@ -181,8 +179,7 @@ class TestUserServiceLogin:
         mock_user.active = True
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         
         # Mock password verification
         from core.utils.encryption.password import password_handler
@@ -205,8 +202,7 @@ class TestUserServiceLogin:
         user_service = UserService(mock_db_session)
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await user_service.login(email="john@example.com", password="password123")
@@ -225,8 +221,7 @@ class TestUserServiceLogin:
         mock_user.password = "$2b$12$hashedpassword"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         
         from core.utils.encryption.password import password_handler
         password_handler.verify_password = MagicMock(return_value=False)
@@ -249,8 +244,7 @@ class TestUserServiceLogin:
         mock_user.active = False
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         
         from core.utils.encryption.password import password_handler
         password_handler.verify_password = MagicMock(return_value=True)
@@ -277,8 +271,7 @@ class TestUserServiceUpdate:
         mock_user.firstName = "John"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -298,8 +291,7 @@ class TestUserServiceUpdate:
         user_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await user_service.update(user_id, firstName="Jane")
@@ -320,8 +312,7 @@ class TestUserServiceDelete:
         
         mock_user = MagicMock()
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         mock_db_session.delete = MagicMock()
         mock_db_session.commit = AsyncMock()
         
@@ -341,8 +332,7 @@ class TestUserServiceDelete:
         user_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await user_service.delete(user_id)
@@ -364,8 +354,7 @@ class TestUserServiceActivate:
         mock_user = MagicMock()
         mock_user.active = False
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -385,8 +374,7 @@ class TestUserServiceActivate:
         user_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await user_service.activate(user_id)
@@ -408,8 +396,7 @@ class TestUserServiceDeactivate:
         mock_user = MagicMock()
         mock_user.active = True
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_user)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -429,8 +416,7 @@ class TestUserServiceDeactivate:
         user_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await user_service.deactivate(user_id)

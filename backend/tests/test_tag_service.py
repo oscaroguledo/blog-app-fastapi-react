@@ -76,8 +76,7 @@ class TestTagServiceGet:
         mock_tag = MagicMock()
         mock_tag.id = tag_id
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
         
         # Act
         result = await tag_service.get(tag_id=tag_id)
@@ -95,8 +94,7 @@ class TestTagServiceGet:
         mock_tag = MagicMock()
         mock_tag.slug = "test-tag"
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
         
         # Act
         result = await tag_service.get(slug="test-tag")
@@ -114,8 +112,7 @@ class TestTagServiceGet:
         mock_tag = MagicMock()
         mock_tag.name = "Test Tag"
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
         
         # Act
         result = await tag_service.get(name="Test Tag")
@@ -150,8 +147,7 @@ class TestTagServiceUpdate:
         mock_tag.name = "Old Name"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -171,8 +167,7 @@ class TestTagServiceUpdate:
         tag_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await tag_service.update(tag_id, name="New Name")
@@ -193,8 +188,7 @@ class TestTagServiceDelete:
         
         mock_tag = MagicMock()
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
         mock_db_session.delete = MagicMock()
         mock_db_session.commit = AsyncMock()
         
@@ -214,8 +208,7 @@ class TestTagServiceDelete:
         tag_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await tag_service.delete(tag_id)

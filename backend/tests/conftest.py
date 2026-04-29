@@ -53,7 +53,11 @@ def mock_db_session():
     mock_query.order_by = MagicMock(return_value=mock_query)
     mock_query.offset = MagicMock(return_value=mock_query)
     mock_query.limit = MagicMock(return_value=mock_query)
-    session.execute = MagicMock(return_value=mock_result)
+    
+    # Make execute return the mock_result dynamically
+    def execute_side_effect(query):
+        return mock_result
+    session.execute = AsyncMock(side_effect=execute_side_effect)
     session.query = MagicMock(return_value=mock_query)
     
     # Mock session methods
@@ -62,6 +66,11 @@ def mock_db_session():
     session.refresh = AsyncMock()
     session.delete = MagicMock()
     session.rollback = AsyncMock()
+    session.flush = AsyncMock()
+    
+    # Store mock_result for test configuration
+    session._mock_result = mock_result
+    session._mock_query = mock_query
     
     return session
 
@@ -109,12 +118,22 @@ async def client(mock_db_session, mock_redis_client):
     
     app.dependency_overrides[get_db] = override_get_db
     
+    # Disable rate limiting in tests
+    import core.middleware as middleware_module
+    original_check_rate_limit = middleware_module.check_rate_limit
+    
+    async def mock_check_rate_limit(*args, **kwargs):
+        pass
+    
+    middleware_module.check_rate_limit = mock_check_rate_limit
+    
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
         yield ac
     
     app.dependency_overrides.clear()
+    middleware_module.check_rate_limit = original_check_rate_limit
 
 
 # ---------------------------------------------------------------------------

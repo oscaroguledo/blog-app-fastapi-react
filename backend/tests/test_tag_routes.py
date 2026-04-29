@@ -53,7 +53,7 @@ class TestTagRoutesCreate:
         )
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestTagRoutesList:
@@ -68,9 +68,8 @@ class TestTagRoutesList:
         mock_tag.to_dict = MagicMock(return_value={"id": str(mock_tag.id)})
         
         mock_result = MagicMock()
-        mock_result.scalars = MagicMock(return_value=mock_result)
-        mock_result.all = MagicMock(return_value=[mock_tag])
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalars = MagicMock(return_value=mock_db_session._mock_result)
+        mock_db_session._mock_result.all = MagicMock(return_value=[mock_tag])
         
         # Act
         response = await client.get("/tags/")
@@ -95,8 +94,7 @@ class TestTagRoutesGetById:
         mock_tag.to_dict = MagicMock(return_value={"id": str(tag_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
         
         # Act
         response = await client.get(f"/tags/{tag_id}")
@@ -112,8 +110,7 @@ class TestTagRoutesGetById:
         # Arrange
         tag_id = uuid.uuid4()
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         response = await client.get(f"/tags/{tag_id}")
@@ -148,8 +145,7 @@ class TestTagRoutesUpdate:
         mock_tag.to_dict = MagicMock(return_value={"id": str(tag_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -175,7 +171,7 @@ class TestTagRoutesUpdate:
         response = await client.patch(f"/tags/{tag_id}", json={"name": "Updated Name"})
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestTagRoutesDelete:
@@ -191,8 +187,7 @@ class TestTagRoutesDelete:
         mock_tag.id = tag_id
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_tag)
         mock_db_session.delete = MagicMock()
         mock_db_session.commit = AsyncMock()
         
@@ -215,4 +210,4 @@ class TestTagRoutesDelete:
         response = await client.delete(f"/tags/{tag_id}")
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403

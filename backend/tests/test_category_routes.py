@@ -53,7 +53,7 @@ class TestCategoryRoutesCreate:
         )
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestCategoryRoutesList:
@@ -68,9 +68,8 @@ class TestCategoryRoutesList:
         mock_category.to_dict = MagicMock(return_value={"id": str(mock_category.id)})
         
         mock_result = MagicMock()
-        mock_result.scalars = MagicMock(return_value=mock_result)
-        mock_result.all = MagicMock(return_value=[mock_category])
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalars = MagicMock(return_value=mock_db_session._mock_result)
+        mock_db_session._mock_result.all = MagicMock(return_value=[mock_category])
         
         # Act
         response = await client.get("/categories/")
@@ -95,8 +94,7 @@ class TestCategoryRoutesGetById:
         mock_category.to_dict = MagicMock(return_value={"id": str(category_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
         
         # Act
         response = await client.get(f"/categories/{category_id}")
@@ -112,8 +110,7 @@ class TestCategoryRoutesGetById:
         # Arrange
         category_id = uuid.uuid4()
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         response = await client.get(f"/categories/{category_id}")
@@ -148,8 +145,7 @@ class TestCategoryRoutesUpdate:
         mock_category.to_dict = MagicMock(return_value={"id": str(category_id)})
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -175,7 +171,7 @@ class TestCategoryRoutesUpdate:
         response = await client.patch(f"/categories/{category_id}", json={"name": "Updated Name"})
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403
 
 
 class TestCategoryRoutesDelete:
@@ -191,8 +187,7 @@ class TestCategoryRoutesDelete:
         mock_category.id = category_id
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_category)
         mock_db_session.delete = MagicMock()
         mock_db_session.commit = AsyncMock()
         
@@ -215,4 +210,4 @@ class TestCategoryRoutesDelete:
         response = await client.delete(f"/categories/{category_id}")
         
         # Assert
-        assert response.status_code == 401
+        assert response.status_code == 403

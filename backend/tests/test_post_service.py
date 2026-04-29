@@ -89,8 +89,7 @@ class TestPostServiceGet:
         mock_post = MagicMock()
         mock_post.id = post_id
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         
         # Act
         result = await post_service.get(post_id)
@@ -107,8 +106,7 @@ class TestPostServiceGet:
         post_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await post_service.get(post_id)
@@ -132,8 +130,7 @@ class TestPostServiceUpdate:
         mock_post.title = "Old Title"
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -153,8 +150,7 @@ class TestPostServiceUpdate:
         post_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await post_service.update(post_id, title="New Title")
@@ -175,8 +171,7 @@ class TestPostServiceDelete:
         
         mock_post = MagicMock()
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.delete = MagicMock()
         mock_db_session.commit = AsyncMock()
         
@@ -196,8 +191,7 @@ class TestPostServiceDelete:
         post_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await post_service.delete(post_id)
@@ -219,8 +213,7 @@ class TestPostServiceIncrementLikes:
         mock_post = MagicMock()
         mock_post.likes = 5
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -240,8 +233,7 @@ class TestPostServiceIncrementLikes:
         post_id = uuid.uuid4()
         
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=None)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=None)
         
         # Act
         result = await post_service.increment_likes(post_id)
@@ -263,8 +255,7 @@ class TestPostServiceDecrementLikes:
         mock_post = MagicMock()
         mock_post.likes = 5
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -286,8 +277,7 @@ class TestPostServiceDecrementLikes:
         mock_post = MagicMock()
         mock_post.likes = 0
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -312,8 +302,7 @@ class TestPostServiceIncrementViews:
         mock_post = MagicMock()
         mock_post.views = 10
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -339,8 +328,7 @@ class TestPostServicePublish:
         mock_post = MagicMock()
         mock_post.isPublished = False
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -366,8 +354,7 @@ class TestPostServiceUnpublish:
         mock_post = MagicMock()
         mock_post.isPublished = True
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -393,8 +380,7 @@ class TestPostServiceFeature:
         mock_post = MagicMock()
         mock_post.featured = False
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
@@ -420,8 +406,7 @@ class TestPostServiceUnfeature:
         mock_post = MagicMock()
         mock_post.featured = True
         mock_result = MagicMock()
-        mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
-        mock_db_session.execute = MagicMock(return_value=mock_result)
+        mock_db_session._mock_result.scalar_one_or_none = MagicMock(return_value=mock_post)
         mock_db_session.commit = AsyncMock()
         mock_db_session.refresh = AsyncMock()
         
