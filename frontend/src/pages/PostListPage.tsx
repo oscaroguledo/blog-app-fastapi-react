@@ -194,7 +194,7 @@ export function PostListPage() {
             <span className="text-sm text-muted-text">Sort by:</span>
             <Dropdown
               value={sortBy}
-              onChange={(value) => setSortBy(value as 'recent' | 'popular' | 'oldest')}
+              onChange={(value) => { setSortBy(value as 'recent' | 'popular' | 'oldest'); doSearch(); }}
               options={[
                 { value: 'recent', label: 'Most Recent' },
                 { value: 'popular', label: 'Most Popular' },
