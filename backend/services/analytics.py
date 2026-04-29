@@ -183,7 +183,19 @@ class AnalyticsService:
 
     async def get_posts_by_category(self) -> List[dict]:
         """Return list of categories with post counts (includes zero counts)."""
-        # Left outer join categories -> post_category and count posts per category
+        # Prefer materialized view `posts_by_category` when available for performance
+        try:
+            result = await self.db.execute(
+                text("SELECT category_name, post_count FROM public.posts_by_category ORDER BY post_count DESC")
+            )
+            rows = result.all()
+            if rows:
+                return [{"name": row[0], "count": int(row[1] or 0)} for row in rows]
+        except Exception:
+            # If materialized view doesn't exist or query fails, fall back to live aggregation
+            pass
+
+        # Fallback: Left outer join categories -> post_category and count posts per category
         result = await self.db.execute(
             select(Category.name, func.count(PostCategory.post_id).label('count'))
             .outerjoin(PostCategory, PostCategory.category_id == Category.id)
